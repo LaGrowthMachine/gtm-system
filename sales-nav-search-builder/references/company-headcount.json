@@ -1,0 +1,11 @@
+[
+  {"id": "A", "displayValue": "Self-employed"},
+  {"id": "B", "displayValue": "1-10"},
+  {"id": "C", "displayValue": "11-50"},
+  {"id": "D", "displayValue": "51-200"},
+  {"id": "E", "displayValue": "201-500"},
+  {"id": "F", "displayValue": "501-1,000"},
+  {"id": "G", "displayValue": "1,001-5,000"},
+  {"id": "H", "displayValue": "5,001-10,000"},
+  {"id": "I", "displayValue": "10,001+"}
+]

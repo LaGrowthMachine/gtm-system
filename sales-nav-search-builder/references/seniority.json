@@ -1,0 +1,12 @@
+[
+  {"id": 320, "displayValue": "Owner / Partner"},
+  {"id": 310, "displayValue": "CXO"},
+  {"id": 300, "displayValue": "Vice President"},
+  {"id": 220, "displayValue": "Director"},
+  {"id": 210, "displayValue": "Experienced Manager"},
+  {"id": 200, "displayValue": "Entry Level Manager"},
+  {"id": 130, "displayValue": "Strategic"},
+  {"id": 120, "displayValue": "Senior"},
+  {"id": 110, "displayValue": "Entry Level"},
+  {"id": 100, "displayValue": "In Training"}
+]

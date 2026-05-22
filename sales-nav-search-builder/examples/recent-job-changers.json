@@ -1,0 +1,34 @@
+{
+  "_comment": "Senior commercial leaders who recently changed jobs (last 90 days). Recent job-changers are a strong warm signal — they're often re-evaluating their stack and processes in their new role. Combine with a broad title filter to catch a wide range of decision-makers.",
+  "filters": [
+    {
+      "type": "INDUSTRY",
+      "values": [
+        {"id": 4, "selectionType": "INCLUDED"},
+        {"id": 6, "selectionType": "INCLUDED"},
+        {"id": 96, "selectionType": "INCLUDED"}
+      ]
+    },
+    {
+      "type": "CURRENT_TITLE",
+      "values": [
+        {
+          "text": "(\"VP Sales\" OR \"VP Marketing\" OR \"Head of Sales\" OR \"Head of Marketing\" OR \"Chief Revenue Officer\" OR CRO OR \"Chief Marketing Officer\" OR CMO) NOT (Fractional OR Interim OR Consultant)",
+          "selectionType": "INCLUDED"
+        }
+      ]
+    },
+    {
+      "type": "COMPANY_HEADCOUNT",
+      "values": [
+        {"id": "D", "selectionType": "INCLUDED"},
+        {"id": "E", "selectionType": "INCLUDED"},
+        {"id": "F", "selectionType": "INCLUDED"}
+      ]
+    },
+    {
+      "type": "RECENTLY_CHANGED_JOBS",
+      "toggle": true
+    }
+  ]
+}

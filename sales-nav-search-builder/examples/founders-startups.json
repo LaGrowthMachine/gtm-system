@@ -1,0 +1,34 @@
+{
+  "_comment": "Founders and CEOs of early-stage tech startups (1-50 employees) in the US. Boolean title captures Founder + Co-Founder + CEO + 'Chief Executive Officer'. NOT excludes serial-advisor profiles ('Former Founder', 'Ex-CEO').",
+  "filters": [
+    {
+      "type": "INDUSTRY",
+      "values": [
+        {"id": 4, "selectionType": "INCLUDED"},
+        {"id": 6, "selectionType": "INCLUDED"}
+      ]
+    },
+    {
+      "type": "CURRENT_TITLE",
+      "values": [
+        {
+          "text": "(Founder OR \"Co-Founder\" OR CEO OR \"Chief Executive Officer\") NOT (Former OR Ex OR Advisor OR Mentor OR \"Board Member\")",
+          "selectionType": "INCLUDED"
+        }
+      ]
+    },
+    {
+      "type": "COMPANY_HEADCOUNT",
+      "values": [
+        {"id": "B", "selectionType": "INCLUDED"},
+        {"id": "C", "selectionType": "INCLUDED"}
+      ]
+    },
+    {
+      "type": "REGION",
+      "values": [
+        {"id": 103644278, "selectionType": "INCLUDED"}
+      ]
+    }
+  ]
+}

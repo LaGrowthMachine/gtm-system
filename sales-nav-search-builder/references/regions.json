@@ -1,0 +1,1126 @@
+[
+  {
+    "id": 91000003,
+    "displayValue": "APAC"
+  },
+  {
+    "id": 91000004,
+    "displayValue": "APJ"
+  },
+  {
+    "id": 104859837,
+    "displayValue": "Abu Musa"
+  },
+  {
+    "id": 116068867,
+    "displayValue": "Abyei"
+  },
+  {
+    "id": 103537801,
+    "displayValue": "Africa"
+  },
+  {
+    "id": 102845717,
+    "displayValue": "Albania"
+  },
+  {
+    "id": 106395874,
+    "displayValue": "Algeria"
+  },
+  {
+    "id": 102431220,
+    "displayValue": "American Samoa"
+  },
+  {
+    "id": 106296266,
+    "displayValue": "Andorra"
+  },
+  {
+    "id": 105371935,
+    "displayValue": "Angola"
+  },
+  {
+    "id": 102287072,
+    "displayValue": "Anguilla"
+  },
+  {
+    "id": 100428639,
+    "displayValue": "Antarctica"
+  },
+  {
+    "id": 100270819,
+    "displayValue": "Antigua and Barbuda"
+  },
+  {
+    "id": 100446943,
+    "displayValue": "Argentina"
+  },
+  {
+    "id": 103030111,
+    "displayValue": "Armenia"
+  },
+  {
+    "id": 105763200,
+    "displayValue": "Aruba"
+  },
+  {
+    "id": 102393603,
+    "displayValue": "Asia"
+  },
+  {
+    "id": 101452733,
+    "displayValue": "Australia"
+  },
+  {
+    "id": 103883259,
+    "displayValue": "Austria"
+  },
+  {
+    "id": 103483173,
+    "displayValue": "Baker Island"
+  },
+  {
+    "id": 106215326,
+    "displayValue": "Bangladesh"
+  },
+  {
+    "id": 102118611,
+    "displayValue": "Barbados"
+  },
+  {
+    "id": 101705918,
+    "displayValue": "Belarus"
+  },
+  {
+    "id": 100565514,
+    "displayValue": "Belgium"
+  },
+  {
+    "id": 91000005,
+    "displayValue": "Benelux"
+  },
+  {
+    "id": 101519029,
+    "displayValue": "Benin"
+  },
+  {
+    "id": 100061709,
+    "displayValue": "Bermuda"
+  },
+  {
+    "id": 103613266,
+    "displayValue": "Bhutan"
+  },
+  {
+    "id": 104379274,
+    "displayValue": "Bolivia"
+  },
+  {
+    "id": 102869081,
+    "displayValue": "Bosnia and Herzegovina"
+  },
+  {
+    "id": 105698121,
+    "displayValue": "Botswana"
+  },
+  {
+    "id": 102127336,
+    "displayValue": "Bouvet Island"
+  },
+  {
+    "id": 106057199,
+    "displayValue": "Brazil"
+  },
+  {
+    "id": 106498958,
+    "displayValue": "British Indian Ocean Territory"
+  },
+  {
+    "id": 105534858,
+    "displayValue": "British Virgin Islands"
+  },
+  {
+    "id": 103809722,
+    "displayValue": "Brunei"
+  },
+  {
+    "id": 105333783,
+    "displayValue": "Bulgaria"
+  },
+  {
+    "id": 100587095,
+    "displayValue": "Burkina Faso"
+  },
+  {
+    "id": 100800406,
+    "displayValue": "Burundi"
+  },
+  {
+    "id": 102500897,
+    "displayValue": "Cambodia"
+  },
+  {
+    "id": 105745966,
+    "displayValue": "Cameroon"
+  },
+  {
+    "id": 101174742,
+    "displayValue": "Canada"
+  },
+  {
+    "id": 101679268,
+    "displayValue": "Cape Verde"
+  },
+  {
+    "id": 101679506,
+    "displayValue": "Cayman Islands"
+  },
+  {
+    "id": 100134827,
+    "displayValue": "Central African Republic"
+  },
+  {
+    "id": 104655384,
+    "displayValue": "Chad"
+  },
+  {
+    "id": 104621616,
+    "displayValue": "Chile"
+  },
+  {
+    "id": 102890883,
+    "displayValue": "China"
+  },
+  {
+    "id": 102893931,
+    "displayValue": "Christmas Island"
+  },
+  {
+    "id": 108490877,
+    "displayValue": "Clipperton Island"
+  },
+  {
+    "id": 103188119,
+    "displayValue": "Cocos (Keeling) Islands"
+  },
+  {
+    "id": 100876405,
+    "displayValue": "Colombia"
+  },
+  {
+    "id": 103069791,
+    "displayValue": "Comoros"
+  },
+  {
+    "id": 103118752,
+    "displayValue": "Cook Islands"
+  },
+  {
+    "id": 101739942,
+    "displayValue": "Costa Rica"
+  },
+  {
+    "id": 104688944,
+    "displayValue": "Croatia"
+  },
+  {
+    "id": 106429766,
+    "displayValue": "Cuba"
+  },
+  {
+    "id": 103619688,
+    "displayValue": "Curacao"
+  },
+  {
+    "id": 106774002,
+    "displayValue": "Cyprus"
+  },
+  {
+    "id": 104508036,
+    "displayValue": "Czechia"
+  },
+  {
+    "id": 103295271,
+    "displayValue": "Côte d'Ivoire"
+  },
+  {
+    "id": 91000006,
+    "displayValue": "DACH"
+  },
+  {
+    "id": 101271829,
+    "displayValue": "Democratic Republic of the Congo"
+  },
+  {
+    "id": 104514075,
+    "displayValue": "Denmark"
+  },
+  {
+    "id": 100371290,
+    "displayValue": "Djibouti"
+  },
+  {
+    "id": 102368675,
+    "displayValue": "Dokdo / Takeshima"
+  },
+  {
+    "id": 100720695,
+    "displayValue": "Dominica"
+  },
+  {
+    "id": 105057336,
+    "displayValue": "Dominican Republic"
+  },
+  {
+    "id": 91000007,
+    "displayValue": "EMEA"
+  },
+  {
+    "id": 106373116,
+    "displayValue": "Ecuador"
+  },
+  {
+    "id": 106155005,
+    "displayValue": "Egypt"
+  },
+  {
+    "id": 106522560,
+    "displayValue": "El Salvador"
+  },
+  {
+    "id": 105141335,
+    "displayValue": "Equatorial Guinea"
+  },
+  {
+    "id": 104219996,
+    "displayValue": "Eritrea"
+  },
+  {
+    "id": 102974008,
+    "displayValue": "Estonia"
+  },
+  {
+    "id": 106768907,
+    "displayValue": "Eswatini"
+  },
+  {
+    "id": 100212432,
+    "displayValue": "Ethiopia"
+  },
+  {
+    "id": 100506914,
+    "displayValue": "Europe"
+  },
+  {
+    "id": 104961595,
+    "displayValue": "Falkland Islands"
+  },
+  {
+    "id": 104630756,
+    "displayValue": "Faroe Islands"
+  },
+  {
+    "id": 102762290,
+    "displayValue": "Federated States of Micronesia"
+  },
+  {
+    "id": 105733447,
+    "displayValue": "Fiji"
+  },
+  {
+    "id": 100456013,
+    "displayValue": "Finland"
+  },
+  {
+    "id": 105015875,
+    "displayValue": "France"
+  },
+  {
+    "id": 105001561,
+    "displayValue": "French Guiana"
+  },
+  {
+    "id": 102681285,
+    "displayValue": "French Polynesia"
+  },
+  {
+    "id": 104827874,
+    "displayValue": "French Southern and Antarctic Lands"
+  },
+  {
+    "id": 104471338,
+    "displayValue": "Gabon"
+  },
+  {
+    "id": 104369891,
+    "displayValue": "Gaza Strip"
+  },
+  {
+    "id": 106315325,
+    "displayValue": "Georgia"
+  },
+  {
+    "id": 101282230,
+    "displayValue": "Germany"
+  },
+  {
+    "id": 105769538,
+    "displayValue": "Ghana"
+  },
+  {
+    "id": 100674501,
+    "displayValue": "Gibraltar"
+  },
+  {
+    "id": 100796347,
+    "displayValue": "Golan Subdistrict"
+  },
+  {
+    "id": 104677530,
+    "displayValue": "Greece"
+  },
+  {
+    "id": 103705642,
+    "displayValue": "Greenland"
+  },
+  {
+    "id": 104232339,
+    "displayValue": "Guadeloupe"
+  },
+  {
+    "id": 107006862,
+    "displayValue": "Guam"
+  },
+  {
+    "id": 104019891,
+    "displayValue": "Guernsey"
+  },
+  {
+    "id": 100099594,
+    "displayValue": "Guinea"
+  },
+  {
+    "id": 100115557,
+    "displayValue": "Guinea-Bissau"
+  },
+  {
+    "id": 105836293,
+    "displayValue": "Guyana"
+  },
+  {
+    "id": 100993490,
+    "displayValue": "Haiti"
+  },
+  {
+    "id": 100737582,
+    "displayValue": "Heard Island and McDonald Islands"
+  },
+  {
+    "id": 101937718,
+    "displayValue": "Honduras"
+  },
+  {
+    "id": 103291313,
+    "displayValue": "Hong Kong SAR"
+  },
+  {
+    "id": 100584550,
+    "displayValue": "Howland Island"
+  },
+  {
+    "id": 100288700,
+    "displayValue": "Hungary"
+  },
+  {
+    "id": 105238872,
+    "displayValue": "Iceland"
+  },
+  {
+    "id": 102713980,
+    "displayValue": "India"
+  },
+  {
+    "id": 102478259,
+    "displayValue": "Indonesia"
+  },
+  {
+    "id": 101934083,
+    "displayValue": "Iran"
+  },
+  {
+    "id": 106725625,
+    "displayValue": "Iraq"
+  },
+  {
+    "id": 104738515,
+    "displayValue": "Ireland"
+  },
+  {
+    "id": 106316481,
+    "displayValue": "Isle of Man"
+  },
+  {
+    "id": 101620260,
+    "displayValue": "Israel"
+  },
+  {
+    "id": 103350119,
+    "displayValue": "Italy"
+  },
+  {
+    "id": 105126983,
+    "displayValue": "Jamaica"
+  },
+  {
+    "id": 105249717,
+    "displayValue": "Jan Mayen"
+  },
+  {
+    "id": 101355337,
+    "displayValue": "Japan"
+  },
+  {
+    "id": 103620124,
+    "displayValue": "Jarvis Island"
+  },
+  {
+    "id": 102705533,
+    "displayValue": "Jersey"
+  },
+  {
+    "id": 104736323,
+    "displayValue": "Johnston Atoll"
+  },
+  {
+    "id": 103710677,
+    "displayValue": "Jordan"
+  },
+  {
+    "id": 106049128,
+    "displayValue": "Kazakhstan"
+  },
+  {
+    "id": 100710459,
+    "displayValue": "Kenya"
+  },
+  {
+    "id": 105480089,
+    "displayValue": "Kingman Reef"
+  },
+  {
+    "id": 104742735,
+    "displayValue": "Kiribati"
+  },
+  {
+    "id": 104640522,
+    "displayValue": "Kosovo"
+  },
+  {
+    "id": 103239229,
+    "displayValue": "Kuwait"
+  },
+  {
+    "id": 103490790,
+    "displayValue": "Kyrgyzstan"
+  },
+  {
+    "id": 100664862,
+    "displayValue": "Laos"
+  },
+  {
+    "id": 105411415,
+    "displayValue": "Lapthal"
+  },
+  {
+    "id": 104341318,
+    "displayValue": "Latvia"
+  },
+  {
+    "id": 101834488,
+    "displayValue": "Lebanon"
+  },
+  {
+    "id": 103712797,
+    "displayValue": "Lesotho"
+  },
+  {
+    "id": 106579411,
+    "displayValue": "Liberia"
+  },
+  {
+    "id": 100878084,
+    "displayValue": "Liechtenstein"
+  },
+  {
+    "id": 101464403,
+    "displayValue": "Lithuania"
+  },
+  {
+    "id": 104042105,
+    "displayValue": "Luxembourg"
+  },
+  {
+    "id": 91000008,
+    "displayValue": "MENA"
+  },
+  {
+    "id": 101316508,
+    "displayValue": "Macao SAR"
+  },
+  {
+    "id": 105587166,
+    "displayValue": "Madagascar"
+  },
+  {
+    "id": 105992277,
+    "displayValue": "Malawi"
+  },
+  {
+    "id": 102903149,
+    "displayValue": "Malaya Kuril’skaya Gryada / Habomai Islands"
+  },
+  {
+    "id": 106808692,
+    "displayValue": "Malaysia"
+  },
+  {
+    "id": 102161637,
+    "displayValue": "Maldives"
+  },
+  {
+    "id": 100961908,
+    "displayValue": "Malta"
+  },
+  {
+    "id": 106516799,
+    "displayValue": "Marshall Islands"
+  },
+  {
+    "id": 103091690,
+    "displayValue": "Martinique"
+  },
+  {
+    "id": 106950838,
+    "displayValue": "Mauritania"
+  },
+  {
+    "id": 106931611,
+    "displayValue": "Mauritius"
+  },
+  {
+    "id": 104097939,
+    "displayValue": "Mayotte"
+  },
+  {
+    "id": 103323778,
+    "displayValue": "Mexico"
+  },
+  {
+    "id": 102808143,
+    "displayValue": "Midway Atoll"
+  },
+  {
+    "id": 106178099,
+    "displayValue": "Moldova"
+  },
+  {
+    "id": 101352147,
+    "displayValue": "Monaco"
+  },
+  {
+    "id": 102396337,
+    "displayValue": "Mongolia"
+  },
+  {
+    "id": 100733275,
+    "displayValue": "Montenegro"
+  },
+  {
+    "id": 101150476,
+    "displayValue": "Montserrat"
+  },
+  {
+    "id": 102787409,
+    "displayValue": "Morocco"
+  },
+  {
+    "id": 100474128,
+    "displayValue": "Mozambique"
+  },
+  {
+    "id": 104136533,
+    "displayValue": "Myanmar"
+  },
+  {
+    "id": 106682822,
+    "displayValue": "Namibia"
+  },
+  {
+    "id": 104630404,
+    "displayValue": "Nepal"
+  },
+  {
+    "id": 102890719,
+    "displayValue": "Netherlands"
+  },
+  {
+    "id": 105535747,
+    "displayValue": "New Caledonia"
+  },
+  {
+    "id": 105490917,
+    "displayValue": "New Zealand"
+  },
+  {
+    "id": 105517145,
+    "displayValue": "Nicaragua"
+  },
+  {
+    "id": 103550069,
+    "displayValue": "Niger"
+  },
+  {
+    "id": 105365761,
+    "displayValue": "Nigeria"
+  },
+  {
+    "id": 102139488,
+    "displayValue": "Niue"
+  },
+  {
+    "id": 118365287,
+    "displayValue": "No man's land"
+  },
+  {
+    "id": 91000009,
+    "displayValue": "Nordics"
+  },
+  {
+    "id": 116224156,
+    "displayValue": "Norfolk Island"
+  },
+  {
+    "id": 102221843,
+    "displayValue": "North America"
+  },
+  {
+    "id": 102356536,
+    "displayValue": "North Korea"
+  },
+  {
+    "id": 103420483,
+    "displayValue": "North Macedonia"
+  },
+  {
+    "id": 103666514,
+    "displayValue": "Northern Mariana Islands"
+  },
+  {
+    "id": 103819153,
+    "displayValue": "Norway"
+  },
+  {
+    "id": 91000010,
+    "displayValue": "Oceania"
+  },
+  {
+    "id": 103619019,
+    "displayValue": "Oman"
+  },
+  {
+    "id": 101265267,
+    "displayValue": "Ostrov Iturup / Etorotu Island"
+  },
+  {
+    "id": 105839105,
+    "displayValue": "Ostrov Kunashir / Kunashiri Island"
+  },
+  {
+    "id": 105770768,
+    "displayValue": "Ostrov Shikotan / Shikotan Island"
+  },
+  {
+    "id": 101022442,
+    "displayValue": "Pakistan"
+  },
+  {
+    "id": 106779877,
+    "displayValue": "Palau"
+  },
+  {
+    "id": 93000000,
+    "displayValue": "Palestinian Authority"
+  },
+  {
+    "id": 103683990,
+    "displayValue": "Palmyra Atoll"
+  },
+  {
+    "id": 100808673,
+    "displayValue": "Panama"
+  },
+  {
+    "id": 100152180,
+    "displayValue": "Papua New Guinea"
+  },
+  {
+    "id": 101839269,
+    "displayValue": "Paracel Islands"
+  },
+  {
+    "id": 104065273,
+    "displayValue": "Paraguay"
+  },
+  {
+    "id": 102927786,
+    "displayValue": "Peru"
+  },
+  {
+    "id": 103121230,
+    "displayValue": "Philippines"
+  },
+  {
+    "id": 104322374,
+    "displayValue": "Pitcairn Islands"
+  },
+  {
+    "id": 105072130,
+    "displayValue": "Poland"
+  },
+  {
+    "id": 100364837,
+    "displayValue": "Portugal"
+  },
+  {
+    "id": 105245958,
+    "displayValue": "Puerto Rico"
+  },
+  {
+    "id": 104170880,
+    "displayValue": "Qatar"
+  },
+  {
+    "id": 92000001,
+    "displayValue": "Remote"
+  },
+  {
+    "id": 106796687,
+    "displayValue": "Republic of the Congo"
+  },
+  {
+    "id": 104265812,
+    "displayValue": "Reunion"
+  },
+  {
+    "id": 106670623,
+    "displayValue": "Romania"
+  },
+  {
+    "id": 101728296,
+    "displayValue": "Russia"
+  },
+  {
+    "id": 103547315,
+    "displayValue": "Rwanda"
+  },
+  {
+    "id": 102129144,
+    "displayValue": "Saba"
+  },
+  {
+    "id": 100936035,
+    "displayValue": "Saint Barthélemy"
+  },
+  {
+    "id": 105392771,
+    "displayValue": "Saint Helena, Ascension and Tristan da Cunha"
+  },
+  {
+    "id": 102098694,
+    "displayValue": "Saint Kitts and Nevis"
+  },
+  {
+    "id": 104022923,
+    "displayValue": "Saint Lucia"
+  },
+  {
+    "id": 103917985,
+    "displayValue": "Saint Martin (France)"
+  },
+  {
+    "id": 102024132,
+    "displayValue": "Saint Pierre and Miquelon"
+  },
+  {
+    "id": 104703990,
+    "displayValue": "Saint Vincent and the Grenadines"
+  },
+  {
+    "id": 104031721,
+    "displayValue": "Samoa"
+  },
+  {
+    "id": 105730022,
+    "displayValue": "San Marino"
+  },
+  {
+    "id": 100594556,
+    "displayValue": "Sang"
+  },
+  {
+    "id": 100459316,
+    "displayValue": "Saudi Arabia"
+  },
+  {
+    "id": 103587512,
+    "displayValue": "Senegal"
+  },
+  {
+    "id": 105090025,
+    "displayValue": "Senkaku Islands/Diaoyutai Qundao"
+  },
+  {
+    "id": 107007050,
+    "displayValue": "Seychelles"
+  },
+  {
+    "id": 106524187,
+    "displayValue": "Sierra Leone"
+  },
+  {
+    "id": 102454443,
+    "displayValue": "Singapore"
+  },
+  {
+    "id": 100552696,
+    "displayValue": "Sint Eustatius"
+  },
+  {
+    "id": 105519673,
+    "displayValue": "Sint Maarten"
+  },
+  {
+    "id": 103119917,
+    "displayValue": "Slovakia"
+  },
+  {
+    "id": 106137034,
+    "displayValue": "Slovenia"
+  },
+  {
+    "id": 104980134,
+    "displayValue": "Solomon Islands"
+  },
+  {
+    "id": 104725424,
+    "displayValue": "Somalia"
+  },
+  {
+    "id": 104035573,
+    "displayValue": "South Africa"
+  },
+  {
+    "id": 104514572,
+    "displayValue": "South America"
+  },
+  {
+    "id": 103665423,
+    "displayValue": "South Georgia And South Sandwich Islands"
+  },
+  {
+    "id": 105149562,
+    "displayValue": "South Korea"
+  },
+  {
+    "id": 103622308,
+    "displayValue": "South Sudan"
+  },
+  {
+    "id": 105646813,
+    "displayValue": "Spain"
+  },
+  {
+    "id": 101522505,
+    "displayValue": "Spratly Islands"
+  },
+  {
+    "id": 100446352,
+    "displayValue": "Sri Lanka"
+  },
+  {
+    "id": 106740205,
+    "displayValue": "Sudan"
+  },
+  {
+    "id": 105530931,
+    "displayValue": "Suriname"
+  },
+  {
+    "id": 104980232,
+    "displayValue": "Svalbard"
+  },
+  {
+    "id": 105117694,
+    "displayValue": "Sweden"
+  },
+  {
+    "id": 106693272,
+    "displayValue": "Switzerland"
+  },
+  {
+    "id": 106714035,
+    "displayValue": "Syria"
+  },
+  {
+    "id": 106867470,
+    "displayValue": "São Tomé and Príncipe"
+  },
+  {
+    "id": 104187078,
+    "displayValue": "Taiwan"
+  },
+  {
+    "id": 104604145,
+    "displayValue": "Tanzania"
+  },
+  {
+    "id": 105146118,
+    "displayValue": "Thailand"
+  },
+  {
+    "id": 106662619,
+    "displayValue": "The Bahamas"
+  },
+  {
+    "id": 106100033,
+    "displayValue": "The Gambia"
+  },
+  {
+    "id": 101101678,
+    "displayValue": "Timor-Leste"
+  },
+  {
+    "id": 103603395,
+    "displayValue": "Togo"
+  },
+  {
+    "id": 100212364,
+    "displayValue": "Tokelau"
+  },
+  {
+    "id": 106947126,
+    "displayValue": "Trinidad and Tobago"
+  },
+  {
+    "id": 105757845,
+    "displayValue": "Tunb Islands"
+  },
+  {
+    "id": 102134353,
+    "displayValue": "Tunisia"
+  },
+  {
+    "id": 105449295,
+    "displayValue": "Turkmenistan"
+  },
+  {
+    "id": 100771715,
+    "displayValue": "Turks and Caicos Islands"
+  },
+  {
+    "id": 103609605,
+    "displayValue": "Tuvalu"
+  },
+  {
+    "id": 102105699,
+    "displayValue": "Türkiye"
+  },
+  {
+    "id": 102119762,
+    "displayValue": "US Virgin Islands"
+  },
+  {
+    "id": 106943612,
+    "displayValue": "Uganda"
+  },
+  {
+    "id": 102264497,
+    "displayValue": "Ukraine"
+  },
+  {
+    "id": 104305776,
+    "displayValue": "United Arab Emirates"
+  },
+  {
+    "id": 101165590,
+    "displayValue": "United Kingdom"
+  },
+  {
+    "id": 103644278,
+    "displayValue": "United States"
+  },
+  {
+    "id": 111818742,
+    "displayValue": "United States Minor Outlying Islands"
+  },
+  {
+    "id": 100867946,
+    "displayValue": "Uruguay"
+  },
+  {
+    "id": 107734735,
+    "displayValue": "Uzbekistan"
+  },
+  {
+    "id": 102185308,
+    "displayValue": "Vanuatu"
+  },
+  {
+    "id": 107163060,
+    "displayValue": "Vatican City"
+  },
+  {
+    "id": 101490751,
+    "displayValue": "Venezuela"
+  },
+  {
+    "id": 104195383,
+    "displayValue": "Vietnam"
+  },
+  {
+    "id": 105498681,
+    "displayValue": "Wake Island"
+  },
+  {
+    "id": 104246629,
+    "displayValue": "Wallis and Futuna"
+  },
+  {
+    "id": 101004336,
+    "displayValue": "West Bank"
+  },
+  {
+    "id": 92000000,
+    "displayValue": "Worldwide"
+  },
+  {
+    "id": 105962095,
+    "displayValue": "Yemen"
+  },
+  {
+    "id": 102120260,
+    "displayValue": "Zambia"
+  },
+  {
+    "id": 101367137,
+    "displayValue": "Zimbabwe"
+  },
+  {
+    "id": 119365922,
+    "displayValue": "Åland Islands"
+  },
+  {
+    "id": 117196730,
+    "displayValue": "Île de la Navasse / Navassa Island (Disputed area USA-HAITI)"
+  }
+]

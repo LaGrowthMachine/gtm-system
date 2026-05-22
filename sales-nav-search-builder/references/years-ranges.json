@@ -1,0 +1,7 @@
+[
+  {"id": 1, "displayValue": "Less than 1 year"},
+  {"id": 2, "displayValue": "1 to 2 years"},
+  {"id": 3, "displayValue": "3 to 5 years"},
+  {"id": 4, "displayValue": "6 to 10 years"},
+  {"id": 5, "displayValue": "More than 10 years"}
+]

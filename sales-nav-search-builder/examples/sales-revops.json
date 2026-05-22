@@ -1,0 +1,49 @@
+{
+  "_comment": "Senior outbound operators (Heads of Sales, VPs, RevOps Managers, SDR/BDR Managers) in UK IT Services & Software. The KEYWORDS field adds a tool stack signal: people who mention outbound platforms in their profile have a mature sales motion. The 'Changed jobs' toggle catches recent movers (warm signal — likely re-evaluating their stack).",
+  "filters": [
+    {
+      "type": "INDUSTRY",
+      "values": [
+        {"id": 96, "selectionType": "INCLUDED"},
+        {"id": 4, "selectionType": "INCLUDED"},
+        {"id": 104, "selectionType": "EXCLUDED"}
+      ]
+    },
+    {
+      "type": "CURRENT_TITLE",
+      "values": [
+        {
+          "text": "(\"Head of Sales\" OR \"VP Sales\" OR \"Sales Director\" OR \"Head of Revenue Operations\" OR \"RevOps Manager\" OR \"Sales Operations Manager\" OR \"SDR Manager\" OR \"BDR Manager\") NOT (Fractional OR Freelance OR Intern OR Junior OR Assistant)",
+          "selectionType": "INCLUDED"
+        }
+      ]
+    },
+    {
+      "type": "KEYWORDS",
+      "values": [
+        {
+          "text": "(outbound OR \"cold email\" OR \"sales automation\" OR \"sales engagement\") AND (Salesforce OR HubSpot OR Outreach OR Salesloft OR Apollo)",
+          "selectionType": "INCLUDED"
+        }
+      ]
+    },
+    {
+      "type": "COMPANY_HEADCOUNT",
+      "values": [
+        {"id": "C", "selectionType": "INCLUDED"},
+        {"id": "D", "selectionType": "INCLUDED"},
+        {"id": "E", "selectionType": "INCLUDED"}
+      ]
+    },
+    {
+      "type": "REGION",
+      "values": [
+        {"id": 101165590, "selectionType": "INCLUDED"}
+      ]
+    },
+    {
+      "type": "RECENTLY_CHANGED_JOBS",
+      "toggle": true
+    }
+  ]
+}

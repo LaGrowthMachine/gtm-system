@@ -1,0 +1,10 @@
+[
+  {"id": "C", "displayValue": "Public Company"},
+  {"id": "P", "displayValue": "Privately Held"},
+  {"id": "N", "displayValue": "Non Profit"},
+  {"id": "D", "displayValue": "Educational Institution"},
+  {"id": "S", "displayValue": "Partnership"},
+  {"id": "E", "displayValue": "Self Employed"},
+  {"id": "O", "displayValue": "Self Owned"},
+  {"id": "G", "displayValue": "Government Agency"}
+]

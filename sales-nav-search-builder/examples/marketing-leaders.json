@@ -1,0 +1,36 @@
+{
+  "_comment": "Marketing decision-makers in B2B SaaS, France, 50-1,000 employees. Boolean title normalization captures CMO + 'Chief Marketing Officer' + 'VP Marketing' + 'Head of Marketing' + 'Director of Marketing'. Excludes fractional, freelance, consultants, and entry-level noise.",
+  "filters": [
+    {
+      "type": "INDUSTRY",
+      "values": [
+        {"id": 4, "selectionType": "INCLUDED"},
+        {"id": 96, "selectionType": "INCLUDED"},
+        {"id": 6, "selectionType": "INCLUDED"}
+      ]
+    },
+    {
+      "type": "CURRENT_TITLE",
+      "values": [
+        {
+          "text": "(CMO OR \"Chief Marketing Officer\" OR \"VP Marketing\" OR \"Head of Marketing\" OR \"Director of Marketing\") NOT (Fractional OR Freelance OR Consultant OR Intern OR Assistant)",
+          "selectionType": "INCLUDED"
+        }
+      ]
+    },
+    {
+      "type": "COMPANY_HEADCOUNT",
+      "values": [
+        {"id": "D", "selectionType": "INCLUDED"},
+        {"id": "E", "selectionType": "INCLUDED"},
+        {"id": "F", "selectionType": "INCLUDED"}
+      ]
+    },
+    {
+      "type": "REGION",
+      "values": [
+        {"id": 105015875, "selectionType": "INCLUDED"}
+      ]
+    }
+  ]
+}
