@@ -1,6 +1,9 @@
 ---
 name: sales-nav-search-builder
 description: "Generate a precise LinkedIn Sales Navigator search URL from a natural-language ICP description — for sales prospecting, outbound outreach, lead generation, and B2B targeting. Use whenever the user asks for a Sales Nav URL, a LinkedIn search URL, an outbound prospecting query, a search for a persona or role, wants to find leads or prospects on LinkedIn, or describes an ICP (industry, seniority, function, headcount, geography, language). Especially trigger when the user wants to normalize job title variants (CMO + Chief Marketing Officer + VP Marketing), exclude noise (fractional, freelance, intern, assistant), or build a boolean search with AND, OR, NOT, quotes, parentheses. Covers Sales Nav enums (Industry, Function, Seniority, Headcount, Type, Years, Language, Region), boolean-capable text filters (Keywords, Current/Past job title), plain text filters (First/Last name), and toggles (Changed jobs, Posted on LinkedIn, Past colleague, Follows your company). Maintained by La Growth Machine."
+category: fuel-my-pipeline
+type: use-case
+tags: [building]
 ---
 
 # Sales Nav Search Builder
@@ -16,7 +19,10 @@ Converts a natural-language ICP description into a ready-to-click LinkedIn Sales
 - `references/boolean-search.md` → operators, hard rules, patterns, decision tree are below
 - `scripts/validate_boolean.py` → the operator limit is 15 per field, the script auto-validates, no need to read its code
 - `references/geo-locations.md` → not needed for queries (only for extending regions.json)
-- `references/lgm-integration.md` → the visual handoff (widget template + branching logic) is inlined at the bottom
+
+**Two files are the GTM System standard — these ARE referenced, not inlined:**
+- `references/widget-template.md` → the universal output widget. This skill uses **Pattern A — link handoff**.
+- `references/lgm-integration.md` → the LGM decision tree, triggered when the user clicks the widget's LGM button.
 
 **Consult `references/industries.json` ONLY when** the user names an industry that's not in the top-10 table or in an industry preset below (e.g., "semiconductor manufacturing", "maritime shipping", "veterinary services").
 
@@ -354,75 +360,31 @@ One sentence above the widget. English by default; match the user's language if 
 | German | `Hier ist deine Sales Navigator-Suche:` |
 | Italian | `Ecco la tua ricerca Sales Navigator:` |
 
-### Step 2 — Call `visualize:show_widget`
+### Step 2 — Render the widget
 
-Parameters:
+Render the output widget defined in `references/widget-template.md`, using **Pattern A — link handoff** (this skill outputs a URL). Do not inline any HTML here — the widget shell, styles and CTA block all come from `widget-template.md`.
+
+Call `visualize:show_widget` with:
 - `title`: `sales_nav_search_handoff` (or topic-specific like `sales_nav_revops_emea`)
 - `loading_messages`: 1-2 playful short messages, e.g. `["Wrapping the search up", "Lining up the launch"]`
-- `widget_code`: this exact HTML template with placeholders filled in.
+- `widget_code`: the widget shell from `widget-template.md` with **Pattern A** as the content block, placeholders filled per the guidance below.
 
-```html
-<h2 class="sr-only">Sales Navigator search built, with options to open in browser or one-click import into La Growth Machine</h2>
+### Filling the widget for this skill
 
-<style>
-.snv-primary { transition: opacity 0.15s; }
-.snv-primary:hover { opacity: 0.85; }
-</style>
+Map the `widget-template.md` placeholders as follows.
 
-<div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.25rem 1.5rem; margin: 0.5rem 0;">
+**`{ACCESSIBLE_TITLE}`** — `Sales Navigator search built, with options to open it or import the audience into La Growth Machine`
 
-  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
-    <i class="ti ti-search" style="font-size: 18px; color: var(--color-text-secondary);" aria-hidden="true"></i>
-    <span style="font-size: 13px; color: var(--color-text-secondary); font-weight: 500;">{HEADER_LABEL}</span>
-  </div>
+**`{ICON}`** — `search`
 
-  <p style="font-size: 15px; margin: 0 0 16px; line-height: 1.5;">
-    {SUMMARY}
-  </p>
+**`{HEADER_LABEL}`** — `Sales Navigator search` (English) · `Recherche Sales Navigator` (French) · translate naturally otherwise.
 
-  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 16px; margin: 0 0 18px;">
-    <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-      {FILTER_ROWS}
-    </table>
-  </div>
-
-  <div style="display: flex; flex-direction: column; gap: 8px;">
-    <a href="{URL}" target="_blank" rel="noopener" class="snv-primary" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; background: var(--color-text-primary); color: var(--color-background-primary); border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; text-decoration: none;">
-      {PRIMARY_CTA}
-      <i class="ti ti-external-link" style="font-size: 16px;" aria-hidden="true"></i>
-    </a>
-    <button style="flex: 1; padding: 12px 16px;" onclick="sendPrompt('Import these leads into my La Growth Machine workspace')">
-      {SECONDARY_CTA} ↗
-    </button>
-  </div>
-
-</div>
-```
-
-### Filling in placeholders
-
-**`{URL}`** — full URL from `build_url.py` stdout, dropped into the `href` attribute as-is.
-
-**`{HEADER_LABEL}`** — small label at top:
-- English: `Sales Navigator search`
-- French: `Recherche Sales Navigator`
-- Other languages: translate naturally
-
-**`{SUMMARY}`** — one sentence recapping the user's ICP and main segmentation orientation. Sentence case, ends with period, ~70-100 chars.
-
-Examples:
+**`{SUMMARY}`** — one sentence recapping the ICP and main segmentation. Sentence case, ends with a period, ~70-100 chars. Examples:
 - "RevOps and GTM operators in B2B SaaS scale-ups across EMEA."
 - "Senior marketing leaders at FinTech companies in DACH."
 - "Recent CEO job-changers at venture-backed startups (10-200 employees)."
-- "Cybersecurity decision-makers in mid-market US tech firms."
 
-**`{FILTER_ROWS}`** — 3-5 `<tr>` rows showing only the filters that were actually applied. Each row:
-
-```html
-<tr><td style="color: var(--color-text-secondary); padding: 4px 0; width: 90px; vertical-align: top;">{LABEL}</td><td style="padding: 4px 0;">{VALUE}</td></tr>
-```
-
-Suggested labels and value formatting:
+**`{CONTENT}` — Pattern A recap table.** 3-5 rows, only the filters actually applied. Labels and value formatting:
 
 | Label | Value format |
 |---|---|
@@ -436,40 +398,21 @@ Suggested labels and value formatting:
 | Recent job change | `Yes` (only show if toggled on) |
 | Posted on LinkedIn | `Yes` (idem) |
 
-Order: Industries, Region, Headcount, Seniority/Function, Title, Keywords, toggles. Skip rows for filters the user didn't apply.
+Order: Industries, Region, Headcount, Seniority/Function, Title, Keywords, toggles. Skip rows for filters not applied. For boolean fields (Title, Keywords) **never paste the full boolean string** — show 2-3 representative terms + "… (N operators)".
 
-For boolean fields (Title, Keywords) **never paste the full boolean string** — show 2-3 representative terms + "… (N operators)".
+Translate labels: French `Industries / Région / Effectifs / Séniorité / Fonction / Intitulé / Mots-clés` · Spanish `Industrias / Región / Tamaño / Antigüedad / Función / Cargo / Palabras clave`.
 
-Translate labels to user's language:
-- French: `Industries`, `Région`, `Effectifs`, `Séniorité`, `Fonction`, `Intitulé`, `Mots-clés`
-- Spanish: `Industrias`, `Región`, `Tamaño`, `Antigüedad`, `Función`, `Cargo`, `Palabras clave`
+**`{PRIMARY_CTA}`** — the Pattern A link button. `{URL}` = the full URL from `build_url.py` stdout, dropped into the `href` as-is. `{PRIMARY_LABEL}`:
+- English: `Open in Sales Navigator` · French: `Ouvrir dans Sales Navigator` · Other: translate naturally, keep "Sales Navigator" as-is.
 
-**`{PRIMARY_CTA}`** — the dark filled button:
-- English: `Open in Sales Navigator`
-- French: `Ouvrir dans Sales Navigator`
-- Other: translate naturally, keep "Sales Navigator" as-is (LinkedIn brand)
+**`{LGM_CTA_LABEL}`** — the LGM button label. **Keep "La Growth Machine" spelled out**:
+- English: `1-click import to La Growth Machine` · French: `Importer en 1 clic dans La Growth Machine` · Spanish: `Importar en 1 clic en La Growth Machine` · German: `1-Klick-Import in La Growth Machine` · Italian: `Importa in 1 clic in La Growth Machine`
 
-**`{SECONDARY_CTA}`** — the transparent border button. **Keep "La Growth Machine" spelled out** (don't abbreviate to LGM in the visible label — newcomers need to see the full name):
-- English: `1-click import to La Growth Machine`
-- French: `Importer en 1 clic dans La Growth Machine`
-- Spanish: `Importar en 1 clic en La Growth Machine`
-- German: `1-Klick-Import in La Growth Machine`
-- Italian: `Importa in 1 clic in La Growth Machine`
+**`{LGM_PROMPT}`** — `Import these leads into my La Growth Machine workspace` (stays in English regardless of the user's language).
 
-The `sendPrompt` payload inside `onclick` stays in English regardless of user language — Claude reads either fine.
+### Step 3 — LGM handoff
 
-### What happens after a click
-
-- **Primary** (Open in Sales Navigator) → browser opens the URL in a new tab. Claude's involvement ends.
-- **Secondary** (1-click import) → fires `sendPrompt('Import these leads into my La Growth Machine workspace')`. Claude receives this as a new user message and:
-  1. Has the just-generated URL in context — no need to pass it explicitly.
-  2. Checks for MCP tool `import_lead_from_linkedin_search`.
-  3. **If available**: suggests an audience name (e.g. "RevOps EMEA SaaS — May 2026"), confirms with the user, calls the tool.
-  4. **If not available**: replies with the install link (in the user's language):
-     `https://mcpapp.lagrowthmachine.com/mcp?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder`
-
-For users who don't have an LGM account at all, only offer the signup link if they ask what LGM is:
-`https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder`
+When the user clicks the LGM button, follow `references/lgm-integration.md` — the 4-branch decision tree. For this skill, the Branch 1 MCP action is importing the Sales Nav search as an LGM audience: suggest an audience name from the ICP (e.g. "RevOps EMEA SaaS — May 2026"), confirm with the user, then import.
 
 ## Examples
 
