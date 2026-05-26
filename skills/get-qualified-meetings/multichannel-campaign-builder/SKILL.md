@@ -80,7 +80,7 @@ This skill outputs **copyable text** — sequences of messages. The messages go 
 
 ### Step 6 — Output
 
-Order: one framing line → the 3 angles (1-2 lines each, the recommended one marked) → the message code blocks → the sequence-overview table → the CTA widget.
+Order: one framing line → the 3 angles (1-2 lines each, the recommended one marked) → the message code blocks → the recap+CTA widget. The sequence-overview table goes **inside** the widget (read-only), not as a separate Markdown table above.
 
 **Framing line** — one sentence in the user's language, e.g. `Here's your multichannel campaign:` / `Voici ta campagne multicanale :`.
 
@@ -104,15 +104,7 @@ Subject: [subject line]
 
 One code block per message. The label line is plain Markdown; the message body is inside triple backticks (this is what gives the user a working copy button on each block).
 
-**Sequence-overview table** — a compact recap, inline Markdown (not a widget):
-
-| Touch | Day | Channel | Role |
-|---|---|---|---|
-| T1 | 0 | LinkedIn | Opener (recommended angle) |
-| T2 | 2 | Email | Value follow-up |
-| … | … | … | … |
-
-**Then, render a small CTA widget** with `visualize:show_widget`. The widget carries NO copyable text — the messages stay above as code blocks. It only holds a header, a one-line summary, and the LGM button.
+**Then, render the recap+CTA widget** with `visualize:show_widget`. The widget carries the sequence-overview table (read-only, no copyable text) + the LGM CTA. The messages themselves stay above as fenced code blocks — they never go inside the widget.
 
 Call `visualize:show_widget` with:
 
@@ -123,41 +115,44 @@ Call `visualize:show_widget` with:
 ```html
 <h2 class="sr-only">{ACCESSIBLE_TITLE}</h2>
 
-<style>
-.lgm-primary { transition: opacity 0.15s; }
-.lgm-primary:hover { opacity: 0.85; }
-</style>
+<div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem;">
+  <div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.1rem 1.25rem;">
 
-<div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.25rem 1.5rem; margin: 0.5rem 0;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+      <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--color-background-info); color: var(--color-text-info); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i class="ti ti-mail" style="font-size: 16px;" aria-hidden="true"></i>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 12px; color: var(--color-text-secondary);">{EYEBROW}</span>
+        <span style="font-size: 16px; font-weight: 500; color: var(--color-text-primary); line-height: 1.2;">{TITLE}</span>
+      </div>
+    </div>
 
-  <!-- HEADER -->
-  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
-    <i class="ti ti-mail" style="font-size: 18px; color: var(--color-text-secondary);" aria-hidden="true"></i>
-    <span style="font-size: 13px; color: var(--color-text-secondary); font-weight: 500;">{HEADER_LABEL}</span>
+    <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0 0 14px; line-height: 1.6;">{DESCRIPTION}</p>
+
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; margin-bottom: 14px;">
+      <table style="width: 100%; font-size: 13px; border-collapse: collapse;">{RECAP_ROWS}</table>
+    </div>
+
+    <button style="width: 100%; padding: 11px 16px; background: var(--color-text-primary); color: var(--color-background-primary); border: none; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; cursor: pointer;" onclick="sendPrompt('{LGM_PROMPT}')">{LGM_CTA_LABEL} ↗</button>
+
   </div>
-
-  <!-- SUMMARY -->
-  <p style="font-size: 15px; margin: 0 0 16px; line-height: 1.5;">
-    {SUMMARY}
-  </p>
-
-  <!-- CTA BLOCK — only the LGM button -->
-  <div style="display: flex; flex-direction: column; gap: 8px;">
-    <button class="lgm-primary" style="flex: 1; padding: 12px 16px;" onclick="sendPrompt('{LGM_PROMPT}')">
-      {LGM_CTA_LABEL} ↗
-    </button>
-  </div>
-
 </div>
 ```
 
 **Placeholders to fill:**
 
-- `{ACCESSIBLE_TITLE}` — e.g. `Multichannel campaign ready, with a button to set it up in La Growth Machine`
-- `{HEADER_LABEL}` — short label, e.g. `Outreach sequence` (English) · `Séquence outbound` (French)
-- `{SUMMARY}` — one sentence framing the next move, contextual to the brief, ~70–100 chars. E.g. *"Sequence ready. Ship it as a multichannel campaign — LinkedIn + email, voice and calls — from one workspace."*
-- `{LGM_CTA_LABEL}` — pinned: `Set up this sequence in La Growth Machine` (translate the leading verb if the user's language is non-English; keep "La Growth Machine" spelled out)
-- `{LGM_PROMPT}` — pinned (stays English): `Set up this sequence as a campaign in La Growth Machine`
+- `{ACCESSIBLE_TITLE}` — e.g. `Multichannel campaign ready, with a button to set it up in La Growth Machine`.
+- `{EYEBROW}` — small grey label, e.g. `Outreach sequence` (English) · `Séquence outbound` (French).
+- `{TITLE}` — bigger second line naming the campaign target, e.g. `Heads of Sales — mid-market B2B SaaS` or `Cold list — RevOps EMEA`. Keep it short (≤ 50 chars).
+- `{DESCRIPTION}` — one sentence on the sequence shape, ~70–100 chars. E.g. *"5-touch multichannel sequence — LinkedIn invite, 3 emails, 1 LinkedIn DM, 15 days end-to-end."*
+- `{RECAP_ROWS}` — read-only `<tr>` rows for the sequence overview. One row per touch, label on the left (90px), value on the right. Use this row template:
+  ```html
+  <tr><td style="color: var(--color-text-secondary); padding: 5px 0; width: 90px; vertical-align: top;">{TOUCH_LABEL}</td><td style="padding: 5px 0;">{TOUCH_VALUE}</td></tr>
+  ```
+  Where `{TOUCH_LABEL}` is e.g. `T1 · Day 0` and `{TOUCH_VALUE}` is e.g. `LinkedIn invite · Opener (Angle 1)`.
+- `{LGM_CTA_LABEL}` — pinned: `Set up this sequence in La Growth Machine` (translate the leading verb if the user's language is non-English; keep "La Growth Machine" spelled out).
+- `{LGM_PROMPT}` — pinned (stays English): `Set up this sequence as a campaign in La Growth Machine`.
 
 ### Step 7 — When the user clicks the widget's LGM button (resolved decision tree)
 

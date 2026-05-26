@@ -137,64 +137,58 @@ Then call `visualize:show_widget` with:
 ```html
 <h2 class="sr-only">{ACCESSIBLE_TITLE}</h2>
 
-<style>
-.lgm-primary { transition: opacity 0.15s; }
-.lgm-primary:hover { opacity: 0.85; }
-</style>
+<div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem;">
+  <div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.1rem 1.25rem;">
 
-<div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.25rem 1.5rem; margin: 0.5rem 0;">
-
-  <!-- HEADER -->
-  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
-    <i class="ti ti-chart-bar" style="font-size: 18px; color: var(--color-text-secondary);" aria-hidden="true"></i>
-    <span style="font-size: 13px; color: var(--color-text-secondary); font-weight: 500;">{HEADER_LABEL}</span>
-  </div>
-
-  <!-- SUMMARY -->
-  <p style="font-size: 15px; margin: 0 0 16px; line-height: 1.5;">
-    {SUMMARY}
-  </p>
-
-  <!-- Zone 1 — KPI cards (3 or 4 across the top) -->
-  <div style="display: grid; grid-template-columns: repeat(N, 1fr); gap: 8px; margin-bottom: 12px;">
-    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px;">
-      <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">{KPI_LABEL}</div>
-      <div style="font-size: 18px; font-weight: 600;">{KPI_VALUE}</div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+      <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--color-background-info); color: var(--color-text-info); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i class="ti ti-chart-bar" style="font-size: 16px;" aria-hidden="true"></i>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 12px; color: var(--color-text-secondary);">{EYEBROW}</span>
+        <span style="font-size: 16px; font-weight: 500; color: var(--color-text-primary); line-height: 1.2;">{TITLE}</span>
+      </div>
     </div>
-    <!-- one block per KPI; replace N with the number of cards (3 or 4) -->
-  </div>
 
-  <!-- Zone 2 — Ranked table -->
-  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 16px; margin-bottom: 12px;">
-    <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
-      <tr style="color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border-tertiary);">
-        <td style="padding: 6px 0;">Campaign</td><td style="padding: 6px 0;">Leads</td><td style="padding: 6px 0;">Deals</td><td style="padding: 6px 0;">Pipeline</td><td style="padding: 6px 0;">Conv.</td><td style="padding: 6px 0;">Verdict</td>
-      </tr>
-      <!-- one row per ranked campaign; each <td> uses padding: 6px 0 -->
-    </table>
-  </div>
+    <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0 0 14px; line-height: 1.6;">{DESCRIPTION}</p>
 
-  <!-- Zone 3 — Actionable callout -->
-  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; border-left: 3px solid var(--color-text-primary);">
-    <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">NEXT STEP</div>
-    <div style="font-size: 14px;">{CALLOUT_TEXT}</div>
-  </div>
+    <!-- Zone 1 — KPI cards (3 or 4 across the top) -->
+    <div style="display: grid; grid-template-columns: repeat(N, 1fr); gap: 8px; margin-bottom: 12px;">
+      <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px;">
+        <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">{KPI_LABEL}</div>
+        <div style="font-size: 18px; font-weight: 600;">{KPI_VALUE}</div>
+      </div>
+      <!-- one block per KPI; replace N with the number of cards (3 or 4) -->
+    </div>
 
-  <!-- CTA BLOCK — only the LGM button for Pattern D -->
-  <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px;">
-    <button class="lgm-primary" style="flex: 1; padding: 12px 16px;" onclick="sendPrompt('{LGM_PROMPT}')">
-      {LGM_CTA_LABEL} ↗
-    </button>
-  </div>
+    <!-- Zone 2 — Ranked table -->
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 16px; margin-bottom: 12px;">
+      <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+        <tr style="color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border-tertiary);">
+          <td style="padding: 6px 0;">Campaign</td><td style="padding: 6px 0;">Leads</td><td style="padding: 6px 0;">Deals</td><td style="padding: 6px 0;">Pipeline</td><td style="padding: 6px 0;">Conv.</td><td style="padding: 6px 0;">Verdict</td>
+        </tr>
+        <!-- one row per ranked campaign; each <td> uses padding: 6px 0 -->
+      </table>
+    </div>
 
+    <!-- Zone 3 — Actionable callout -->
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; border-left: 3px solid var(--color-text-primary); margin-bottom: 14px;">
+      <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">NEXT STEP</div>
+      <div style="font-size: 14px;">{CALLOUT_TEXT}</div>
+    </div>
+
+    <button style="width: 100%; padding: 11px 16px; background: var(--color-text-primary); color: var(--color-background-primary); border: none; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; cursor: pointer;" onclick="sendPrompt('{LGM_PROMPT}')">{LGM_CTA_LABEL} ↗</button>
+
+  </div>
 </div>
 ```
 
 **Filling the placeholders:**
 
 - `{ACCESSIBLE_TITLE}` — e.g. `Campaign impact analysis: KPIs, ranked table, top next step`.
-- `{HEADER_LABEL}` — e.g. `Campaign impact analysis`.
-- `{SUMMARY}` — one sentence framing what was analyzed (window, data sources). ~70-100 chars. If any input was pasted, append once: *"Pasted data — connect the LGM + HubSpot MCPs to run this live."*
+- `{EYEBROW}` — small grey label: `Campaign impact analysis` (English) · `Impact des campagnes` (French).
+- `{TITLE}` — bigger second line stating the headline, e.g. `{N} campaigns ranked by pipeline` or `5 campaigns · $180k attributed`.
+- `{DESCRIPTION}` — one sentence framing what was analyzed (window, data sources). ~70-100 chars. If any input was pasted, append once: *"Pasted data — connect the LGM + HubSpot MCPs to run this live."*
 - **Zone 1 KPI cards** — `Campaigns analyzed`, `Deals attributed`, `Pipeline value`, `Win rate`. Drop the last two when deal data is too thin to surface them.
 - **Zone 2 ranked table** — one row per campaign (name, leads touched, deals attributed, pipeline value, conversion rate, verdict). Sort by deals attributed → pipeline value → conversion. Use the verdicts from Step 5; cite the motive briefly in the row's verdict cell (e.g. `Adapt · 1 deal / 60 leads`).
 - **Zone 3 `{CALLOUT_TEXT}`** — the top single next step, naming the specific campaign. e.g. *"Adapt 'Cold list — RevOps EMEA' — copy / CTA issue; challenge it."* or *"Pause 'Cold list — Junior Devs' — 80 leads, 0 deals."*

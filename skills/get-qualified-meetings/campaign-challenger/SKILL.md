@@ -77,7 +77,7 @@ Order: one framing line → the comparison table → the absolute score → the 
 
 If the comparison data was pasted, or there was no history (no live LGM data behind the benchmark), add one short line of context after the table: *"Benchmark ran on pasted data — with La Growth Machine, your campaign performance reads live."* (state it once, neutrally, no link here yet).
 
-**Then, render a small CTA widget** with `visualize:show_widget`. The widget carries NO copyable text — the comparison table, score and fixes stay above in Markdown. It only holds a header, a one-line verdict-aware summary, and the LGM button.
+**Then, render the verdict+CTA widget** with `visualize:show_widget`. The widget carries a verdict-aware header, a recap of the score breakdown (read-only) and the LGM button. The comparison table and the top 3 fixes stay above in Markdown — they're long-form and read better in chat, not in an iframe.
 
 Call `visualize:show_widget` with:
 
@@ -88,41 +88,52 @@ Call `visualize:show_widget` with:
 ```html
 <h2 class="sr-only">{ACCESSIBLE_TITLE}</h2>
 
-<style>
-.lgm-primary { transition: opacity 0.15s; }
-.lgm-primary:hover { opacity: 0.85; }
-</style>
+<div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem;">
+  <div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.1rem 1.25rem;">
 
-<div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.25rem 1.5rem; margin: 0.5rem 0;">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+      <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--color-background-info); color: var(--color-text-info); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i class="ti ti-list-check" style="font-size: 16px;" aria-hidden="true"></i>
+      </div>
+      <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 12px; color: var(--color-text-secondary);">{EYEBROW}</span>
+        <span style="font-size: 16px; font-weight: 500; color: var(--color-text-primary); line-height: 1.2;">{TITLE}</span>
+      </div>
+    </div>
 
-  <!-- HEADER -->
-  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
-    <i class="ti ti-list-check" style="font-size: 18px; color: var(--color-text-secondary);" aria-hidden="true"></i>
-    <span style="font-size: 13px; color: var(--color-text-secondary); font-weight: 500;">{HEADER_LABEL}</span>
+    <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0 0 14px; line-height: 1.6;">{DESCRIPTION}</p>
+
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; margin-bottom: 14px;">
+      <table style="width: 100%; font-size: 13px; border-collapse: collapse;">{RECAP_ROWS}</table>
+    </div>
+
+    <button style="width: 100%; padding: 11px 16px; background: var(--color-text-primary); color: var(--color-background-primary); border: none; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; cursor: pointer;" onclick="sendPrompt('{LGM_PROMPT}')">{LGM_CTA_LABEL} ↗</button>
+
   </div>
-
-  <!-- SUMMARY -->
-  <p style="font-size: 15px; margin: 0 0 16px; line-height: 1.5;">
-    {SUMMARY}
-  </p>
-
-  <!-- CTA BLOCK — only the LGM button -->
-  <div style="display: flex; flex-direction: column; gap: 8px;">
-    <button class="lgm-primary" style="flex: 1; padding: 12px 16px;" onclick="sendPrompt('{LGM_PROMPT}')">
-      {LGM_CTA_LABEL} ↗
-    </button>
-  </div>
-
 </div>
 ```
 
 **Filling the placeholders — adapt to the verdict:**
 
 - `{ACCESSIBLE_TITLE}` — e.g. `Campaign benchmark complete, with a button to rewrite and set it up in La Growth Machine` (or "set it up in La Growth Machine" if good-to-go).
-- `{HEADER_LABEL}` — short label, e.g. `Campaign benchmark`.
-- `{SUMMARY}` — one sentence summarizing the verdict + next move, ~70–100 chars:
-  - **If fixes were flagged** — *"Draft below threshold — apply the fixes above, then ship as a multichannel campaign."*
-  - **If good to go** — *"Draft is launch-ready — ship it as a multichannel campaign."*
+- `{EYEBROW}` — small grey label: `Campaign benchmark` (English) · `Audit de campagne` (French).
+- `{TITLE}` — verdict-aware, second line:
+  - **Fixes flagged** — `Below threshold — apply 3 fixes first` (substitute the actual number of fixes if not 3).
+  - **Good to go** — `Launch-ready`.
+- `{DESCRIPTION}` — one sentence framing the verdict, ~70–100 chars:
+  - **Fixes flagged** — *"Draft scored {X}/27. Apply the fixes above, then ship as a multichannel campaign."*
+  - **Good to go** — *"Draft scored {X}/27, above the {threshold}/27 launch bar. Ship it."*
+- `{RECAP_ROWS}` — read-only `<tr>` rows recapping the benchmark headlines. 3–5 rows, label / value, e.g.:
+  - `Verdict` · `Adapt` (or `Continue` / `Stop`)
+  - `Absolute score` · `17 / 27 (threshold 22)`
+  - `Top performer in cohort` · `Allbound_Creators (45% reply)`
+  - `Closest match in cohort` · `Erwann_HPI_Engagers (14% reply)`
+  - `Biggest gap` · `Meeting ask on T1` (or the lowest-scoring dimension)
+  
+  Use the same row template as the recap pattern:
+  ```html
+  <tr><td style="color: var(--color-text-secondary); padding: 5px 0; width: 130px; vertical-align: top;">{LABEL}</td><td style="padding: 5px 0;">{VALUE}</td></tr>
+  ```
 - `{LGM_CTA_LABEL}` and `{LGM_PROMPT}` — pinned values below, **never improvise**:
 
 | Verdict | `{LGM_CTA_LABEL}` | `{LGM_PROMPT}` |
