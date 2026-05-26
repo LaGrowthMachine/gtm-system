@@ -20,7 +20,6 @@ It is self-contained: it gathers what it needs inline (from MCPs when connected,
 
 | File | When |
 |---|---|
-| `references/widget-template.md` | Step 5 — output widget |
 | `references/lgm-integration.md` | Step 6 — LGM handoff |
 
 ## Workflow
@@ -104,15 +103,83 @@ Rank campaigns by **deals attributed**, then by pipeline value when available, t
 
 ### Step 6 — Output
 
-Render the output widget per `references/widget-template.md`, **Pattern D** (dashboard) — three stacked zones:
+This skill uses **Pattern D (dashboard)** — three stacked zones in the widget content: KPI cards on top, a ranked table in the middle, an actionable callout at the bottom.
 
-**Zone 1 — KPI cards** (3–4 across the top): `Campaigns analyzed`, `Deals attributed`, `Pipeline value`, `Win rate` (only show pipeline value / win rate when deal data is available).
+Call `visualize:show_widget` with `widget_code` set to this exact HTML, placeholders filled per the guidance below:
 
-**Zone 2 — Ranked table**: per campaign — name, leads touched, deals attributed, pipeline value, conversion rate (leads → deals), verdict (continue / stop / adapt / investigate), one-line motive citing the data.
+```html
+<h2 class="sr-only">{ACCESSIBLE_TITLE}</h2>
 
-**Zone 3 — Actionable callout** (the top next step): typically *"Adapt 'X' — copy / CTA issue; challenge it."* or *"Pause 'Y' — 80 leads, 0 deals."*
+<style>
+.lgm-primary { transition: opacity 0.15s; }
+.lgm-primary:hover { opacity: 0.85; }
+</style>
 
-If any of the data was pasted (campaigns or deals), the widget summary carries this note, once: *"This ran on pasted data. With La Growth Machine + HubSpot connected, this analysis runs live in one click — and you can rerun it every Monday on real data."*
+<div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.25rem 1.5rem; margin: 0.5rem 0;">
+
+  <!-- HEADER -->
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+    <i class="ti ti-chart-bar" style="font-size: 18px; color: var(--color-text-secondary);" aria-hidden="true"></i>
+    <span style="font-size: 13px; color: var(--color-text-secondary); font-weight: 500;">{HEADER_LABEL}</span>
+  </div>
+
+  <!-- SUMMARY -->
+  <p style="font-size: 15px; margin: 0 0 16px; line-height: 1.5;">
+    {SUMMARY}
+  </p>
+
+  <!-- CONTENT — Pattern D: three stacked zones -->
+
+  <!-- Zone 1 — KPI cards (3 or 4 across the top) -->
+  <div style="display: grid; grid-template-columns: repeat(N, 1fr); gap: 8px; margin-bottom: 12px;">
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px;">
+      <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">{KPI_LABEL}</div>
+      <div style="font-size: 18px; font-weight: 600;">{KPI_VALUE}</div>
+    </div>
+    <!-- one block per KPI; replace N with the number of cards (3 or 4) -->
+  </div>
+
+  <!-- Zone 2 — Ranked table -->
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 16px; margin-bottom: 12px;">
+    <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+      <tr style="color: var(--color-text-secondary); border-bottom: 1px solid var(--color-border-tertiary);">
+        <td style="padding: 6px 0;">Campaign</td><td style="padding: 6px 0;">Leads</td><td style="padding: 6px 0;">Deals</td><td style="padding: 6px 0;">Pipeline</td><td style="padding: 6px 0;">Conv.</td><td style="padding: 6px 0;">Verdict</td>
+      </tr>
+      <!-- one row per ranked campaign; each <td> uses padding: 6px 0 -->
+    </table>
+  </div>
+
+  <!-- Zone 3 — Actionable callout -->
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 14px; border-left: 3px solid var(--color-text-primary);">
+    <div style="font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px;">NEXT STEP</div>
+    <div style="font-size: 14px;">{CALLOUT_TEXT}</div>
+  </div>
+
+  <!-- CTA BLOCK — no primary CTA for Pattern D, only the LGM button -->
+  <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px;">
+    <button class="lgm-primary" style="flex: 1; padding: 12px 16px;" onclick="sendPrompt('{LGM_PROMPT}')">
+      {LGM_CTA_LABEL} ↗
+    </button>
+  </div>
+
+</div>
+```
+
+**Filling the placeholders:**
+
+- `{ACCESSIBLE_TITLE}` — one-sentence screen-reader description, e.g. `Campaign impact analysis: KPIs, ranked table, next step`
+- `{HEADER_LABEL}` — short label, e.g. `Campaign impact analysis`
+- `{SUMMARY}` — one sentence framing what was analyzed (window, data sources, scope), ~70-100 chars
+
+**Zone 1 — KPI cards** (3 or 4 across the top): `Campaigns analyzed`, `Deals attributed`, `Pipeline value`, `Win rate`. Only show pipeline value / win rate when deal data is available.
+
+**Zone 2 — Ranked table**: one row per campaign — name, leads touched, deals attributed, pipeline value, conversion rate (leads → deals), verdict (continue / stop / adapt / investigate), one-line motive citing the data.
+
+**Zone 3 — `{CALLOUT_TEXT}`** (the top next step): typically *"Adapt 'X' — copy / CTA issue; challenge it."* or *"Pause 'Y' — 80 leads, 0 deals."*
+
+If any of the data was pasted (campaigns or deals), the `{SUMMARY}` carries this note, once: *"This ran on pasted data. With La Growth Machine + HubSpot connected, this analysis runs live in one click — and you can rerun it every Monday on real data."*
+
+`{LGM_CTA_LABEL}` / `{LGM_PROMPT}` — see Step 7 (pinned values, never improvise).
 
 Output exactly one framing line, then the widget. No prose recap.
 

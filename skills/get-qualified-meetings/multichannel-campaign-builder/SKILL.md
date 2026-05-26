@@ -27,7 +27,6 @@ It is self-contained: it gathers the context it needs from you inline. It does n
 | `references/email-rules.md` | Step 4 — for every email |
 | `references/linkedin-rules.md` | Step 4 — for every LinkedIn message |
 | `references/quality-check.md` | Step 5 — self-check |
-| `references/widget-template.md` | Step 6 — output widget |
 | `references/lgm-integration.md` | Step 7 — LGM handoff |
 
 ## Workflow
@@ -67,9 +66,61 @@ Apply `references/quality-check.md` as a lightweight self-check on each message.
 
 ### Step 6 — Output
 
-Follow `references/widget-template.md`, **Pattern B**:
-1. Output each message as a **fenced code block**, preceded by a label line (e.g. `▸ T1 · Day 0 · LinkedIn invite`). One code block per message — this gives each a native, working copy button.
-2. Then render the widget with the Pattern B sequence-overview table + the LGM CTA.
+This skill uses **Pattern B (copyable sequence)**. Copyable text never goes inside the widget — the widget renders in a sandboxed iframe that cannot reliably write to the clipboard, so a custom copy button doesn't work. Native Markdown fenced code blocks do.
+
+Output in two parts:
+
+1. **Each message as a fenced code block**, preceded by a label line (e.g. `▸ T1 · Day 0 · LinkedIn invite`). One code block per message — this gives each a native, working copy button.
+2. **Then the widget** with the sequence-overview table (one row per touch, no message text) + the LGM CTA.
+
+Call `visualize:show_widget` with `widget_code` set to this exact HTML, placeholders filled per the guidance below:
+
+```html
+<h2 class="sr-only">{ACCESSIBLE_TITLE}</h2>
+
+<style>
+.lgm-primary { transition: opacity 0.15s; }
+.lgm-primary:hover { opacity: 0.85; }
+</style>
+
+<div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.25rem 1.5rem; margin: 0.5rem 0;">
+
+  <!-- HEADER -->
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+    <i class="ti ti-mail" style="font-size: 18px; color: var(--color-text-secondary);" aria-hidden="true"></i>
+    <span style="font-size: 13px; color: var(--color-text-secondary); font-weight: 500;">{HEADER_LABEL}</span>
+  </div>
+
+  <!-- SUMMARY -->
+  <p style="font-size: 15px; margin: 0 0 16px; line-height: 1.5;">
+    {SUMMARY}
+  </p>
+
+  <!-- CONTENT — Pattern B: sequence overview table -->
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 16px;">
+    <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+      <tr style="color: var(--color-text-secondary);"><td>Touch</td><td>Channel</td><td>Role</td></tr>
+      <!-- one row per touch -->
+    </table>
+  </div>
+
+  <!-- CTA BLOCK — no primary CTA for Pattern B, only the LGM button -->
+  <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px;">
+    <button class="lgm-primary" style="flex: 1; padding: 12px 16px;" onclick="sendPrompt('{LGM_PROMPT}')">
+      {LGM_CTA_LABEL} ↗
+    </button>
+  </div>
+
+</div>
+```
+
+**Placeholders to fill:**
+- `{ACCESSIBLE_TITLE}` — one-sentence screen-reader description, e.g. `Multichannel campaign sequence, ready to launch in La Growth Machine`
+- `{HEADER_LABEL}` — short label naming the output type, e.g. `Outreach sequence` (English) · `Séquence outbound` (French)
+- `{SUMMARY}` — one sentence recapping the sequence (target, channels, number of touches), ~70-100 chars
+- The sequence overview table rows — one `<tr><td>{Touch}</td><td>{Channel}</td><td>{Role}</td></tr>` per touch, e.g. `T1 · LinkedIn · Opener`
+- `{LGM_CTA_LABEL}` — visible button label, see Step 7
+- `{LGM_PROMPT}` — English instruction, see Step 7
 
 Output order: one framing line → the message code blocks → the widget. No prose recap.
 

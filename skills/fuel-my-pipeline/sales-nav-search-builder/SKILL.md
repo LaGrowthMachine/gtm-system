@@ -21,7 +21,6 @@ Converts a natural-language ICP description into a ready-to-click LinkedIn Sales
 - `references/geo-locations.md` → not needed for queries (only for extending regions.json)
 
 **Two files are the GTM System standard — these ARE referenced, not inlined:**
-- `references/widget-template.md` → the universal output widget. This skill uses **Pattern A — link handoff**.
 - `references/lgm-integration.md` → the LGM decision tree, triggered when the user clicks the widget's LGM button.
 
 **Consult `references/industries.json` ONLY when** the user names an industry that's not in the top-10 table or in an industry preset below (e.g., "semiconductor manufacturing", "maritime shipping", "veterinary services").
@@ -362,16 +361,57 @@ One sentence above the widget. English by default; match the user's language if 
 
 ### Step 2 — Render the widget
 
-Render the output widget defined in `references/widget-template.md`, using **Pattern A — link handoff** (this skill outputs a URL). Do not inline any HTML here — the widget shell, styles and CTA block all come from `widget-template.md`.
-
 Call `visualize:show_widget` with:
 - `title`: `sales_nav_search_handoff` (or topic-specific like `sales_nav_revops_emea`)
 - `loading_messages`: 1-2 playful short messages, e.g. `["Wrapping the search up", "Lining up the launch"]`
-- `widget_code`: the widget shell from `widget-template.md` with **Pattern A** as the content block, placeholders filled per the guidance below.
+- `widget_code`: this exact HTML, placeholders filled per the guidance below.
+
+```html
+<h2 class="sr-only">{ACCESSIBLE_TITLE}</h2>
+
+<style>
+.lgm-primary { transition: opacity 0.15s; }
+.lgm-primary:hover { opacity: 0.85; }
+</style>
+
+<div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.25rem 1.5rem; margin: 0.5rem 0;">
+
+  <!-- HEADER -->
+  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+    <i class="ti ti-{ICON}" style="font-size: 18px; color: var(--color-text-secondary);" aria-hidden="true"></i>
+    <span style="font-size: 13px; color: var(--color-text-secondary); font-weight: 500;">{HEADER_LABEL}</span>
+  </div>
+
+  <!-- SUMMARY -->
+  <p style="font-size: 15px; margin: 0 0 16px; line-height: 1.5;">
+    {SUMMARY}
+  </p>
+
+  <!-- CONTENT — Pattern A: recap table -->
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px 16px;">
+    <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+      <tr><td style="color: var(--color-text-secondary); padding: 4px 0; width: 90px; vertical-align: top;">{LABEL}</td><td style="padding: 4px 0;">{VALUE}</td></tr>
+      <!-- repeat rows; see the recap-table guidance below -->
+    </table>
+  </div>
+
+  <!-- CTA BLOCK -->
+  <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px;">
+    <a href="{URL}" target="_blank" rel="noopener" class="lgm-primary" style="flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; background: var(--color-text-primary); color: var(--color-background-primary); border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; text-decoration: none;">
+      {PRIMARY_LABEL}
+      <i class="ti ti-external-link" style="font-size: 16px;" aria-hidden="true"></i>
+    </a>
+    <button class="lgm-primary" style="flex: 1; padding: 12px 16px;" onclick="sendPrompt('{LGM_PROMPT}')">
+      {LGM_CTA_LABEL} ↗
+    </button>
+  </div>
+
+</div>
+```
 
 ### Filling the widget for this skill
 
-Map the `widget-template.md` placeholders as follows.
+Map the placeholders above as follows.
 
 **`{ACCESSIBLE_TITLE}`** — `Sales Navigator search built, with options to open it or import the audience into La Growth Machine`
 
