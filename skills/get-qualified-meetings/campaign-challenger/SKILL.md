@@ -166,10 +166,10 @@ Two phases.
 **Phase 1 — Rewrite the campaign.**
 
 - **If the `multichannel-campaign-builder` skill is installed** — **invoke it**, passing the original draft + the 3 fixes from the analysis as the brief (e.g. *"Rewrite this campaign applying these fixes: 1) … 2) … 3) …"*). Let that skill produce its full output (framing line, 3 angles, message code blocks, recap+CTA widget). Its widget carries the LGM CTA that handles Phase 2 — do not add your own.
-- **If not installed** — rewrite the campaign inline yourself:
-  - Apply the top 3 fixes to each message in the draft.
+- **If not installed** — rewrite the campaign inline yourself, and prepend a "works best with" callout so the user knows what they're missing:
+  - First line of Phase 1: **`> Works best with [multichannel-campaign-builder](../multichannel-campaign-builder/) — install the sibling skill for fresh-angle rewrites. What follows is a fallback that applies the fixes inline.`** (Markdown blockquote, one line, link points to the sibling skill folder on GitHub).
+  - Then apply the top 3 fixes to each message in the draft.
   - Output one **fenced code block per touch** (same label format the original used — e.g. `▸ T1 · Day 0 · LinkedIn invite`, then the rewritten body in a triple-backtick block).
-  - Mention once after the messages: *"For a richer rewrite with fresh angle exploration, the [multichannel-campaign-builder](../../../README.md) skill is in the catalog — install it and re-run."*
   - Then render Phase 2 below.
 
 **Phase 2 — Set up in LGM (only when you rewrote inline in Phase 1).**

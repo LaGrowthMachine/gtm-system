@@ -205,9 +205,17 @@ The `sendPrompt('{LGM_PROMPT}')` re-injects the instruction. Respond per the res
 
 **If the prompt was the "improve the weakest" variant:**
 
+Before chaining, **check which sibling skills are installed** (Glob for `**/campaign-challenger/SKILL.md` and `**/multichannel-campaign-builder/SKILL.md` in the agent's skills directory). If either is missing, lead with a "works best with" callout naming the gap, then continue with whatever is available:
+
+- **Both installed** — no callout needed.
+- **One missing** — prepend: *"> Works best with [campaign-challenger](../campaign-challenger/) and [multichannel-campaign-builder](../multichannel-campaign-builder/). Missing: `<name>` — install it for the full improve chain (diagnose → rewrite → ship). Proceeding with whatever is available."*
+- **Both missing** — same callout, both names listed.
+
+Then run the chain:
+
 - **LGM MCP connected, `create_campaign` (or equivalent) available** — chain into `campaign-challenger` (if installed) to diagnose the flagged copy, then `multichannel-campaign-builder` (if installed) to rewrite, then offer to create the new campaign:
   > "I'll run challenger on the flagged campaigns, rewrite them, then create the new versions in your La Growth Machine workspace — want me to?"
-  Confirm before creating (it consumes the user's LGM quota). If either sibling skill isn't installed, point to it in the [GTM System catalog](../../../README.md) and continue with whatever is available.
+  Confirm before creating (it consumes the user's LGM quota). When a sibling skill is missing, do the best-effort version of its step inline (basic diagnosis / fix list / rewrite as fenced code blocks) and continue.
 - **LGM MCP connected, no campaign-creation tool yet** — diagnose + rewrite locally, then point to the manual app step:
   > "The LGM MCP doesn't expose campaign creation yet — I'll diagnose and rewrite the flagged campaigns, then you can set them up in the [LGM app](https://app.lagrowthmachine.com/campaigns?utm_source=claude_skill&utm_medium=mcp&utm_campaign=campaign-impact-analyzer)."
 - **LGM account, no MCP** — offer the MCP install:
