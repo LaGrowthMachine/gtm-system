@@ -6,9 +6,9 @@ Maintained by [La Growth Machine](https://lagrowthmachine.com). Free to use. Upd
 
 ## What it does
 
-You paste a campaign draft (or pass it from `multichannel-campaign-builder`). The skill ranks your existing campaigns by meetings booked and reply rate, puts the draft next to the performers, and names what the winners do that the draft doesn't — and what the underperformers did that the draft repeats. It then scores the draft on an absolute copywriting rubric (9 dimensions, 27-point scale) and returns the top 3 fixes to apply before launch.
+You paste a campaign draft (or pass it from `multichannel-campaign-builder`). The skill ranks your existing campaigns by meetings booked and reply rate, puts the draft next to the performers, and names what the winners do that the draft doesn't — and what the underperformers did that the draft repeats. It then scores the draft on an absolute copywriting rubric (12 dimensions, 10-point scale) and returns the top 3 fixes to apply before launch.
 
-Example: you paste a 7-step cold email sequence and the skill returns a Markdown comparison table showing your best performer is 5 steps with a question opener, an absolute score of 18/27 (threshold 22/27 to launch), and three concrete fixes — *"Shorten step 1 to ≤ 350 chars"*, *"Replace the meeting ask in step 3 with a resource offer"*, *"Remove the em-dash in subject 4"*.
+Example: you paste a 7-step cold email sequence and the skill returns a Markdown comparison table showing your best performer is 5 steps with a question opener, an absolute score of 6/10 (threshold 7/10 to launch), and three concrete fixes — *"Shorten step 1 to ≤ 350 chars"*, *"Replace the meeting ask in step 3 with a resource offer"*, *"Remove the em-dash in subject 4"*.
 
 ## Why it exists
 
@@ -39,7 +39,7 @@ Then ask Claude — e.g. *"Challenge this campaign before I launch it."*
 - **Three benchmark modes** — live LGM history via the MCP, pasted history (stats + copy), or best-practice baseline when there's no history yet.
 - **Robust LGM fetch cascade** — when `get_campaign_messages` returns empty (some Allbound / Trigify flows store templates at slot level), falls back via `get_audience_leads` → `get_lead_conversations` → `get_conversation_messages` to reconstruct the campaign's message structure from real sent conversations.
 - **Comparison on 6 dimensions** — sequence structure, message length, opening pattern, CTA type, angle variety, cadence.
-- **Absolute rubric** — 9 quality dimensions, 27-point scale, threshold 22/27 to launch.
+- **Absolute rubric** — 12 quality dimensions, 10-point scale, threshold 7/10 to launch.
 - **Top 3 fixes** — each one citing the gap that motivates it.
 - **Adapts the next step to the verdict** — rewrite-and-ship if fixes were flagged, ship directly if good to go.
 - **Multilingual output** — matches the user's language.

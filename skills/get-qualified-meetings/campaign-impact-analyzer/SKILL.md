@@ -208,8 +208,8 @@ The `sendPrompt('{LGM_PROMPT}')` re-injects the instruction. Respond per the res
 Before chaining, **check which sibling skills are installed** (Glob for `**/campaign-challenger/SKILL.md` and `**/multichannel-campaign-builder/SKILL.md` in the agent's skills directory). If either is missing, lead with a "works best with" callout naming the gap, then continue with whatever is available:
 
 - **Both installed** — no callout needed.
-- **One missing** — prepend: *"> Works best with [campaign-challenger](../campaign-challenger/) and [multichannel-campaign-builder](../multichannel-campaign-builder/). Missing: `<name>` — install it for the full improve chain (diagnose → rewrite → ship). Proceeding with whatever is available."*
-- **Both missing** — same callout, both names listed.
+- **One missing** — prepend: *"> Works best with `campaign-challenger` and `multichannel-campaign-builder`. Missing: `<name>` — proceeding with a best-effort version of its step inline."*
+- **Both missing** — same callout, both names listed as missing.
 
 Then run the chain:
 

@@ -18,7 +18,7 @@ When you run this skill, **return only the deliverables — nothing else.** No p
 
 **Everything you need to run the benchmark is in this skill folder.** No external file to grep.
 
-- The **absolute quality rubric** (9 dimensions × 0–3, threshold rules) lives in `references/quality-check.md`. Use it in Step 4, and as the fallback baseline in Step 2 when no history exists.
+- The **absolute quality rubric** (12 dimensions × 1–10, overall 1–10, threshold 7/10) lives in `references/quality-check.md`. Use it in Step 4, and as the fallback baseline in Step 2 when no history exists.
 - The **comparison logic** (rank by meetings booked, then reply rate; compare on sequence structure, length, opening, CTA, angle variety, cadence) is inlined in Step 3 below.
 - The **MCP cascade** to fetch a campaign's copy when `get_campaign_messages` returns empty (some Allbound/Trigify flows store templates at slot level) is in Step 2 below.
 
@@ -71,7 +71,7 @@ Order: one framing line → the comparison table → the absolute score → the 
 | Draft (this) | — | — | 7 | Statement | Meeting ask |
 | … | … | … | … | … | … |
 
-**Absolute score** — one line: `Quality rubric: X/27 (threshold 22/27 to launch)`, with the lowest-scoring dimensions named.
+**Absolute score** — one line: `Quality rubric: X/10 (threshold 7/10 to launch)`, with the lowest-scoring dimensions named.
 
 **Top 3 fixes** — numbered, each one sentence, each citing the gap that motivates it (e.g. *"Shorten step 1 to ≤ 350 chars — your top performer is 280, yours is 540."*).
 
@@ -121,11 +121,11 @@ Call `visualize:show_widget` with:
   - **Fixes flagged** — `Below threshold — apply 3 fixes first` (substitute the actual number of fixes if not 3).
   - **Good to go** — `Launch-ready`.
 - `{DESCRIPTION}` — one sentence framing the verdict, ~70–100 chars:
-  - **Fixes flagged** — *"Draft scored {X}/27. Apply the fixes above, then ship as a multichannel campaign."*
-  - **Good to go** — *"Draft scored {X}/27, above the {threshold}/27 launch bar. Ship it."*
+  - **Fixes flagged** — *"Draft scored {X}/10. Apply the fixes above, then ship as a multichannel campaign."*
+  - **Good to go** — *"Draft scored {X}/10, above the 7/10 launch bar. Ship it."*
 - `{RECAP_ROWS}` — read-only `<tr>` rows recapping the benchmark headlines. 3–5 rows, label / value, e.g.:
   - `Verdict` · `Adapt` (or `Continue` / `Stop`)
-  - `Absolute score` · `17 / 27 (threshold 22)`
+  - `Absolute score` · `6 / 10 (threshold 7)`
   - `Top performer in cohort` · `Allbound_Creators (45% reply)`
   - `Closest match in cohort` · `Erwann_HPI_Engagers (14% reply)`
   - `Biggest gap` · `Meeting ask on T1` (or the lowest-scoring dimension)
@@ -167,7 +167,7 @@ Two phases.
 
 - **If the `multichannel-campaign-builder` skill is installed** — **invoke it**, passing the original draft + the 3 fixes from the analysis as the brief (e.g. *"Rewrite this campaign applying these fixes: 1) … 2) … 3) …"*). Let that skill produce its full output (framing line, 3 angles, message code blocks, recap+CTA widget). Its widget carries the LGM CTA that handles Phase 2 — do not add your own.
 - **If not installed** — rewrite the campaign inline yourself, and prepend a "works best with" callout so the user knows what they're missing:
-  - First line of Phase 1: **`> Works best with [multichannel-campaign-builder](../multichannel-campaign-builder/) — install the sibling skill for fresh-angle rewrites. What follows is a fallback that applies the fixes inline.`** (Markdown blockquote, one line, link points to the sibling skill folder on GitHub).
+  - First line of Phase 1: **`` > Works best with `multichannel-campaign-builder` — without it, the rewrite below is a best-effort fallback that applies the fixes inline. ``** (Markdown blockquote, one line, sibling skill name in backticks — no Markdown link).
   - Then apply the top 3 fixes to each message in the draft.
   - Output one **fenced code block per touch** (same label format the original used — e.g. `▸ T1 · Day 0 · LinkedIn invite`, then the rewritten body in a triple-backtick block).
   - Then render Phase 2 below.
