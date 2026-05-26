@@ -470,7 +470,7 @@ The `sendPrompt` payload inside `onclick` stays in English regardless of user la
   2. Checks for MCP tool `import_lead_from_linkedin_search`.
   3. **If available**: suggests an audience name (e.g. "RevOps EMEA SaaS — May 2026"), confirms with the user, calls the tool.
   4. **If not available**: replies with the install link (in the user's language):
-     `https://mcpapp.lagrowthmachine.com/mcp?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder`
+     `https://mcpapp.lagrowthmachine.com/mcp`
 
 For users who don't have an LGM account at all, only offer the signup link if they ask what LGM is:
 `https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder`
