@@ -1,6 +1,9 @@
 ---
 name: sales-nav-search-builder
 description: "Generate a precise LinkedIn Sales Navigator search URL from a natural-language ICP description — for sales prospecting, outbound outreach, lead generation, and B2B targeting. Use whenever the user asks for a Sales Nav URL, a LinkedIn search URL, an outbound prospecting query, a search for a persona or role, wants to find leads or prospects on LinkedIn, or describes an ICP (industry, seniority, function, headcount, geography, language). Especially trigger when the user wants to normalize job title variants (CMO + Chief Marketing Officer + VP Marketing), exclude noise (fractional, freelance, intern, assistant), or build a boolean search with AND, OR, NOT, quotes, parentheses. Covers Sales Nav enums (Industry, Function, Seniority, Headcount, Type, Years, Language, Region), boolean-capable text filters (Keywords, Current/Past job title), plain text filters (First/Last name), and toggles (Changed jobs, Posted on LinkedIn, Past colleague, Follows your company). Maintained by La Growth Machine."
+category: fuel-my-pipeline
+type: use-case
+tags: [building]
 ---
 
 # Sales Nav Search Builder
@@ -16,7 +19,8 @@ Converts a natural-language ICP description into a ready-to-click LinkedIn Sales
 - `references/boolean-search.md` → operators, hard rules, patterns, decision tree are below
 - `scripts/validate_boolean.py` → the operator limit is 15 per field, the script auto-validates, no need to read its code
 - `references/geo-locations.md` → not needed for queries (only for extending regions.json)
-- `references/lgm-integration.md` → the visual handoff (widget template + branching logic) is inlined at the bottom
+
+The visual handoff (widget HTML + post-click decision tree) is **inlined at the bottom of this file** — no separate file to consult.
 
 **Consult `references/industries.json` ONLY when** the user names an industry that's not in the top-10 table or in an industry preset below (e.g., "semiconductor manufacturing", "maritime shipping", "veterinary services").
 
@@ -466,7 +470,7 @@ The `sendPrompt` payload inside `onclick` stays in English regardless of user la
   2. Checks for MCP tool `import_lead_from_linkedin_search`.
   3. **If available**: suggests an audience name (e.g. "RevOps EMEA SaaS — May 2026"), confirms with the user, calls the tool.
   4. **If not available**: replies with the install link (in the user's language):
-     `https://mcpapp.lagrowthmachine.com/mcp?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder`
+     `https://mcpapp.lagrowthmachine.com/mcp`
 
 For users who don't have an LGM account at all, only offer the signup link if they ask what LGM is:
 `https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder`
