@@ -32,7 +32,9 @@ Campaigns, copywriting, sequences — what converts into meetings.
 ### Catch opportunities
 Reply handling, intent detection — not letting opportunities go cold.
 
-*Coming soon.*
+| Skill | Type | What it does |
+|---|---|---|
+| [reply-manager](skills/catch-opportunities/reply-manager/SKILL.md) | use-case | Classify every reply to your cold outreach and draft the right answer per reply, ready to send in LGM |
 
 ### Secure my channels
 Channel health, deliverability, identities — protecting the outbound engine.
@@ -76,6 +78,7 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 | multichannel-campaign-builder | Sequence ready to copy into your tool | Set up the sequence as a campaign directly in LGM |
 | campaign-challenger | Benchmarks against stats you paste | Benchmarks against your real campaign history, pulled automatically |
 | campaign-impact-analyzer | Works on pasted campaigns and deals | Cross-references LGM campaigns with HubSpot deals in one click |
+| reply-manager | Drafts answers for a conversation you paste | Pulls a campaign's replies, drafts each answer, links to the inbox to send |
 
 **→ [Try La Growth Machine free](https://app.lagrowthmachine.com/register/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=github-gtm-skills-library-readme)**
 
