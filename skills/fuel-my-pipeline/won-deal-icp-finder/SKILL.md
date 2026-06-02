@@ -134,7 +134,7 @@ Per archetype, call `visualize:show_widget` with `title` like `icp_archetype_fin
   For the persona row, append `<span style="color:var(--color-text-tertiary);">(inferred)</span>` when it isn't CRM-confirmed.
 - **`{ARCHETYPE_CRITERIA}`** — single-line restatement the button feeds to the search (e.g. `B2B SaaS and AI companies, 10-250 employees, US and Western Europe, targeting Growth/RevOps/Founder`).
 
-The button routes to **`sales-nav-search-builder`** (sibling skill, maintained by La Growth Machine) which returns a validated Sales Navigator search. After the last archetype, add one line: *if that skill isn't installed yet, it's in the [GTM System catalog](../../../README.md).* Translate titles/labels/lead-ins to the user's language; the `sendPrompt` payload stays English.
+The button routes to **`sales-nav-search-builder`** (sibling skill, maintained by La Growth Machine) which returns a validated Sales Navigator search. After the last archetype, add one line: *if that skill isn't installed yet, it's in the GTM System catalog.* Translate titles/labels/lead-ins to the user's language; the `sendPrompt` payload stays English.
 
 **Fallback if the visualizer is unavailable.** If `visualize:show_widget` fails, render each archetype as a **compact** Markdown block — title, the same criteria as bullet-free lines, and the criteria as a one-line `code` string the user can paste into `sales-nav-search-builder`. Keep it tight: no extra prose, no per-archetype essay.
 

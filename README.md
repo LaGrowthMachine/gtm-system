@@ -41,25 +41,58 @@ Channel health, deliverability, identities — protecting the outbound engine.
 
 ---
 
-## Install
+## Install everything in one command
 
-**Prerequisites:** [Claude Code](https://claude.com/product/claude-code), [Cursor](https://cursor.sh), [Codex](https://github.com/openai/codex), [Amp](https://ampcode.com), or any other supported agent.
+The fastest way: install all the GTM skills **and** the LGM MCP server (so Claude can act inside your La Growth Machine workspace) in one go.
 
-**One-line (recommended)** — uses [`skills`](https://github.com/vercel-labs/skills) from Vercel Labs to install the skill into Claude Code (and Cursor, Codex, Amp, +30 other agents) in one command:
+```bash
+curl -fsSL https://raw.githubusercontent.com/LaGrowthMachine/gtm-system/main/install.sh | sh
+```
+
+This installs:
+
+- **The GTM skills** — for Claude Code, Cursor, and Codex (via the [Vercel Labs `skills`](https://github.com/vercel-labs/skills) CLI under the hood)
+- **The LGM MCP** — registered with Claude Code via `claude mcp add --scope user --transport http` (user scope → config stored in `~/.claude.json`, available in every project). The installer is **interactive**: it asks if you have an LGM account, then prompts for your API key (hidden input). If you don't have an account, it shows a quick pitch + register link and skips the MCP setup without touching your Claude config.
+
+The script is idempotent — re-running it is safe. Want to review before running?
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/LaGrowthMachine/gtm-system/main/install.sh -o lgm-install.sh
+less lgm-install.sh
+sh lgm-install.sh
+```
+
+**Prerequisites:** [Claude Code](https://claude.com/product/claude-code) (or [Cursor](https://cursor.sh), [Codex](https://github.com/openai/codex), [Amp](https://ampcode.com), any other supported agent) and Node.js ≥ 18.
+
+---
+
+## Other ways to install
+
+### Install one skill at a time
+
+If you only need a specific skill (no MCP), use the [Vercel Labs `skills`](https://github.com/vercel-labs/skills) CLI directly:
 
 ```bash
 npx skills add LaGrowthMachine/gtm-system/skills/fuel-my-pipeline/sales-nav-search-builder
 ```
 
-Replace the path with any skill from the catalog above. Add `-g` for a global install.
+Replace the path with any skill from the catalog above. Add `-g` for a global install. Works with Claude Code, Cursor, Codex, Amp + 30 other agents.
 
-**Manual install** — if you'd rather not use the CLI, clone and copy:
+### Manual install
+
+Clone the repo and copy the skill folder yourself:
 
 ```bash
 git clone https://github.com/LaGrowthMachine/gtm-system.git
 cd gtm-system
 cp -r skills/fuel-my-pipeline/sales-nav-search-builder ~/.claude/skills/
 ```
+
+### LGM MCP on Claude.ai (web)
+
+Claude.ai accepts HTTP MCP connectors natively. Add the LGM MCP manually:
+
+> Settings → Connectors → Add custom connector → `https://mcpapp.lagrowthmachine.com/mcp`
 
 Then ask Claude — e.g. *"Build me a Sales Navigator search for RevOps leaders in EMEA SaaS."*
 
