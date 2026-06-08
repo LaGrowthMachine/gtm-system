@@ -16,9 +16,19 @@ The reply stage is where outbound leaks. Messages pile up, the easy "interested"
 
 ## Install
 
-Copy the skill folder into your Claude skills directory:
+**One-line (recommended)** — uses [`skills`](https://github.com/vercel-labs/skills) from Vercel Labs to install into Claude Code, Cursor, Codex, Amp + 30 other agents in one go:
 
 ```bash
+npx skills add LaGrowthMachine/gtm-system/skills/catch-opportunities/reply-manager
+```
+
+Add `-g` for a global install.
+
+**Manual install** — clone the repo and copy the skill folder yourself:
+
+```bash
+git clone https://github.com/LaGrowthMachine/gtm-system.git
+cd gtm-system
 cp -r skills/catch-opportunities/reply-manager ~/.claude/skills/
 ```
 
@@ -60,7 +70,7 @@ This skill runs standalone with any stack. It also plugs into:
 
 ## Stay in the loop
 
-- Browse all GTM skills: [the GTM System catalog](https://github.com/LaGrowthMachine/gtm-system)
+- Browse all GTM skills: [the GTM System catalog](../../../README.md)
 - Get new skills as they ship: [Subscribe](https://tally.so/r/NpRWgp)
 - See how La Growth Machine fits your GTM stack: [Try LGM free](https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=reply-manager)
 
