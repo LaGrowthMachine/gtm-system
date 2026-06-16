@@ -2,6 +2,8 @@
 
 How to write the reply once a message is classified (see `classification-rules.md`). One draft per reply — calibrated to the thread, not a template.
 
+**Draft on the full conversation, not just the last message.** Read the whole thread first: what was already said and offered, the rapport and tone established, any question left open. The classification keys on the last received message, but the answer has to fit everything that came before — pick up earlier points where it helps, and never repeat a question already asked or re-pitch something already covered.
+
 The goal of every reply: move the conversation forward **and** leave the person better off, even on a "no". A cold reply is a relationship, not a transaction.
 
 ## The 5 non-negotiable rules

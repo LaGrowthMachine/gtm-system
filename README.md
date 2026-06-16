@@ -111,7 +111,7 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 | multichannel-campaign-builder | Sequence ready to copy into your tool | Set up the sequence as a campaign directly in LGM |
 | campaign-challenger | Benchmarks against stats you paste | Benchmarks against your real campaign history, pulled automatically |
 | campaign-impact-analyzer | Works on pasted campaigns and deals | Cross-references LGM campaigns with HubSpot deals in one click |
-| reply-manager | Drafts answers for a conversation you paste | Pulls a campaign's replies, drafts each answer, links to the inbox to send |
+| reply-manager | Drafts answers for a conversation you paste | Pulls your inbox/campaign replies, drafts each answer, sends them natively on your approval |
 
 **→ [Try La Growth Machine free](https://app.lagrowthmachine.com/register/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=github-gtm-skills-library-readme)**
 
