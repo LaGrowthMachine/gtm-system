@@ -1,12 +1,19 @@
-# La Growth Machine — GTM Skills for Claude
+# GTM Skills for Claude
 
-> The open-source toolkit to build your full GTM system as Claude skills.
+> The open-source GTM toolkit for Claude: skills and an MCP server to run outbound from the chat.
 
-A library of Claude skills built to help GTM teams run their go-to-market motion — from sourcing lists and building campaigns to qualifying meetings and securing channels. Each skill works with your existing stack. Plug the **La Growth Machine MCP** on top to execute the operational steps natively from Claude.
+Source your next list, write multichannel LinkedIn and email campaigns, pressure-test them against what already converted, rank your live campaigns by revenue, and handle every reply. Each skill works on its own with any stack. Connect the **La Growth Machine** MCP and Claude acts inside your workspace: it imports audiences, pulls your inbox, and sends your replies. Free, open source, MIT licensed.
 
-**[Get notified when new skills ship](https://tally.so/r/NpRWgp)** · **[Try La Growth Machine free](https://app.lagrowthmachine.com/register/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=github-gtm-skills-library-readme)**
+[Browse skills](#catalog) · [Quick start](#install-everything-in-one-command) · [Skills library](https://lagrowthmachine.com/claude-skills/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-skills-library) · [MCP server](https://lagrowthmachine.com/mcp/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-mcp) · Built by [La Growth Machine](https://lagrowthmachine.com/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-brand)
 
 ---
+
+## Who it's for
+
+- RevOps and SalesOps wiring outreach into the CRM and the rest of the stack
+- GTM and Growth Engineers automating the prospecting workflow
+- Heads of Sales and Marketing, and CROs, who want qualified pipeline without the busywork
+- Founders running their own outbound
 
 ## Catalog
 
@@ -34,7 +41,7 @@ Reply handling, intent detection — not letting opportunities go cold.
 
 | Skill | Type | What it does |
 |---|---|---|
-| [reply-manager](skills/catch-opportunities/reply-manager/SKILL.md) | use-case | Classify every reply to your cold outreach and draft the right answer per reply, ready to send in LGM |
+| [reply-manager](skills/catch-opportunities/reply-manager/SKILL.md) | use-case | Triage your inbox or a campaign's replies, draft the right answer from the full thread, and send it in LGM on your approval |
 
 ### Secure my channels
 Channel health, deliverability, identities — protecting the outbound engine.
@@ -103,6 +110,8 @@ Then ask Claude — e.g. *"Build me a Sales Navigator search for RevOps leaders 
 ## La Growth Machine MCP
 
 These skills work with any outreach stack. Install the **LGM MCP** to execute the operational steps natively from Claude — no copy-pasting between tools.
+
+**[See the full MCP page →](https://lagrowthmachine.com/mcp/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=mcp-section)**
 
 | Skill | Without LGM MCP | With LGM MCP |
 |---|---|---|
