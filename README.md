@@ -122,6 +122,84 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 | campaign-impact-analyzer | Works on pasted campaigns and deals | Cross-references LGM campaigns with HubSpot deals in one click |
 | reply-manager | Drafts answers for a conversation you paste | Pulls your inbox/campaign replies, drafts each answer, sends them natively on your approval |
 
+### Connect the MCP
+
+The La Growth Machine MCP is hosted (remote): there's nothing to run locally. Authenticate once with your LGM API key (LGM → Settings → API), and Claude can act in your workspace: import audiences, read campaigns and stats, pull your inbox, and send replies.
+
+**Claude Code** (and Cursor, Codex, Amp):
+
+```bash
+claude mcp add --scope user --transport http LaGrowthMachine \
+  https://mcpapp.lagrowthmachine.com/mcp \
+  --header "Authorization:Bearer YOUR_LGM_API_KEY"
+```
+
+**Manual config** (clients that read an MCP JSON config):
+
+```json
+{
+  "mcpServers": {
+    "LaGrowthMachine": {
+      "type": "http",
+      "url": "https://mcpapp.lagrowthmachine.com/mcp",
+      "headers": { "Authorization": "Bearer YOUR_LGM_API_KEY" }
+    }
+  }
+}
+```
+
+**Claude.ai (web):** Settings → Connectors → Add custom connector → `https://mcpapp.lagrowthmachine.com/mcp`
+
+The one-line installer at the top sets this up for you automatically.
+
+### Available tools
+
+The MCP exposes your La Growth Machine workspace to Claude. The skills above orchestrate these tools into full workflows.
+
+**Campaigns & audiences**
+
+| Tool | What it does |
+|---|---|
+| `list_campaigns` | List your campaigns and their status |
+| `get_campaign_stats` | Acceptance, reply and conversion rates for a campaign |
+| `get_campaign_messages` | The message sequence of a campaign |
+| `get_audience` | Details and import status of an audience |
+| `get_audience_leads` | Leads in an audience (name, company, title, email, LinkedIn) |
+| `create_audience_from_linkedin_url` | Build an audience from a LinkedIn / Sales Navigator search or a post's engagers |
+
+**Leads & conversations**
+
+| Tool | What it does |
+|---|---|
+| `get_lead_conversations` | A lead's conversations across channels |
+| `get_conversation_messages` | The full message thread of a conversation |
+| `get_lead_logs` | Activity log for a lead (sent, accepted, replied…) |
+
+**Inbox**
+
+| Tool | What it does |
+|---|---|
+| `get_conversations_to_reply` | Conversations waiting on your reply |
+| `get_unread_conversations` | Unread conversations |
+| `get_favourite_conversations` | Starred conversations |
+| `search_conversations` | Filter the whole inbox (campaign, channel, date, status…) |
+
+**Send & manage**
+
+| Tool | What it does |
+|---|---|
+| `send_linkedin_message` | Send a LinkedIn message (text or voice note) |
+| `send_email_message` | Send an email, with thread-aware replies |
+| `snooze_conversation` / `unsnooze_conversation` | Snooze a conversation until later |
+| `archive_conversation` / `unarchive_conversation` | Archive or restore a conversation |
+
+**Account**
+
+| Tool | What it does |
+|---|---|
+| `list_identities` | Your connected LinkedIn / email identities |
+| `list_members` | The members of your LGM account |
+
 **→ [Try La Growth Machine free](https://app.lagrowthmachine.com/register/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=github-gtm-skills-library-readme)**
 
 ---
