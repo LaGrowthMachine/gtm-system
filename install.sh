@@ -13,23 +13,22 @@
 # What it does (in order):
 #   1. Checks Node.js / npx are available.
 #   2. Installs LGM GTM Skills via `npx skills add` (claude-code, cursor, codex).
-#   3. Checks the user has an LGM account + collects their API key.
-#      If no account → pitches LGM with a register link and exits cleanly.
-#   4. Registers the LGM MCP in Claude Code via `claude mcp add --scope user
-#      --transport http`, passing the API key as `Authorization: Bearer …`.
-#   5. Prints suggested first-step prompts and a soft "star the repo" nudge.
+#   3. Registers the LGM MCP in Claude Code via `claude mcp add --scope user
+#      --transport http`. Auth is handled by the MCP itself: on first use a
+#      browser tab opens to sign in to La Growth Machine (OAuth) — no API key
+#      to copy, nothing to paste.
+#   4. Prints suggested first-step prompts and a soft "star the repo" nudge.
 #
 # Honors:
 #   LGM_INSTALL_NO_CLAUDE_PERMS=1  — skip the Claude MCP setup entirely.
 #   LGM_INSTALL_NO_LAUNCH=1        — skip the final launch message.
-#   LGM_API_KEY=...                — provide the LGM API key non-interactively.
 #   LGM_INSTALL_VERBOSE=1          — show the full output of npx / claude commands
 #                                    (instead of silencing it) — useful for debugging.
 
 set -eu
 
-SCRIPT_VERSION="2026.06.02.1"
-MCP_URL="https://mcpapp.lagrowthmachine.com/mcp"
+SCRIPT_VERSION="2026.06.16.1"
+MCP_URL="https://mcp.lagrowthmachine.com"
 MCP_ALIAS="LaGrowthMachine"
 SKILLS_PKG="LaGrowthMachine/gtm-system"
 
@@ -37,7 +36,6 @@ SKILLS_PKG="LaGrowthMachine/gtm-system"
 # `utm_medium=installer` distinguishes this entry point from the README, and
 # `utm_content` identifies the specific link the user clicked.
 REGISTER_URL="https://app.lagrowthmachine.com/register/?utm_source=github&utm_medium=installer&utm_campaign=gtm-system-installer&utm_content=register"
-API_KEY_URL="https://app.lagrowthmachine.com/settings/integrations/api?utm_source=github&utm_medium=installer&utm_campaign=gtm-system-installer&utm_content=api-key"
 REPO_URL="https://github.com/LaGrowthMachine/gtm-system"
 
 # ─────────────────────────────────────────────────────────────────────
@@ -63,8 +61,7 @@ fail() { printf "%b\n" "${RED}$*${RESET}" >&2; exit 1; }
 #
 # stdin is redirected from /dev/null so the command can't consume the script
 # itself when this installer is piped (curl ... | sh) — otherwise npx would
-# swallow the rest of the script and the MCP step would never run. Interactive
-# prompts read from /dev/tty directly, so they are unaffected.
+# swallow the rest of the script and the MCP step would never run.
 run_quiet() {
   if [ "${LGM_INSTALL_VERBOSE:-0}" = "1" ]; then
     "$@" </dev/null
@@ -90,42 +87,6 @@ print_logo() {
 
 # Tracks whether MCP config got written (controls the final hints)
 LGM_MCP_CONFIGURED=0
-# Tracks the user's API key for Step 4 — collected in Step 3
-LGM_API_KEY_VALUE=""
-
-# Read input from /dev/tty when stdin is a pipe (curl | sh case).
-read_tty() {
-  REPLY=""
-  if [ -r /dev/tty ]; then
-    IFS= read -r REPLY </dev/tty || true
-  else
-    IFS= read -r REPLY || true
-  fi
-  printf "%s" "$REPLY"
-}
-
-# Read a secret silently (no echo) when possible.
-read_secret_tty() {
-  REPLY=""
-  if [ -r /dev/tty ]; then
-    if command -v stty >/dev/null 2>&1; then
-      OLD_STTY="$(stty -g </dev/tty 2>/dev/null || true)"
-      # If the user hits Ctrl+C while echo is off, restore it before exiting —
-      # otherwise their terminal stays invisible (no echo) until they run `reset`.
-      trap 'stty echo </dev/tty 2>/dev/null; printf "\n" >&2; exit 130' INT TERM
-      stty -echo </dev/tty 2>/dev/null || true
-      IFS= read -r REPLY </dev/tty || true
-      [ -n "$OLD_STTY" ] && stty "$OLD_STTY" </dev/tty 2>/dev/null || true
-      trap - INT TERM
-      printf "\n" >&2
-    else
-      IFS= read -r REPLY </dev/tty || true
-    fi
-  else
-    IFS= read -r REPLY || true
-  fi
-  printf "%s" "$REPLY"
-}
 
 # ─────────────────────────────────────────────────────────────────────
 # Step 1 — check Node.js / npx
@@ -152,105 +113,16 @@ install_skills() {
 }
 
 # ─────────────────────────────────────────────────────────────────────
-# Pitch shown to users who don't have an LGM account yet.
-# Returns 0 — execution continues to the final summary; MCP config is skipped.
-# ─────────────────────────────────────────────────────────────────────
-pitch_lgm() {
-  say ""
-  say "${CYAN}La Growth Machine — what the MCP unlocks${RESET}"
-  say "  ${GREEN}•${RESET} Run multichannel outbound (LinkedIn, email, voice, calls) from one workspace"
-  say "  ${GREEN}•${RESET} Pull live campaign data, replies and pipeline straight into Claude"
-  say "  ${GREEN}•${RESET} Push Sales Navigator audiences into LGM with one prompt"
-  say "  ${GREEN}•${RESET} Native HubSpot integration — every deal mapped back to the campaign that won it"
-  say ""
-  say "  ${CYAN}Create your free LGM account (14-day trial):${RESET}"
-  say "  ${CYAN}${REGISTER_URL}${RESET}"
-  say ""
-  say "  ${GREY}Once you have an account, re-run this installer and paste your API key${RESET}"
-  say "  ${GREY}from ${API_KEY_URL%%\?*} to finish the setup.${RESET}"
-}
-
-# ─────────────────────────────────────────────────────────────────────
-# Step 3 — check LGM account + collect the API key
-#
-# The LGM MCP authenticates with a Bearer token (the user's LGM API key)
-# passed on every upstream call. No OAuth dance, no browser step.
-#
-# Behavior:
-#   - LGM_INSTALL_NO_CLAUDE_PERMS=1   → skip everything, no prompt.
-#   - LGM_API_KEY env var present     → non-interactive, use it directly.
-#   - LGM MCP already configured      → skip (idempotent, checked via `claude mcp list`).
-#   - Otherwise interactive:
-#       "Do you have an LGM account?" yes → ask for API key.
-#                                    no  → pitch LGM + register link, exit step.
-# ─────────────────────────────────────────────────────────────────────
-collect_account_and_key() {
-  [ "${LGM_INSTALL_NO_CLAUDE_PERMS:-0}" = "1" ] && return 0
-
-  # Idempotence: skip if our alias is already registered with Claude Code.
-  if command -v claude >/dev/null 2>&1; then
-    if claude mcp list </dev/null 2>/dev/null | grep -q "^${MCP_ALIAS}:"; then
-      say "${GREEN}✓ LGM MCP already configured — skipping.${RESET}"
-      LGM_MCP_CONFIGURED=1
-      return 0
-    fi
-  fi
-
-  # Non-interactive fast path — API key in env var.
-  if [ -n "${LGM_API_KEY:-}" ]; then
-    LGM_API_KEY_VALUE="$LGM_API_KEY"
-    return 0
-  fi
-
-  # No TTY → can't prompt safely.
-  if [ ! -t 0 ] && [ ! -r /dev/tty ]; then
-    say ""
-    say "${YELLOW}  No terminal detected — skipping the LGM MCP setup.${RESET}"
-    say "${GREY}  Re-run interactively, or set LGM_API_KEY=... before piping to sh.${RESET}"
-    return 0
-  fi
-
-  say ""
-  say "${CYAN}Connect the LGM MCP?${RESET}"
-  say "  The MCP lets Claude act inside your La Growth Machine workspace —"
-  say "  pull campaigns, push audiences, draft replies, all from chat."
-  say "  ${GREY}(an LGM account is required)${RESET}"
-  say ""
-  printf "  Do you already have an LGM account? [y/N]: "
-  ACCOUNT_REPLY="$(read_tty)"
-
-  case "$ACCOUNT_REPLY" in
-    y|Y|yes|YES) ;;
-    *)
-      pitch_lgm
-      return 0
-      ;;
-  esac
-
-  say ""
-  say "  ${CYAN}Grab your API key here:${RESET} ${API_KEY_URL}"
-  say "  ${GREY}(Settings → Integrations → API)${RESET}"
-  printf "  Paste your LGM API key (hidden): "
-  LGM_API_KEY_VALUE="$(read_secret_tty)"
-
-  if [ -z "$LGM_API_KEY_VALUE" ]; then
-    say ""
-    warn "  No API key entered — skipping MCP setup."
-    warn "  Re-run when you have it: ${API_KEY_URL}"
-    return 0
-  fi
-}
-
-# ─────────────────────────────────────────────────────────────────────
-# Step 4 — register the LGM MCP with Claude Code
+# Step 3 — register the LGM MCP with Claude Code
 #
 # Uses Claude Code's native HTTP MCP transport via `claude mcp add`.
-# The LGM API key is sent on every upstream call as `Authorization: Bearer <key>`.
-# No mcp-remote bridge, no OAuth dance, no browser step.
+# The MCP authenticates itself: on first use a browser tab opens to sign in
+# to La Growth Machine (OAuth). No API key, no Bearer header, nothing to paste —
+# so this works the same whether the installer runs interactively or headless.
+# New to LGM? The sign-in tab lets you create a free account on the spot.
 # ─────────────────────────────────────────────────────────────────────
-install_claude_config() {
-  # Skip if Step 3 didn't collect the API key.
-  [ -z "$LGM_API_KEY_VALUE" ] && return 0
+register_mcp() {
+  [ "${LGM_INSTALL_NO_CLAUDE_PERMS:-0}" = "1" ] && return 0
 
   # The canonical method requires the `claude` CLI. If absent, surface the
   # one-line command the user can run later, and don't fail the installer.
@@ -259,26 +131,34 @@ install_claude_config() {
     warn "  Claude Code CLI not found — can't auto-register the LGM MCP."
     warn "  Install Claude Code: https://claude.ai/download"
     warn "  Then run this once:"
-    warn "    claude mcp add --scope user --transport http ${MCP_ALIAS} ${MCP_URL} --header \"Authorization:Bearer YOUR_LGM_API_KEY\""
+    warn "    claude mcp add --scope user --transport http ${MCP_ALIAS} ${MCP_URL}"
+    return 0
+  fi
+
+  # Idempotence: skip if our alias is already registered with Claude Code.
+  if claude mcp list </dev/null 2>/dev/null | grep -q "^${MCP_ALIAS}:"; then
+    say "${GREEN}✓ LGM MCP already configured — skipping.${RESET}"
+    LGM_MCP_CONFIGURED=1
     return 0
   fi
 
   # --scope user writes to ~/.claude.json (global) instead of the default
   # local scope (.mcp.json in the current dir) — so the MCP is available in
   # every project, regardless of where the installer was run from.
-  if run_quiet claude mcp add --scope user --transport http "$MCP_ALIAS" "$MCP_URL" \
-       --header "Authorization:Bearer $LGM_API_KEY_VALUE"; then
+  if run_quiet claude mcp add --scope user --transport http "$MCP_ALIAS" "$MCP_URL"; then
     say "${GREEN}✓ LGM MCP registered with Claude Code (${MCP_ALIAS}, user scope).${RESET}"
+    say "${GREY}  On first use, a browser tab opens to sign in to La Growth Machine.${RESET}"
+    say "${GREY}  New here? You can create a free account from that tab.${RESET}"
     say "${GREY}  Verify with: claude mcp list${RESET}"
     LGM_MCP_CONFIGURED=1
   else
     warn "  claude mcp add failed. Run manually:"
-    warn "    claude mcp add --scope user --transport http ${MCP_ALIAS} ${MCP_URL} --header \"Authorization:Bearer YOUR_LGM_API_KEY\""
+    warn "    claude mcp add --scope user --transport http ${MCP_ALIAS} ${MCP_URL}"
   fi
 }
 
 # ─────────────────────────────────────────────────────────────────────
-# Step 5 — print first-step prompts + soft "star the repo" nudge
+# Step 4 — print first-step prompts + soft "star the repo" nudge
 # ─────────────────────────────────────────────────────────────────────
 print_first_steps() {
   [ "${LGM_INSTALL_NO_LAUNCH:-0}" = "1" ] && return 0
@@ -296,7 +176,8 @@ print_first_steps() {
     say "${GREEN}  LGM GTM Skills + MCP ready.${RESET}"
   else
     say "${GREEN}  LGM GTM Skills installed.${RESET}"
-    say "${GREY}  MCP setup skipped — re-run this installer once your LGM account is ready.${RESET}"
+    say "${GREY}  MCP setup skipped — add it anytime:${RESET}"
+    say "${GREY}    claude mcp add --scope user --transport http ${MCP_ALIAS} ${MCP_URL}${RESET}"
     say ""
     say "${CYAN}  In the meantime, the skills are ready to use.${RESET}"
     say "${GREY}    They work standalone — paste your data (deal export, campaign sequence,${RESET}"
@@ -321,6 +202,7 @@ print_first_steps() {
   say "  ${CYAN}See which campaigns drive pipeline${RESET}"
   say "  ${GREY}→ \"Which of my campaigns is actually driving pipeline?\"${RESET}"
   say ""
+  say "${GREY}  New to La Growth Machine? Create a free account: ${REGISTER_URL}${RESET}"
   say "${GREY}  If this helped, ${RESET}${CYAN}star the repo${RESET}${GREY}: ${REPO_URL}${RESET}"
   say "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
   say ""
@@ -332,6 +214,5 @@ print_first_steps() {
 print_logo
 ensure_node
 install_skills
-collect_account_and_key
-install_claude_config
+register_mcp
 print_first_steps

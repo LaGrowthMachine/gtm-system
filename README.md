@@ -61,7 +61,7 @@ curl -fsSL https://raw.githubusercontent.com/LaGrowthMachine/gtm-system/main/ins
 This installs:
 
 - **The GTM skills** — for Claude Code, Cursor, and Codex (via the [Vercel Labs `skills`](https://github.com/vercel-labs/skills) CLI under the hood)
-- **The LGM MCP** — registered with Claude Code via `claude mcp add --scope user --transport http` (user scope → config stored in `~/.claude.json`, available in every project). The installer is **interactive**: it asks if you have an LGM account, then prompts for your API key (hidden input). If you don't have an account, it shows a quick pitch + register link and skips the MCP setup without touching your Claude config.
+- **The LGM MCP** — registered with Claude Code via `claude mcp add --scope user --transport http` (user scope → config stored in `~/.claude.json`, available in every project). No API key to copy: on first use a browser tab opens to sign in to La Growth Machine (OAuth). New to LGM? You can create a free account from that tab.
 
 The script is idempotent — re-running it is safe. Want to review before running?
 
@@ -101,7 +101,7 @@ cp -r skills/fuel-my-pipeline/sales-nav-search-builder ~/.claude/skills/
 
 Claude.ai accepts HTTP MCP connectors natively. Add the LGM MCP manually:
 
-> Settings → Connectors → Add custom connector → `https://mcpapp.lagrowthmachine.com/mcp`
+> Settings → Connectors → Add custom connector → `https://mcp.lagrowthmachine.com`
 
 Then ask Claude — e.g. *"Build me a Sales Navigator search for RevOps leaders in EMEA SaaS."*
 
@@ -124,14 +124,13 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 
 ### Connect the MCP
 
-The La Growth Machine MCP is hosted (remote): there's nothing to run locally. Authenticate once with your LGM API key (LGM → Settings → API), and Claude can act in your workspace: import audiences, read campaigns and stats, pull your inbox, and send replies.
+The La Growth Machine MCP is hosted (remote): there's nothing to run locally, and no API key to copy. On first use a browser tab opens to sign in to La Growth Machine (OAuth) — new accounts can be created from that tab. Once connected, Claude can act in your workspace: import audiences, read campaigns and stats, pull your inbox, and send replies.
 
 **Claude Code** (and Cursor, Codex, Amp):
 
 ```bash
 claude mcp add --scope user --transport http LaGrowthMachine \
-  https://mcpapp.lagrowthmachine.com/mcp \
-  --header "Authorization:Bearer YOUR_LGM_API_KEY"
+  https://mcp.lagrowthmachine.com
 ```
 
 **Manual config** (clients that read an MCP JSON config):
@@ -141,14 +140,13 @@ claude mcp add --scope user --transport http LaGrowthMachine \
   "mcpServers": {
     "LaGrowthMachine": {
       "type": "http",
-      "url": "https://mcpapp.lagrowthmachine.com/mcp",
-      "headers": { "Authorization": "Bearer YOUR_LGM_API_KEY" }
+      "url": "https://mcp.lagrowthmachine.com"
     }
   }
 }
 ```
 
-**Claude.ai (web):** Settings → Connectors → Add custom connector → `https://mcpapp.lagrowthmachine.com/mcp`
+**Claude.ai (web):** Settings → Connectors → Add custom connector → `https://mcp.lagrowthmachine.com`
 
 The one-line installer at the top sets this up for you automatically.
 
