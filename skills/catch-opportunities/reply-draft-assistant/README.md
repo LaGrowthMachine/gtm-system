@@ -1,4 +1,4 @@
-# Reply Manager
+# Reply Draft Assistant
 
 > Turns the replies to your cold outreach into classified, ready-to-send answers — from your inbox, a campaign, or a pasted thread. One calibrated draft per reply, sent on your approval.
 
@@ -6,20 +6,20 @@ Maintained by [La Growth Machine](https://lagrowthmachine.com). Free to use. Upd
 
 ## What it does
 
-Reply Manager handles the back half of outbound: the answers. Point it at the replies your prospects sent — your LGM inbox ("who do I need to reply to?"), a specific campaign, or a thread you paste — and it reads each full conversation, classifies the reply (interested, curious, objection, question, wrong fit, not interested, auto-reply, voice note), drafts a single calibrated answer built on the whole thread, shows them all for review, and on your approval sends each one natively via LinkedIn or email.
+Reply Draft Assistant handles the back half of outbound: the answers. Point it at the replies your prospects sent — your LGM inbox ("who do I need to reply to?"), a specific campaign, or a thread you paste — and it reads each full conversation, classifies the reply (interested, curious, objection, question, wrong fit, not interested, auto-reply, voice note), drafts a single calibrated answer built on the whole thread, shows them all for review, and on your approval sends each one natively via LinkedIn or email.
 
 Example: 40 people replied across your campaigns and triaging them by hand is the bottleneck. You ask Claude to handle your inbox; it pulls the conversations waiting on you, tells you what each reply is, drafts the right response from the full context, and sends the batch you greenlight — without you leaving the chat.
 
 ## Why it exists
 
-The reply stage is where outbound leaks. Messages pile up, the easy "interested" ones get answered and the objections and curious-but-noncommittal replies go cold because writing a good, non-pushy answer for each takes time. Reply Manager removes the per-reply effort — the classification, the "what do I even say to this", the formatting tells that scream automation — so no answered lead sits unanswered.
+The reply stage is where outbound leaks. Messages pile up, the easy "interested" ones get answered and the objections and curious-but-noncommittal replies go cold because writing a good, non-pushy answer for each takes time. Reply Draft Assistant removes the per-reply effort — the classification, the "what do I even say to this", the formatting tells that scream automation — so no answered lead sits unanswered.
 
 ## Install
 
 **One-line (recommended)** — uses [`skills`](https://github.com/vercel-labs/skills) from Vercel Labs to install into Claude Code, Cursor, Codex, Amp + 30 other agents in one go:
 
 ```bash
-npx skills add LaGrowthMachine/gtm-system/skills/catch-opportunities/reply-manager
+npx skills add LaGrowthMachine/gtm-system/skills/catch-opportunities/reply-draft-assistant
 ```
 
 Add `-g` for a global install.
@@ -29,7 +29,7 @@ Add `-g` for a global install.
 ```bash
 git clone https://github.com/LaGrowthMachine/gtm-system.git
 cd gtm-system
-cp -r skills/catch-opportunities/reply-manager ~/.claude/skills/
+cp -r skills/catch-opportunities/reply-draft-assistant ~/.claude/skills/
 ```
 
 Then ask Claude — e.g. *"Help me reply to the people who answered my Q2 outbound campaign."*
@@ -72,7 +72,7 @@ This skill runs standalone with any stack. It also plugs into:
 
 - Browse all GTM skills: [the GTM System catalog](https://github.com/LaGrowthMachine/gtm-system)
 - Get new skills as they ship: [Subscribe](https://tally.so/r/NpRWgp)
-- See how La Growth Machine fits your GTM stack: [Try LGM free](https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=reply-manager)
+- See how La Growth Machine fits your GTM stack: [Try LGM free](https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=reply-draft-assistant)
 
 ## License
 

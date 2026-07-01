@@ -41,7 +41,7 @@ Reply handling, intent detection — not letting opportunities go cold.
 
 | Skill | Type | What it does |
 |---|---|---|
-| [reply-manager](skills/catch-opportunities/reply-manager/SKILL.md) | use-case | Triage your inbox or a campaign's replies, draft the right answer from the full thread, and send it in LGM on your approval |
+| [reply-draft-assistant](skills/catch-opportunities/reply-draft-assistant/SKILL.md) | use-case | Triage your inbox or a campaign's replies, draft the right answer from the full thread, and send it in LGM on your approval |
 
 ### Secure my channels
 Channel health, deliverability, identities — protecting the outbound engine.
@@ -120,7 +120,7 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 | multichannel-campaign-builder | Sequence ready to copy into your tool | Set up the sequence as a campaign directly in LGM |
 | campaign-challenger | Benchmarks against stats you paste | Benchmarks against your real campaign history, pulled automatically |
 | campaign-impact-analyzer | Works on pasted campaigns and deals | Cross-references LGM campaigns with HubSpot deals in one click |
-| reply-manager | Drafts answers for a conversation you paste | Pulls your inbox/campaign replies, drafts each answer, sends them natively on your approval |
+| reply-draft-assistant | Drafts answers for a conversation you paste | Pulls your inbox/campaign replies, drafts each answer, sends them natively on your approval |
 
 ### Connect the MCP
 
