@@ -4,7 +4,7 @@
 
 Source your next list, write multichannel LinkedIn and email campaigns, pressure-test them against what already converted, rank your live campaigns by revenue, and handle every reply. Each skill works on its own with any stack. Connect the **La Growth Machine** MCP and Claude acts inside your workspace: it imports audiences, pulls your inbox, and sends your replies. Free, open source, MIT licensed.
 
-[Browse skills](#catalog) · [Quick start](#install-everything-in-one-command) · [Skills library](https://lagrowthmachine.com/claude-skills/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-skills-library) · [MCP server](https://lagrowthmachine.com/mcp/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-mcp) · Built by [La Growth Machine](https://lagrowthmachine.com/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-brand)
+[Browse skills](#catalog) · [Quick start](#install-everything-in-one-command) · [Skills library](https://lagrowthmachine.com/claude-skills/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-skills-library) · [MCP server](https://lagrowthmachine.com/mcp/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-mcp) · [MCP Toolkit](https://lagrowthmachine.com/mcp-toolkit/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-mcp-toolkit) · Built by [La Growth Machine](https://lagrowthmachine.com/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=hero-brand)
 
 ---
 
@@ -204,9 +204,9 @@ The MCP exposes your La Growth Machine workspace to Claude. The skills above orc
 
 ## Get new skills as soon as they ship
 
-We add new skills and use cases regularly. One email per batch, no spam.
+A new outbound workflow drops every week — a skill, a playbook, or an MCP scenario. They all land on the [MCP Toolkit](https://lagrowthmachine.com/mcp-toolkit/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=drops-mcp-toolkit).
 
-**→ [Subscribe](https://tally.so/r/NpRWgp)**
+**→ [Subscribe](https://tally.so/r/NpRWgp)** to get each one the day it ships.
 
 ---
 
