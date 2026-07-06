@@ -2,7 +2,7 @@
 
 > Benchmark an outbound campaign copy against your real campaign history — what worked, what didn't, and the prioritized fixes before you ship.
 
-Maintained by [La Growth Machine](https://lagrowthmachine.com). Free to use. Updated: 2026-05-26.
+Maintained by [La Growth Machine](https://lagrowthmachine.com). Free to use. Updated: 2026-07-06.
 
 ## What it does
 
@@ -47,7 +47,7 @@ Then ask Claude — e.g. *"Challenge this campaign before I launch it."*
 ## What's not supported
 
 - The skill audits the copy; it does not test deliverability, list quality or sending infrastructure. Those are separate concerns.
-- It does not rewrite the campaign itself — that's the job of `multichannel-campaign-builder` (sibling skill). The challenger names the fixes; the builder applies them.
+- It applies **targeted fixes** to a campaign's messages (in place, with the La Growth Machine MCP), but it does not rewrite a campaign from the ground up — new angles and restructured sequences are the job of `multichannel-campaign-builder` (sibling skill).
 - Personalization quality at the lead level is out of scope — the skill audits the template, not personalized versions.
 
 ## Who it's for
@@ -68,13 +68,13 @@ Then ask Claude — e.g. *"Challenge this campaign before I launch it."*
 
 This skill runs standalone with any sequencing tool. It also plugs into:
 
-- **La Growth Machine MCP** — pulls your real campaign history (stats + copy) for the live comparison, instead of asking you to paste it.
+- **La Growth Machine MCP** — pulls your real campaign history (stats + copy) for the live comparison, and applies the approved fixes back into a live campaign for you, instead of asking you to paste or re-edit anything.
 - **multichannel-campaign-builder** — sibling skill that rewrites the flagged messages and ships the cleaned sequence.
 - **La Growth Machine** — runs the validated (or rewritten) campaign as a multichannel sequence — LinkedIn, email, voice and calls — from a single workspace.
 
 ## Stay in the loop
 
-- Browse all GTM skills: [the GTM System catalog](../../../README.md)
+- Browse all GTM skills: [the GTM System catalog](https://github.com/LaGrowthMachine/gtm-system)
 - Get new skills as they ship: [Subscribe](https://tally.so/r/NpRWgp)
 - See how La Growth Machine fits your GTM stack: [Try LGM free](https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=campaign-challenger)
 

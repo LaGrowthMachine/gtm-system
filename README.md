@@ -117,8 +117,8 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 |---|---|---|
 | sales-nav-search-builder | Sales Nav URL to open and import manually | Import the search as a ready-to-use LGM audience |
 | won-deal-icp-finder | Works on a HubSpot export you paste | Pulls deals live, attribution clean |
-| multichannel-campaign-builder | Sequence ready to copy into your tool | Set up the sequence as a campaign directly in LGM |
-| campaign-challenger | Benchmarks against stats you paste | Benchmarks against your real campaign history, pulled automatically |
+| multichannel-campaign-builder | Sequence ready to copy into your tool | Creates the sequence as a draft campaign directly in LGM |
+| campaign-challenger | Benchmarks against stats you paste | Benchmarks against your real campaign history and applies the fixes back into your campaign |
 | campaign-impact-analyzer | Works on pasted campaigns and deals | Cross-references LGM campaigns with HubSpot deals in one click |
 | reply-draft-assistant | Drafts answers for a conversation you paste | Pulls your inbox/campaign replies, drafts each answer, sends them natively on your approval |
 
@@ -164,6 +164,11 @@ The MCP exposes your La Growth Machine workspace to Claude. The skills above orc
 | `get_audience` | Details and import status of an audience |
 | `get_audience_leads` | Leads in an audience (name, company, title, email, LinkedIn) |
 | `create_audience_from_linkedin_url` | Build an audience from a LinkedIn / Sales Navigator search or a post's engagers |
+| `get_campaign_steps` | The steps of a campaign sequence — channel, order, whether a message is attached |
+| `duplicate_campaign` | Copy a campaign into an editable draft, without launching it |
+| `add_campaign_step_message` | Write the message for an empty campaign step |
+| `edit_campaign_message` | Rewrite a campaign step's message |
+| `get_linkedin_post` | Read a LinkedIn post's content and engagement from its URL |
 
 **Leads & conversations**
 

@@ -2,7 +2,7 @@
 
 > Turn a natural-language brief into a complete outbound campaign — a full sequence of LinkedIn and email messages, each ready to copy.
 
-Maintained by [La Growth Machine](https://lagrowthmachine.com). Free to use. Updated: 2026-05-26.
+Maintained by [La Growth Machine](https://lagrowthmachine.com). Free to use. Updated: 2026-07-06.
 
 ## What it does
 
@@ -45,7 +45,7 @@ Then ask Claude — e.g. *"Write me a multichannel outbound campaign for Heads o
 
 ## What's not supported
 
-- The skill writes a campaign; it does not send it. Use La Growth Machine (or your sequencing tool) for the execution.
+- The skill writes a campaign, and with the La Growth Machine MCP it can set it up as a **draft** campaign for you — but it never launches or sends it. You review the draft and start it yourself.
 - It does not personalize per lead — the output is the campaign template. Personalization tokens (`{{firstname}}` etc.) are inserted at template level, not resolved to real values.
 - It does not generate the lead list. Pair it with `sales-nav-search-builder` (sibling skill) for the targeting side.
 
@@ -67,12 +67,12 @@ Then ask Claude — e.g. *"Write me a multichannel outbound campaign for Heads o
 
 This skill runs standalone with any sequencing tool. It also plugs into:
 
-- **La Growth Machine** — runs the sequence as a multichannel campaign (LinkedIn, email, voice, calls) from a single workspace, with built-in enrichment, a unified inbox, and native HubSpot integration.
+- **La Growth Machine MCP** — Claude sets the approved sequence up as a **draft campaign** directly in your LGM workspace (no copy-pasting), ready for you to review and start. Runs multichannel (LinkedIn, email, voice, calls) with built-in enrichment, a unified inbox, and native HubSpot integration.
 - **sales-nav-search-builder** — sibling skill that builds the LinkedIn Sales Navigator search behind the audience the campaign targets.
 
 ## Stay in the loop
 
-- Browse all GTM skills: [the GTM System catalog](../../../README.md)
+- Browse all GTM skills: [the GTM System catalog](https://github.com/LaGrowthMachine/gtm-system)
 - Get new skills as they ship: [Subscribe](https://tally.so/r/NpRWgp)
 - See how La Growth Machine fits your GTM stack: [Try LGM free](https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=multichannel-campaign-builder)
 
