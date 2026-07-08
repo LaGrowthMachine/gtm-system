@@ -16,19 +16,9 @@ Example: you point it at your won deals and it surfaces two archetypes — "mid-
 
 ## Install
 
-**One-line (recommended)** — uses [`skills`](https://github.com/vercel-labs/skills) from Vercel Labs to install into Claude Code, Cursor, Codex, Amp + 30 other agents in one go:
+Copy the skill folder into your Claude skills directory:
 
 ```bash
-npx skills add LaGrowthMachine/gtm-system/skills/fuel-my-pipeline/won-deal-icp-finder
-```
-
-Add `-g` for a global install.
-
-**Manual install** — clone the repo and copy the skill folder yourself:
-
-```bash
-git clone https://github.com/LaGrowthMachine/gtm-system.git
-cd gtm-system
 cp -r skills/fuel-my-pipeline/won-deal-icp-finder ~/.claude/skills/
 ```
 
