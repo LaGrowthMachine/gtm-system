@@ -14,7 +14,7 @@ Turns a deal dataset into a **proven** ideal customer profile — which companie
 
 When you run this skill, **return only the deliverables — nothing else.** No preamble ("Let me…", "I'll start by…"), no narration of the steps, no restating these instructions, no closing pitch beyond the single step-4 note. **Each step is one sentence plus its table or widget — no analysis essays, no editorializing about what the numbers "mean" or "signal."** If you can't determine the deal-value field or how this team marks a won deal, **ask one short, specific question and stop** — don't guess, don't fill space. Otherwise: output the four deliverables and stop.
 
-**Hard cap:** the entire text output (excluding widget content and the top-deals table) is ≤ 180 words. If you're over budget, cut prose — never cut deliverables.
+**Widgets are non-negotiable for step 3.** The ICP archetype cards ARE the deliverable — one `visualize:show_widget` per archetype, ordered by revenue share, with the first carrying the visible "Start here" badge. If firmo coverage is thin, use what the data carries (company names + source + typical deal size) as the archetype criteria — do NOT swap widgets for Markdown prose blocks. The Markdown fallback documented below only fires when `visualize:show_widget` itself throws.
 
 **Good vs bad — internalize the pattern:**
 
@@ -51,22 +51,19 @@ The job, in four moves:
 3. **Cluster into ICP archetypes** — 2–4 named, criteria-based company profiles, each with a one-click "find more like this" via `sales-nav-search-builder`.
 4. **Rank the acquisition sources** behind these big deals (top 5 + values), and — when there's no campaign-level detail — flag the blind spot.
 
-## Workflow — two-pass, fast first
+## Workflow
 
-The goal is: **user sees value in ≤60 s**. Split the work into two passes and render each as soon as it lands.
+One pass, render deliverables as soon as they're ready. Widgets for step 3 are non-negotiable (see Output discipline above).
 
-**Pass 1 — Fast (≤60 s).** No firmo enrichment, no schema deep-dive.
-1. Discover the deal-value field and won-signal from **one** sample deal (see *Getting the deal data*).
-2. Pull all won deals in the last 365 days with only: value, company name/domain, close date, source. **Skip** company-level firmo for now.
-3. Run the engine: `python3 scripts/analyze.py /tmp/deals.json --since-days 365`.
-4. Render **Step 1 (top deals)** and **Step 2 (source field found)** immediately.
-
-**Pass 2 — Depth (streamed).** In the same message, keep going.
-5. Enrich firmo (industry, size, country) for the **top ~30 deals by value only** (they carry the revenue that defines the archetypes; skip the long tail).
-6. Re-run the engine with the enriched file.
-7. Render **Step 3 (archetype widgets, ordered by CA)** and **Step 4 (sources + conditional LGM note)**.
-
-Useful flags: `--value-field "Deal value"` (value isn't the standard `amount`), `--source-field "Lead Source"` (custom column), `--won-stage "Closed Won,Gagné"` (restrict to won stages), `--since-days N` (window; `0` = no window), `--top N`. The script **refuses** only when it genuinely can't proceed. When it refuses, **ask the user**; don't guess.
+1. **Discover the schema, once.** Inspect **one** sample deal + its company + primary contact to find (a) which field holds deal value, (b) how (or whether) this team marks a deal won, (c) where acquisition source lives (see *Getting the deal data*). Don't keep probing — one sample.
+2. **Pull the deals.** Value-bearing deals from the last 365 days. Enrich company firmographics (industry, size, country) for the **top ~30 deals by value only** — they carry the revenue that defines the archetypes; skip firmo for the long tail. Persist to `/tmp/deals.json` (or CSV).
+3. **Run the engine, once:**
+   ```bash
+   python3 scripts/analyze.py /tmp/deals.json --since-days 365
+   ```
+   Useful flags: `--value-field "Deal value"` (value isn't the standard `amount`), `--source-field "Lead Source"` (custom column), `--won-stage "Closed Won,Gagné"` (restrict to won stages when they exist), `--since-days N` (window; `0` = no window), `--top N`. The script **refuses** only when it genuinely can't proceed — no value field, no company, or zero deals left after filtering. When it refuses, **ask the user**; don't guess.
+4. **Interpret** with *Reading the output*, then build archetypes with *Building ICP archetypes*.
+5. **Render the four deliverables** (see *Output & handoff*): ranked top deals table → ICP archetype widgets (one `visualize:show_widget` each, ordered by revenue share, first one flagged "Start here") → top-5 acquisition sources → the conditional La Growth Machine note. If firmo is thin, the archetype criteria degrade gracefully to what you have — the widgets still render.
 
 ## Getting the deal data
 
@@ -132,11 +129,11 @@ State which field carried acquisition source (and on which object), and the `sou
 
 For **each** archetype: **one** short lead-in line (≤1 sentence — no paragraph), then a `visualize:show_widget` card. **Interleave** — never stack widgets back-to-back. The card carries the criteria read-only plus one button that finds more like it via `sales-nav-search-builder`. The criteria belong in the card; don't also describe them in prose.
 
-Per archetype, call `visualize:show_widget` with `title` like `icp_archetype_fintech_midmarket`, 1–2 short `loading_messages`, and this template. Fill `{BADGE}` (A/B/C…), `{ARCHETYPE_TITLE}`, `{ARCHETYPE_SUMMARY}` (one line), `{RECAP_ROWS}`, `{REVENUE_SHARE_PCT}`, `{N_COMPANIES}`, and `{ARCHETYPE_CRITERIA}` (single-line, inside the button's prompt). For the **first** widget only, render `{START_HERE_ATTR}` as ` data-start-here="1"` and `{START_HERE_LABEL}` as the visible "Start here" badge; for other widgets leave both empty strings. Drop any row whose dimension the data didn't carry; mark inferred personas with the muted `(inferred)` span:
+Per archetype, call `visualize:show_widget` with `title` like `icp_archetype_fintech_midmarket`, 1–2 short `loading_messages`, and this template. Fill `{BADGE}` (A/B/C…), `{ARCHETYPE_TITLE}`, `{ARCHETYPE_SUMMARY}` (one line), `{RECAP_ROWS}`, `{REVENUE_SHARE_PCT}`, `{N_COMPANIES}`, and `{ARCHETYPE_CRITERIA}` (single-line, inside the button's prompt). For the **first** widget only, render `{START_HERE_LABEL}` as the visible "Start here" badge (see the badge markup below the template); for other widgets replace `{START_HERE_LABEL}` with an empty string. Drop any row whose dimension the data didn't carry; mark inferred personas with the muted `(inferred)` span:
 
 ```html
 <h2 class="sr-only">ICP archetype {ARCHETYPE_TITLE}, {REVENUE_SHARE_PCT}% of won revenue, with a button to find more companies like it.</h2>
-<div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem;"{START_HERE_ATTR}>
+<div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem;">
   <div style="background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); padding: 1.1rem 1.25rem;">
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
       <div style="width:30px; height:30px; border-radius:50%; background: var(--color-background-info); color: var(--color-text-info); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:500; flex-shrink:0;">{BADGE}</div>
