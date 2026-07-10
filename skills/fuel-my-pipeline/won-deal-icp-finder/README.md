@@ -2,7 +2,7 @@
 
 > Turn your closed-won deals into a proven ideal customer profile — then go find more accounts like them.
 
-Maintained by [La Growth Machine](https://lagrowthmachine.com). Free to use. Updated: 2026-05-25.
+Maintained by [La Growth Machine](https://lagrowthmachine.com). Free to use. Updated: 2026-07-10.
 
 ## What it does
 
