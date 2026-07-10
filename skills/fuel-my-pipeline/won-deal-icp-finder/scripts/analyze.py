@@ -143,44 +143,6 @@ def norm_date(raw):
 
 ISO = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
-# Source labels that carry a value but no channel signal (uniformly-populated
-# integration buckets). If >=90% of value lands on one of these, the field is
-# "populated but blind" — the ICP note about attribution is tautological and
-# must be replaced with a repair checklist.
-NON_INFORMATIVE_SOURCES = {
-    "offline", "offline sources", "direct traffic", "direct", "other",
-    "other campaigns", "unknown", "n/a", "na", "none", "-", "—", "hors ligne",
-}
-
-
-def _mono_value(deals, revenue_with_source, won_revenue):
-    """Detect the 'field populated but useless' case (e.g. all deals = OFFLINE).
-
-    Returns {"is_mono": bool, "value": str|None, "share_pct": float,
-             "reason": "single-value"|"single-non-informative"|None}.
-    """
-    if not deals or not won_revenue:
-        return {"is_mono": False, "value": None, "share_pct": 0.0, "reason": None}
-    counts = {}
-    for d in deals:
-        if d["source"]:
-            counts[d["source"]] = counts.get(d["source"], 0.0) + d["amount"]
-    if not counts:
-        return {"is_mono": False, "value": None, "share_pct": 0.0, "reason": None}
-    top_src, top_rev = max(counts.items(), key=lambda kv: kv[1])
-    coverage = revenue_with_source / won_revenue if won_revenue else 0.0
-    dominance = (top_rev / revenue_with_source) if revenue_with_source else 0.0
-    share_of_total = round(100 * top_rev / won_revenue, 1)
-    # Only mono if the source field actually covers most of the revenue AND is
-    # dominated by one value — otherwise it's just partial coverage.
-    if coverage >= 0.9 and dominance >= 0.9:
-        reason = ("single-non-informative"
-                  if top_src.strip().lower() in NON_INFORMATIVE_SOURCES
-                  else "single-value")
-        return {"is_mono": True, "value": top_src, "share_pct": share_of_total,
-                "reason": reason}
-    return {"is_mono": False, "value": None, "share_pct": 0.0, "reason": None}
-
 
 def build_field_map(headers):
     lower = {h.strip().lower(): h for h in headers}
@@ -439,20 +401,12 @@ def analyze(records, value_field=None, won_stages=None, source_field=None,
             "source_coverage_pct": (round(100 * revenue_with_source / won_revenue, 1)
                                     if won_revenue else 0.0),
             "top_sources_by_frequency": acquisition_sources[:5],
-            "all_sources": acquisition_sources,
-            "source_is_mono_value": _mono_value(deals, revenue_with_source, won_revenue),
-        },
+            "all_sources": acquisition_sources},
         "data_quality": {"warnings": []},
     }
 
     w = report["data_quality"]["warnings"]
     aq = report["acquisition"]
-    mv = aq["source_is_mono_value"]
-    if mv["is_mono"]:
-        w.append(
-            f"Attribution field is populated but blind: {mv['share_pct']}% of value "
-            f"lands on a single value ('{mv['value']}'). Channel breakdown is "
-            "uninformative — do NOT surface it as an attribution insight.")
     if basis.startswith("value-in-window"):
         w.append("No closed-won status found on these deals. Analyzing every deal that "
                  "carries a value in the window — confirm with the user that this maps "
@@ -588,27 +542,6 @@ def _selftest():
           and all(d["account"] != "Initech" for d in rws["top_deals"]))
 
     # --- refusals ---
-    # --- mono-value attribution: all deals same non-informative source ---
-    mono = [
-        {"Company": "A", "Amount": "1000", "Close Date": "2026-04-01", "Original Source": "OFFLINE"},
-        {"Company": "B", "Amount": "2000", "Close Date": "2026-04-02", "Original Source": "OFFLINE"},
-        {"Company": "C", "Amount": "3000", "Close Date": "2026-04-03", "Original Source": "OFFLINE"},
-    ]
-    rmono = analyze(mono, as_of=AS_OF)
-    check("mono_detected", rmono["acquisition"]["source_is_mono_value"]["is_mono"] is True)
-    check("mono_reason_non_informative",
-          rmono["acquisition"]["source_is_mono_value"]["reason"] == "single-non-informative")
-    check("mono_warning", any("populated but blind" in x
-          for x in rmono["data_quality"]["warnings"]))
-    # a diverse dataset must NOT be flagged
-    diverse = [
-        {"Company": "A", "Amount": "1000", "Close Date": "2026-04-01", "Original Source": "LinkedIn"},
-        {"Company": "B", "Amount": "1000", "Close Date": "2026-04-02", "Original Source": "Email"},
-        {"Company": "C", "Amount": "1000", "Close Date": "2026-04-03", "Original Source": "Webinar"},
-    ]
-    rdiv = analyze(diverse, as_of=AS_OF)
-    check("diverse_not_mono", rdiv["acquisition"]["source_is_mono_value"]["is_mono"] is False)
-
     must_raise("empty", lambda: analyze([]))
     must_raise("no_value_field", lambda: analyze([{"Company": "X", "Close Date": "2026-04-01"}], as_of=AS_OF))
     must_raise("no_account", lambda: analyze([{"Amount": "100", "Close Date": "2026-04-01"}], as_of=AS_OF))
