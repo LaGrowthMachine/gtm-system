@@ -232,8 +232,6 @@ Three consequences that are easy to get wrong:
 
 ### The widget
 
-### The widget
-
 ```html
 <h2 class="sr-only">{ACCESSIBLE_SUMMARY}</h2>
 <style>

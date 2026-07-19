@@ -29,9 +29,19 @@ Fast and wrong at the edges, or smart and unauditable — you need both.
 
 ## Install
 
-Copy the skill folder into your Claude skills directory:
+**One-line (recommended)** — uses [`skills`](https://github.com/vercel-labs/skills) from Vercel Labs to install into Claude Code, Cursor, Codex, Amp + 30 other agents in one go:
 
 ```bash
+npx skills add LaGrowthMachine/gtm-system/skills/fuel-my-pipeline/audience-icp-filter
+```
+
+Add `-g` for a global install.
+
+**Manual install** — clone the repo and copy the skill folder yourself:
+
+```bash
+git clone https://github.com/LaGrowthMachine/gtm-system.git
+cd gtm-system
 cp -r skills/fuel-my-pipeline/audience-icp-filter ~/.claude/skills/
 ```
 
