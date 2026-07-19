@@ -26,6 +26,7 @@ Sourcing, list building, ICP — keeping the lead reservoir full.
 |---|---|---|
 | [sales-nav-search-builder](skills/fuel-my-pipeline/sales-nav-search-builder/SKILL.md) | use-case | Turn a natural-language ICP into a precise LinkedIn Sales Navigator search URL, ready to import as an LGM audience |
 | [post-to-campaign](skills/fuel-my-pipeline/post-to-campaign/SKILL.md) | use-case | Turn a LinkedIn post into a ready-to-launch campaign: scrape the post's likers and commenters into an audience and fill a draft sequence |
+| [audience-icp-filter](skills/fuel-my-pipeline/audience-icp-filter/SKILL.md) | use-case | Filter an existing audience against your ICP — sorts every lead into match / needs review / no match, strips your team and competitors, never silently drops anyone |
 | [won-deal-icp-finder](skills/fuel-my-pipeline/won-deal-icp-finder/SKILL.md) | use-case | Audit your biggest closed-won deals to find your proven ICP and a look-alike target list |
 
 ### Get qualified meetings
@@ -119,6 +120,7 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 |---|---|---|
 | sales-nav-search-builder | Sales Nav URL to open and import manually | Import the search as a ready-to-use LGM audience |
 | post-to-campaign | Writes the outreach sequence from the post | Scrapes the post's engagers into an audience and fills a draft campaign |
+| audience-icp-filter | Filters a CSV you paste — you re-import the segmented buckets by hand | Reads your audience live, enriches missing fields on approval, writes `[icp]` and `[review]` back as complementary audiences with the source untouched |
 | won-deal-icp-finder | Works on a HubSpot export you paste | Pulls deals live, attribution clean |
 | multichannel-campaign-builder | Sequence ready to copy into your tool | Creates the sequence as a draft campaign directly in LGM |
 | campaign-challenger | Benchmarks against stats you paste | Benchmarks against your real campaign history and applies the fixes back into your campaign |
