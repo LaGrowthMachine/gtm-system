@@ -308,7 +308,7 @@ omit or empty a field to get its documented empty state (e.g. no `value` → the
 {
   "weekLabel": "Jul 20, 2026", "lastUpdated": "Jul 20, 2026", "refreshTaskId": "",
   "outcomeLabel": "Signups",
-  "kpis": { "value": "€126k"|null, "outcome": 23, "hotPipeline": 6,
+  "kpis": { "value": "€120k"|null, "outcome": 23, "hotPipeline": 6,
             "liReply": 20, "liZone": "yellow", "emReply": 3, "emZone": "red", "medianResp": "1.7d" },
   "coverage": "43 RUNNING campaigns, 17 in full detail",
   "hotLeads": [ { "wait":"9d", "owner":"{rep}", "lead":"{name}", "msg":"{signal}" } ],
