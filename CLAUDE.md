@@ -94,6 +94,7 @@ Skills guide Claude through complex GTM workflows. Just describe what you want. 
 - `campaign-challenger` — benchmark a campaign copy against your existing campaigns, return prioritized fixes, and apply them back into the campaign
 - `campaign-impact-analyzer` — rank campaigns by real revenue impact by cross-referencing LGM campaigns with HubSpot deals
 - `weekly-performance-advisor` — build a two-tab weekly cockpit from your LGM data: replies to handle, campaigns to fix, and reply-volume trends
+- `weekly-team-performance` — rank each sender on reply rate, your success event and conversion, surface hot leads going cold, and clone your best reps' campaigns across the team
 
 **Catch opportunities** — reply handling, intent detection
 
@@ -117,6 +118,7 @@ Suggest one of these depending on what the user wants to do:
 | Pressure-test a campaign before launch | Use `campaign-challenger` |
 | See which campaigns drive pipeline | Use `campaign-impact-analyzer` |
 | See what to do this week / campaign health | Use `weekly-performance-advisor` |
+| See per-rep team performance / who converts best | Use `weekly-team-performance` |
 | Handle or draft replies to their inbox | Use `reply-draft-assistant` |
 | Pull live campaign data ad hoc | Call the MCP directly (e.g. `list_campaigns`, `get_campaign_stats`) |
 | Run a custom analytics query | Call the BigQuery tools (`execute_bigquery_query`, `get_bigquery_logs_guide`) |
