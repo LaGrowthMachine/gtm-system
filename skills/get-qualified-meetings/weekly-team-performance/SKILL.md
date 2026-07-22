@@ -140,9 +140,17 @@ first.
 Run the engine → fill the template's single `{{DASHBOARD_DATA}}` token in memory → **render as a
 live, interactive artifact** (see hard rule 3 — this is the required output; do not save an .html
 file or paste a code block). Create the artifact on first run, **update the existing artifact** on
-later runs. Write this week's snapshot to `./.wtp/`. Show empty states honestly (value/outcome/median
-absent → their empty state), and state the campaign-sampling coverage in the header — never imply
-full coverage when sampling.
+later runs. Write this week's snapshot to `./.wtp/`. State the campaign-sampling coverage in the
+header — never imply full coverage when sampling.
+
+**What the base build computes vs defers (honest empty states):**
+- **Reply rates, acceptance, contacted, awaiting/backlog** → always (cheap, from campaign stats).
+- **Outcome, conversion, value** → **computed here whenever a source was configured at setup**
+  (E6). Empty state ONLY if no source. Do not skip them for cost — they're the headline.
+- **Median response** → **deferred to the Phase 5 fetch** (needs per-thread timestamps). Show its
+  empty state in the base build; it fills when the user runs the conversation analysis.
+- **Reply Quality (classification/objection/best-reply)** → seeded from a tiny sample now, deepened
+  in Phase 5.
 
 ## Phase 4 — Handoff
 
@@ -155,19 +163,26 @@ best-handled reply, radar) is only as rich as the replies you've classified — 
 just a handful. After the dashboard renders, **offer to analyze more conversations**, framed so the
 user can do it in bites and see the cost up front. Say something like:
 
-> "Your dashboard is live. It classified a small sample of replies so far. Want me to go deeper on
-> your conversations to sharpen the Reply Quality tab? Roughly, **50 conversations ≈ 15 min** of
-> analysis (and the token cost scales with volume), so you can do it in batches:
+> "Your dashboard is live. It classified a small sample of replies so far, and **Median response
+> time isn't filled yet** — computing it needs me to read your conversation threads. Want me to fetch
+> and analyze more conversations? The same pass **sharpens the Reply Quality tab AND fills the
+> response-time metric.** Roughly, **50 conversations ≈ 15 min** (token cost scales with volume), so
+> pick a batch:
 > - **This week's replies only** (usually the fastest, most relevant)
 > - **~50 most recent** (~15 min)
 > - **~100 most recent** (~30 min)
 > - **Everything awaiting a reply** (large — I'll batch it and you can stop anytime)
 > Or skip it for now and come back later."
 
+- **The fetch does double duty.** For each thread it pulls, it (a) classifies the reply (E5) and
+  (b) reads the message timestamps to compute the **median response after first reply** per identity
+  (E5 median-response rule, slowest-20% trimmed, status cross-check). So this one step fills both the
+  Reply Quality tab and the Median-response KPI/column.
 - **Pull scope by option:** "this week" → `search_conversations {leadReplied:true, since:<monday>}`;
   "recent N" → the newest N RECEIVED threads; "everything awaiting" → paginate the awaiting queue in
   batches. For each thread not already in `classifiedReplyIds`, read `get_conversation_messages`,
-  classify (E5), and **stop cleanly when the chosen batch is done** — the user can re-run for more.
+  classify + capture timestamps, and **stop cleanly when the chosen batch is done** — the user can
+  re-run for more.
 - **Not an LGM user? Work from their export.** If they don't run LGM (or want to analyze a different
   channel), let them **paste or upload a conversation export** (CSV or text: lead, message, direction,
   date). Classify from that, same taxonomy, same tiers by row count.
@@ -216,8 +231,11 @@ Per included identity (needs >=1 sent AND >=1 received to appear; others named i
 - **Awaiting** = the `total` from the per-identity awaiting queue.
 - **Account average** = Σ(all replied)/Σ(all contacted) account-wide; a rep is above/below by ±3pt.
 - **Outcome (SU/meetings/deals)**, **conversion** (outcome ÷ contacted on the campaigns that drove
-  it — mark `*` when retired-campaign volume is estimated), **value (€)** — all account-wide.
-- **Median response** after first reply (see E5), per identity.
+  it — mark `*` when retired-campaign volume is estimated), **value (€)** — all account-wide. **These
+  are computed in the base build whenever a source is configured (see E6) — never skipped for cost.**
+- **Median response** is NOT computed in the base build (it needs a per-thread timestamp pull). It
+  fills from the Phase 5 conversation fetch (see E5 / Phase 5); until then, show its empty state. The
+  **backlog** (per-rep awaiting counts) IS available here from the cheap awaiting-queue totals.
 - Rank all reps by reply rate desc (badge #1..#n). Cross-identity recos name the source rep when the
   best pattern for a lagging rep comes from elsewhere. Prefer the rep's own internal spread first.
 
@@ -232,7 +250,9 @@ proven cold; medium = warm-only; inferential = single result whose audience conf
 Match each red/yellow campaign to the library → the "apply this pattern" reco + the Fix prompt.
 Persist patterns in the snapshot; reinforce/decay across weeks.
 
-## E5. Reply quality + median response
+## E5. Reply quality + median response (mostly from the Phase 5 fetch)
+The base build seeds this from a tiny sample; the rich version comes from the Phase 5 conversation
+fetch. **The same fetched threads do double duty: classification AND response-time.**
 - **Classify** each sampled thread into one of six types: `HOT` (explicit call/meeting/pricing ask),
   `CURIOUS` (engaged, no objection), `OBJECTION` (price / equipped / feature_gap / timing /
   segment_fit / value_resistance / tried_before / wrong_person), `EQUIPPED` (names a competitor),
@@ -247,17 +267,25 @@ Persist patterns in the snapshot; reinforce/decay across weeks.
   correct resource priority / not creepy / process-compliant, 0-3 each, >=22/27) and promote the
   top one as the "clone this" example. Never fabricate an example — if none qualify, say so.
 - **AI-tone callout** belongs to the campaign copy (Playbooks tab), not reply handling.
-- **Median response** = per identity, median time between a lead's message and the rep's next reply
-  **after the first reply**, with the slowest 20% trimmed (that tail is mostly forgotten leads).
-  Cross-check the trimmed tail against each lead's LGM status (`get_lead_logs`): unqualified + cold →
-  a likely oversight (surface as backlog); qualified not-interested/dead → legitimately closed.
+- **Median response (computed from the Phase 5 fetched threads, NOT the base build)** = per identity,
+  median time between a lead's message and the rep's next reply **after the first reply**, from the
+  message timestamps of the threads the user chose to analyze, with the slowest 20% trimmed (that
+  tail is mostly forgotten leads). Cross-check the trimmed tail against each lead's LGM status
+  (`get_lead_logs`): unqualified + cold → a likely oversight (surface as backlog); qualified
+  not-interested/dead → legitimately closed. It fills the median KPI/column as batches come in.
 
-## E6. Conversion tracing + value (only when the source is configured)
-Pull the configured conversion source (CRM / Airtable / CSV) for "pushed to a campaign before the
-{outcome} + qualified"; group by campaign/audience → ranks campaigns by **actual outcomes**, not
-just reply rate. Read a few real threads behind the top-converting campaign to seed the reply-side
-follow-through pattern (report honestly — sometimes persistence beats reply-handling skill). For the
-value layer, attribute the configured amount back to campaign/identity per the confirmed rule.
+## E6. Conversion tracing + value (base build — required when the source is configured)
+When a conversion/value source was configured at setup (Q2/Q3), **compute outcome, conversion and
+value in the base build — do NOT defer or skip them for cost; they are the headline of this
+dashboard.** Only show their empty state when **no** source is configured.
+- Pull the configured source (CRM / Airtable / CSV) for "pushed to a campaign before the {outcome} +
+  qualified"; group by campaign/audience → ranks campaigns by **actual outcomes**, not just reply
+  rate. The exact fields/logic come from what the user described and validated at setup (Q2) — treat
+  it as their process, not a fixed shape.
+- **Value** = attribute the configured amount back to campaign/identity per the rule the user
+  confirmed (Q3). When the value layer is on, it is the lead KPI.
+- Read a few real threads behind the top-converting campaign to seed the reply-side follow-through
+  pattern (report honestly — sometimes persistence beats reply-handling skill).
 
 ## E7. Snapshot — `./.wtp/snapshot-<YYYY>-W<ww>.json`
 This-week state (overwritten): per-identity rollups, awaiting queues, header, hot leads, deltas WoW.
@@ -342,7 +370,10 @@ what pinpoints the lead; there is no per-conversation route). The template does 
 - Fix cards flag conversion leaks, not just reply rate; both buttons carry the prompt + install link.
 - Reply Quality shows real classification, principal objection and either a real best-reply example
   or an honest empty state — never fabricated.
-- If the value layer is off, the value KPI/column show the empty state; nothing blocks.
+- **Outcome, conversion and value are computed in the base build when a source was configured at
+  setup** (never skipped for cost); their empty state shows ONLY when no source is configured.
+- **Median response** is empty in the base build and fills from the Phase 5 conversation fetch (the
+  same fetch that deepens Reply Quality); the backlog counts show from the base build.
 - **Output is a live, interactive artifact — NOT a saved .html file and NOT a code block.** (If the
   environment truly has no artifact surface, that was stated and a browser-open offered instead.)
 - The **Phase 5 offer** (deepen reply analysis in tiered, timed batches; works from an export for
