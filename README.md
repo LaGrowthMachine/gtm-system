@@ -37,6 +37,7 @@ Campaigns, copywriting, sequences — what converts into meetings.
 | [campaign-challenger](skills/get-qualified-meetings/campaign-challenger/SKILL.md) | use-case | Benchmark a campaign copy against your existing campaign history and return prioritized fixes before launch |
 | [campaign-impact-analyzer](skills/get-qualified-meetings/campaign-impact-analyzer/SKILL.md) | use-case | Rank campaigns by real revenue impact — cross-references LGM campaigns with HubSpot deals |
 | [weekly-performance-advisor](skills/get-qualified-meetings/weekly-performance-advisor/SKILL.md) | use-case | Build a two-tab weekly cockpit from your LGM data — replies to handle, campaigns to fix, health & reply trends |
+| [weekly-team-performance](skills/get-qualified-meetings/weekly-team-performance/SKILL.md) | use-case | Rank each sender on reply rate, your success event and conversion, surface hot leads going cold, and clone your best reps' campaigns across the team |
 
 ### Catch opportunities
 Reply handling, intent detection — not letting opportunities go cold.
@@ -125,6 +126,7 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 | campaign-impact-analyzer | Works on pasted campaigns and deals | Cross-references LGM campaigns with HubSpot deals in one click |
 | reply-draft-assistant | Drafts answers for a conversation you paste | Pulls your inbox/campaign replies, drafts each answer, sends them natively on your approval |
 | weekly-performance-advisor | Needs the LGM MCP — the dashboard is built from live LGM data | Pulls your campaigns, stats and inbox live and renders your weekly cockpit |
+| weekly-team-performance | Needs the LGM MCP — the dashboard is built from live LGM data | Ranks every rep on reply rate, your success event and conversion from live data, with per-rep coaching |
 
 ### Connect the MCP
 
