@@ -1,0 +1,454 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Weekly Team Performance — Week of {{WEEK_LABEL}}</title><style>
+  :root {
+    --dark:#1E1735; --dark-2:#312448; --white:#FFFFFF; --light-bg:#F2F0F5;
+    --linkedin:#2B7BFF; --email:#F07060; --audio:#9B6FD1; --green:#3DDC84;
+    --text-2:#5B4E6E; --text-3:#817891; --border:#E2DFE9;
+    --z-green:#1F8F79; --z-yellow:#C08A2E; --z-red:#FF645A;
+    --font:'PP Telegraf', system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --radius-sm:8px; --radius-md:14px; --radius-lg:18px;
+    --bg:var(--light-bg); --surface:var(--white); --surface-2:#F8F7FA;
+    --ink:var(--dark); --ink-2:var(--text-2); --ink-3:var(--text-3); --line:var(--border);
+    --shadow:0 1px 3px rgba(30,23,53,0.04), 0 6px 16px rgba(30,23,53,0.06);
+    color-scheme:light;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; }
+  .wpb { font-family:var(--font); color:var(--ink); background:var(--bg); min-height:100%; padding:0 0 56px; }
+  .wpb a { color:inherit; }
+
+  .wpb-header { background:var(--dark); color:var(--white); padding:24px clamp(16px,4vw,40px) 20px; position:relative; overflow:hidden; text-align:center; }
+  .wpb-brick { position:absolute; border-radius:16px; opacity:0.32; transform:rotate(28deg); }
+  .header-refresh-wrap { position:absolute; top:20px; right:clamp(16px,4vw,40px); z-index:2; display:flex; flex-direction:column; align-items:flex-end; gap:4px; }
+  .header-refresh { font-family:var(--font); background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:var(--white); font-size:12.5px; font-weight:700; padding:8px 14px; border-radius:999px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+  .header-refresh:hover { background:rgba(61,220,132,0.18); border-color:var(--green); }
+  .header-refresh-date { font-size:10.5px; color:#A79EC0; }
+  @media (max-width:640px){ .header-refresh-wrap { position:static; align-items:center; margin:0 0 12px; } }
+  .wpb-eyebrow { font-size:13px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; color:var(--green); margin:0 0 3px; position:relative; z-index:1; }
+  .wpb-team-sub { font-size:11.5px; color:#A79EC0; margin:0 0 16px; position:relative; z-index:1; }
+
+  .wpb-kpi-row { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:stretch; position:relative; z-index:1; }
+  .wpb-kpi { flex:1 1 150px; min-width:140px; max-width:188px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.13); border-radius:var(--radius-md); padding:13px 18px; }
+  .wpb-kpi .k-lbl { font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:#B6ADC7; margin:0 0 4px; min-height:13px; }
+  .wpb-kpi .k-val { font-size:27px; font-weight:800; font-variant-numeric:tabular-nums; line-height:1.05; letter-spacing:-0.01em; }
+  .wpb-kpi .k-val.empty { font-size:15px; font-weight:700; color:#A79EC0; }
+  .wpb-kpi .k-target { font-size:10.5px; color:#A79EC0; margin-top:4px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wpb-kpi.kpi-hero { background:rgba(61,220,132,0.1); border-color:rgba(61,220,132,0.3); }
+  .wpb-kpi.zgreen .k-val { color:var(--green); }
+  .wpb-kpi.zyellow .k-val { color:#F0C674; }
+  .wpb-kpi.zred .k-val { color:#FF8E86; }
+  .wpb-meta-line { font-size:11px; color:#A79EC0; margin:15px 0 0; position:relative; z-index:1; }
+
+  .wpb-tabs { display:flex; gap:4px; padding:12px clamp(16px,4vw,40px) 0; background:var(--dark); overflow-x:auto; justify-content:center; }
+  .wpb-tab { font-family:var(--font); background:transparent; border:none; color:#B6ADC7; font-size:13px; font-weight:700; padding:10px 14px; border-radius:8px 8px 0 0; cursor:pointer; white-space:nowrap; }
+  .wpb-tab:hover { color:var(--white); }
+  .wpb-tab[aria-selected="true"] { color:var(--dark); background:var(--surface); }
+
+  .wpb-body { max-width:1120px; margin:0 auto; padding:22px clamp(16px,4vw,40px) 0; }
+  .wpb-panel { display:none; }
+  .wpb-panel.active { display:block; }
+  .wpb-section-label { font-size:10.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-3); margin:0 0 8px; }
+  .wpb-lede { font-size:13px; color:var(--ink-2); line-height:1.55; margin:0 0 16px; max-width:78ch; }
+  .empty-state { font-size:13px; color:var(--ink-3); background:var(--surface); border:1px dashed var(--line); border-radius:var(--radius-lg); padding:18px; }
+
+  .hero { background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--z-red); border-radius:var(--radius-lg); padding:16px 20px; margin-bottom:16px; box-shadow:var(--shadow); }
+  .hero-tag { font-size:13px; font-weight:800; margin:0 0 4px; display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+  .hero-tag .count { color:var(--ink-3); font-weight:600; font-size:11.5px; }
+  .hero-sub { font-size:12px; color:var(--ink-2); margin:0 0 12px; line-height:1.45; }
+  .hero-list { display:flex; flex-direction:column; }
+  .hero-lead { display:flex; align-items:center; gap:12px; font-size:12.5px; color:var(--ink-2); padding:9px 8px; border-bottom:1px solid var(--line); border-radius:var(--radius-sm); text-decoration:none; }
+  .hero-lead:hover { background:var(--surface-2); }
+  .hero-lead:last-child { border-bottom:none; }
+  .hero-lead .wait { font-size:11px; font-weight:800; color:var(--z-red); font-variant-numeric:tabular-nums; white-space:nowrap; min-width:40px; }
+  .hero-lead .who-owner { color:var(--ink-3); font-size:11px; white-space:nowrap; min-width:52px; }
+  .hero-lead .lead-name { font-weight:700; color:var(--ink); white-space:nowrap; }
+  .hero-lead .lead-msg { color:var(--ink-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+  .hero-lead .open-ic { color:var(--linkedin); font-size:11px; font-weight:700; white-space:nowrap; opacity:0.7; }
+  .hero-lead:hover .open-ic { opacity:1; }
+
+  .speed-card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:14px 18px; margin-bottom:22px; box-shadow:var(--shadow); display:flex; gap:20px; flex-wrap:wrap; align-items:center; }
+  .speed-metric { display:flex; flex-direction:column; }
+  .speed-metric .sm-val { font-size:22px; font-weight:800; font-variant-numeric:tabular-nums; }
+  .speed-metric .sm-val.warn { color:var(--z-red); }
+  .speed-metric .sm-lbl { font-size:11px; color:var(--ink-3); }
+  .speed-note { flex:1; min-width:230px; font-size:12px; color:var(--ink-2); line-height:1.5; border-left:1px solid var(--line); padding-left:18px; }
+
+  .chart-insight-block { background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--green); border-radius:var(--radius-lg); padding:14px 18px; box-shadow:var(--shadow); margin-bottom:16px; }
+  .chart-insight-block h4 { font-size:13px; font-weight:800; margin:0 0 8px; }
+  .chart-insight-block ul { margin:0; padding-left:18px; }
+  .chart-insight-block li { font-size:12.5px; color:var(--ink-2); line-height:1.55; margin-bottom:5px; }
+  .chart-insight-block li b { color:var(--ink); }
+
+  .team-table-wrap { width:100%; overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius-lg); box-shadow:var(--shadow); }
+  table.team-table { border-collapse:collapse; width:100%; min-width:640px; font-size:12.5px; background:var(--surface); }
+  table.team-table th { text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-3); font-weight:700; padding:9px 12px; background:var(--surface-2); border-bottom:1px solid var(--line); }
+  table.team-table th.num, table.team-table td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  table.team-table th.sortable { cursor:pointer; user-select:none; white-space:nowrap; }
+  table.team-table th.sortable:hover { color:var(--ink); }
+  table.team-table th .arr { opacity:0.35; font-size:8px; margin-left:2px; }
+  table.team-table th.sorted { color:var(--ink); } table.team-table th.sorted .arr { opacity:1; color:var(--linkedin); }
+  table.team-table tr.group-row th { font-size:9.5px; letter-spacing:0.06em; padding:7px 12px; text-align:center; border-bottom:none; }
+  table.team-table tr.group-row th.g-active { color:var(--linkedin); }
+  table.team-table tr.group-row th.g-alltime { color:var(--audio); }
+  table.team-table .grp-divider { border-left:2px solid var(--line); }
+  table.team-table td { padding:10px 12px; border-bottom:1px solid var(--line); }
+  table.team-table tr:last-child td { border-bottom:none; }
+  .name-cell { font-weight:700; }
+  .reply-cell { display:inline-flex; align-items:center; gap:6px; }
+  .zdot { width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0; }
+  .zdot.green { background:var(--z-green); } .zdot.yellow { background:var(--z-yellow); } .zdot.red { background:var(--z-red); } .zdot.gray { background:var(--ink-3); }
+  .su-badge { font-weight:700; } .su-badge.top { color:var(--z-green); }
+  .foot-note { font-size:11.5px; color:var(--ink-3); margin:10px 0 0; line-height:1.5; }
+
+  .a-list { display:flex; flex-direction:column; gap:10px; margin-bottom:26px; }
+  .a-card { background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--z-red); border-radius:var(--radius-lg); padding:15px 17px; box-shadow:var(--shadow); }
+  .a-card.flag-yellow { border-left-color:var(--z-yellow); }
+  .a-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:5px; }
+  .a-stat { font-size:10.5px; font-weight:800; padding:3px 9px; border-radius:999px; white-space:nowrap; flex-shrink:0; font-variant-numeric:tabular-nums; }
+  .a-stat.red { background:rgba(255,100,90,0.13); color:var(--z-red); }
+  .a-stat.yellow { background:rgba(192,138,46,0.14); color:var(--z-yellow); }
+  .a-headline { font-size:13.5px; font-weight:700; margin:0; }
+  .a-headline .who { color:var(--linkedin); }
+  .a-context { font-size:12.5px; color:var(--ink-2); line-height:1.5; margin:0 0 10px; }
+  .a-cta-row { display:flex; gap:8px; flex-wrap:wrap; }
+  .wpb-fix { font-family:var(--font); background:var(--surface-2); color:var(--ink); border:1px solid var(--line); font-size:12px; font-weight:700; padding:7px 13px; border-radius:999px; cursor:pointer; }
+  .wpb-fix:hover { border-color:var(--ink-3); }
+
+  .sub-nav { display:flex; gap:6px; margin-bottom:16px; border-bottom:1px solid var(--line); }
+  .sub-tab { font-family:var(--font); background:transparent; border:none; border-bottom:2px solid transparent; color:var(--ink-3); font-size:13px; font-weight:700; padding:8px 12px; cursor:pointer; margin-bottom:-1px; }
+  .sub-tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--green); }
+  .sub-panel { display:none; } .sub-panel.active { display:block; }
+
+  .bp-card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:15px 17px; box-shadow:var(--shadow); margin-bottom:12px; }
+  .bp-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .bp-chan { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; padding:3px 9px; border-radius:999px; }
+  .bp-chan.email { background:rgba(240,112,96,0.14); color:var(--email); }
+  .bp-chan.linkedin { background:rgba(43,123,255,0.13); color:var(--linkedin); }
+  .bp-card h4 { font-size:13.5px; font-weight:700; margin:0; }
+  .bp-row { display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dashed var(--line); font-size:12.5px; align-items:baseline; }
+  .bp-row:last-child { border-bottom:none; }
+  .bp-row .bp-what { color:var(--ink-2); flex:1; }
+  .bp-row .bp-metric { font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .bp-row .bp-metric.up { color:var(--z-green); }
+  .bp-empty { font-size:12px; color:var(--ink-3); font-style:italic; padding:6px 0; }
+  .bp-conf { font-size:10px; color:var(--ink-3); margin-top:8px; }
+
+  .p-card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:14px 16px; box-shadow:var(--shadow); margin-bottom:10px; }
+  .p-top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; flex-wrap:wrap; }
+  .p-name { font-size:13.5px; font-weight:700; margin:0 0 2px; }
+  .p-lift { font-size:12px; color:var(--z-green); font-weight:600; }
+  .p-conf { font-size:10px; font-weight:700; text-transform:uppercase; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+  .p-conf.high { background:rgba(43,123,255,0.12); color:var(--linkedin); }
+  .p-conf.medium { background:rgba(155,111,209,0.14); color:var(--audio); }
+  .p-conf.inferential { background:var(--surface-2); color:var(--ink-3); }
+  .p-desc { font-size:12.5px; color:var(--ink-2); line-height:1.5; margin:8px 0; }
+  .p-excerpt { background:var(--surface-2); border-left:3px solid var(--linkedin); border-radius:0 var(--radius-sm) var(--radius-sm) 0; padding:8px 12px; font-size:12px; color:var(--ink-2); font-style:italic; line-height:1.45; margin:0 0 6px; }
+  .p-meta { font-size:11px; color:var(--ink-3); }
+
+  .po-banner { background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--audio); border-radius:var(--radius-lg); padding:16px 18px; margin-bottom:16px; box-shadow:var(--shadow); }
+  .po-banner .po-lbl { font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:var(--audio); margin:0 0 6px; }
+  .po-banner h3 { font-size:16px; font-weight:800; margin:0 0 6px; }
+  .po-banner p { font-size:12.5px; color:var(--ink-2); line-height:1.5; margin:0 0 8px; }
+  .po-banner .po-team { font-size:12.5px; color:var(--ink); background:var(--surface-2); border-radius:var(--radius-sm); padding:8px 12px; }
+  .rq-card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:15px 18px; box-shadow:var(--shadow); margin-bottom:16px; }
+  .rq-card.warn { border-left:3px solid var(--z-red); }
+  .rq-card h3 { font-size:13.5px; font-weight:700; margin:0 0 8px; }
+  .rq-card p { font-size:12.5px; color:var(--ink-2); line-height:1.5; margin:0; }
+  .rq-card em { color:var(--ink); font-style:italic; }
+  .rq-split { display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:center; }
+  @media (max-width:640px){ .rq-split { grid-template-columns:1fr; } }
+  .radar-svg { display:block; width:100%; max-width:280px; margin:0 auto; height:auto; }
+  .radar-svg .grid { fill:none; stroke:var(--line); stroke-width:1; }
+  .radar-svg .axis { stroke:var(--line); stroke-width:1; }
+  .radar-svg .poly { fill:rgba(43,123,255,0.16); stroke:var(--linkedin); stroke-width:2; }
+  .radar-svg .rlbl { fill:var(--ink-2); font-size:8px; font-family:var(--font); }
+  .prio-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  .prio-table th { text-align:left; font-size:10px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-3); font-weight:700; padding:7px 10px; border-bottom:1px solid var(--line); }
+  .prio-table td { padding:9px 10px; border-bottom:1px solid var(--line); color:var(--ink-2); line-height:1.4; vertical-align:top; }
+  .prio-table tr:last-child td { border-bottom:none; }
+  .prio-table .p-cat { font-weight:700; color:var(--ink); white-space:nowrap; }
+  .prio-pill { font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px; white-space:nowrap; }
+  .prio-pill.hi { background:rgba(255,100,90,0.13); color:var(--z-red); }
+  .prio-pill.mid { background:rgba(192,138,46,0.14); color:var(--z-yellow); }
+  .prio-pill.lo { background:var(--surface-2); color:var(--ink-3); }
+  .example-box { background:var(--surface-2); border-radius:var(--radius-sm); padding:12px 14px; }
+  .ex-score { font-size:11px; font-weight:700; color:var(--z-green); margin:0 0 6px; }
+  .ex-text { font-size:12.5px; color:var(--ink-2); font-style:italic; line-height:1.5; margin:0 0 8px; }
+  .ex-meta { font-size:11.5px; color:var(--ink-3); margin:0; }
+
+  .help-card { background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:15px 18px; margin-bottom:12px; box-shadow:var(--shadow); }
+  .help-card h3 { font-size:13.5px; font-weight:700; margin:0 0 10px; }
+  .help-dl { margin:0; display:grid; grid-template-columns:200px 1fr; gap:6px 16px; font-size:12.5px; }
+  @media (max-width:560px){ .help-dl { grid-template-columns:1fr; gap:2px 0; } .help-dl dt { margin-top:8px; } }
+  .help-dl dt { font-weight:700; color:var(--ink); }
+  .help-dl dd { margin:0; color:var(--ink-2); line-height:1.45; }
+  .help-zones { display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--ink-2); }
+  .help-zones div { display:flex; align-items:center; gap:8px; }
+  .help-zones b { color:var(--ink); }
+  .doctrine { display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; font-size:12px; }
+  @media (max-width:560px){ .doctrine { grid-template-columns:1fr; } }
+  .doctrine div { padding:4px 0; border-bottom:1px dashed var(--line); color:var(--ink-2); }
+  .help-link { color:var(--linkedin); font-weight:700; text-decoration:none; }
+  .help-link:hover { text-decoration:underline; }
+
+  .wpb-modal-overlay { position:fixed; inset:0; background:rgba(20,16,42,0.5); display:none; align-items:center; justify-content:center; padding:20px; z-index:50; }
+  .wpb-modal-overlay.open { display:flex; }
+  .wpb-modal { background:var(--surface); border-radius:var(--radius-lg); max-width:520px; width:100%; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+  .wpb-modal h4 { font-size:14px; font-weight:700; margin:0 0 8px; }
+  .wpb-modal-text { background:var(--surface-2); border-radius:var(--radius-sm); padding:12px; font-size:12.5px; color:var(--ink-2); line-height:1.5; max-height:220px; overflow-y:auto; margin-bottom:12px; white-space:pre-wrap; }
+  .wpb-modal-actions { display:flex; gap:8px; justify-content:flex-end; }
+  .wpb-copy { font-family:var(--font); background:var(--green); color:var(--dark); border:none; font-weight:700; font-size:12.5px; padding:8px 14px; border-radius:999px; cursor:pointer; }
+  .wpb-modal-close { font-family:var(--font); background:transparent; color:var(--ink-2); border:1px solid var(--line); font-weight:600; font-size:12.5px; padding:8px 14px; border-radius:999px; cursor:pointer; }
+</style></head><body>
+<div class="wpb">
+  <header class="wpb-header">
+    <span class="wpb-brick" style="width:100px;height:100px;background:var(--linkedin);top:-36px;right:50px;"></span>
+    <span class="wpb-brick" style="width:64px;height:64px;background:var(--audio);top:16px;right:160px;opacity:0.22;"></span>
+    <div class="header-refresh-wrap">
+      <button class="header-refresh" id="refresh-btn">&#8635; Refresh data</button>
+      <span class="header-refresh-date" id="refresh-date"></span>
+    </div>
+    <p class="wpb-eyebrow">&#129513; Weekly Team Performance</p>
+    <p class="wpb-team-sub" id="team-sub"></p>
+    <div class="wpb-kpi-row" id="kpi-row"></div>
+    <p class="wpb-meta-line" id="meta-line"></p>
+  </header>
+
+  <nav class="wpb-tabs" role="tablist" aria-label="Weekly Team Performance sections">
+    <button class="wpb-tab" role="tab" aria-selected="true" aria-controls="panel-team" id="tab-team">Team Performance</button>
+    <button class="wpb-tab" role="tab" aria-selected="false" aria-controls="panel-playbooks" id="tab-playbooks">Playbooks</button>
+    <button class="wpb-tab" role="tab" aria-selected="false" aria-controls="panel-quality" id="tab-quality">Reply Quality</button>
+    <button class="wpb-tab" role="tab" aria-selected="false" aria-controls="panel-help" id="tab-help">Help</button>
+  </nav>
+
+  <div class="wpb-body">
+    <section class="wpb-panel active" id="panel-team" role="tabpanel" aria-labelledby="tab-team">
+      <div id="hero-mount"></div>
+      <div id="speed-mount"></div>
+      <p class="wpb-section-label">Who's driving results</p>
+      <div id="insights-mount"></div>
+      <p class="foot-note" style="margin:0 0 8px;">Click any column header to sort. Every KPI per identity, in one place.</p>
+      <div class="team-table-wrap">
+        <table class="team-table" id="team-table"><thead>
+          <tr class="group-row"><th></th><th class="g-active" colspan="6">This week &middot; active routine</th><th class="g-alltime grp-divider" colspan="3">All-time &middot; all campaigns</th></tr>
+          <tr id="team-head"></tr>
+        </thead><tbody id="team-table-body"></tbody></table>
+      </div>
+      <p class="foot-note" id="team-foot"></p>
+      <p class="wpb-section-label" style="margin-top:24px;">Fixes needed &mdash; flagged only</p>
+      <div class="a-list" id="actions-list"></div>
+    </section>
+
+    <section class="wpb-panel" id="panel-playbooks" role="tabpanel" aria-labelledby="tab-playbooks">
+      <p class="wpb-section-label">Playbooks &mdash; what's working, by category</p>
+      <div class="sub-nav" role="tablist" aria-label="Playbook categories">
+        <button class="sub-tab" role="tab" aria-selected="true" aria-controls="sub-reply" id="st-reply">Reply handling</button>
+        <button class="sub-tab" role="tab" aria-selected="false" aria-controls="sub-campaign" id="st-campaign">Outreach / campaign</button>
+      </div>
+      <div class="sub-panel active" id="sub-reply" role="tabpanel" aria-labelledby="st-reply">
+        <p class="wpb-lede">How replies get worked into your outcome &mdash; the reply-side plays, from real converting threads.</p>
+        <div id="pattern-reply"></div>
+      </div>
+      <div class="sub-panel" id="sub-campaign" role="tabpanel" aria-labelledby="st-campaign">
+        <div id="ai-callout-mount"></div>
+        <p class="wpb-lede">Per-channel best practices, computed only from variants that exist in your account &mdash; no fabricated lift.</p>
+        <div id="bp-list"></div>
+        <p class="wpb-section-label" style="margin-top:18px;">Campaign-side patterns</p>
+        <div id="pattern-campaign"></div>
+      </div>
+    </section>
+
+    <section class="wpb-panel" id="panel-quality" role="tabpanel" aria-labelledby="tab-quality">
+      <div id="principal-obj-mount"></div>
+      <div class="rq-card"><h3>What your team is actually replying to</h3><div class="rq-split">
+        <svg class="radar-svg" id="radar" viewBox="0 0 240 240" role="img" aria-label="Reply category distribution"></svg>
+        <div><table class="prio-table"><thead><tr><th>Category</th><th>Priority</th><th>What to do</th></tr></thead><tbody id="prio-body"></tbody></table></div>
+      </div></div>
+      <div id="best-reply-mount"></div>
+    </section>
+
+    <section class="wpb-panel" id="panel-help" role="tabpanel" aria-labelledby="tab-help">
+      <p class="wpb-section-label">How to read this dashboard</p>
+      <div class="help-card"><h3>Header KPIs</h3><dl class="help-dl">
+        <dt>Generated value</dt><dd>Revenue attributed to campaigns once a CRM/Stripe source is connected at setup. When on, it's the lead KPI &mdash; the truth above reply rate and volume. Empty until connected.</dd>
+        <dt>Success event</dt><dd>Your configured outcome (signup, meeting, deal, account created), chosen at setup.</dd>
+        <dt>Hot pipeline</dt><dd>Leads who replied with clear intent, still unanswered &mdash; listed by name, each linking to that rep's inbox.</dd>
+        <dt>Reply rates</dt><dd>&Sigma; replied &divide; &Sigma; sent per channel, coloured by the zones below.</dd>
+        <dt>Median response</dt><dd>Median time to reply after the first reply, slowest 20% trimmed.</dd>
+      </dl></div>
+      <div class="help-card"><h3>Reply-rate zones &mdash; based on La Growth Machine benchmark targets</h3><div class="help-zones">
+        <div><span class="zdot green"></span><b>On target</b> &mdash; LinkedIn reply &ge;25%, email reply &ge;6%</div>
+        <div><span class="zdot yellow"></span><b>Watch</b> &mdash; LinkedIn 15-25%, email 3-6%. Optimization, not an alarm.</div>
+        <div><span class="zdot red"></span><b>To fix</b> &mdash; LinkedIn &lt;15%, email &lt;3%.</div>
+        <div><span class="zdot gray"></span><b>Low sample</b> &mdash; under the 20-contact floor; rates aren't reliable yet.</div>
+      </div></div>
+      <div class="help-card"><h3>The two table scopes</h3><dl class="help-dl">
+        <dt>This week &middot; active routine</dt><dd>Reply rate, acceptance &amp; awaiting cover only the campaigns you're actively working &mdash; a rep can be 0% here if their active campaign is below the floor.</dd>
+        <dt>All-time &middot; all campaigns</dt><dd>Outcome, conversion &amp; value cover every campaign ever run, incl. retired &mdash; where older outcomes live. So 0% active reply with N all-time outcomes is expected, not a bug.</dd>
+        <dt>Conversion</dt><dd>Outcome &divide; contacted on the campaigns that produced it. * = estimated where retired-campaign volume is inferred.</dd>
+      </dl></div>
+      <div class="help-card"><h3>Reply classification doctrine</h3><div class="doctrine">
+        <div><b>&#128293; Hot</b> &mdash; explicit ask to move forward. Needs speed.</div>
+        <div><b>&#128172; Curious</b> &mdash; engaged, no objection. Needs nurture-to-outcome.</div>
+        <div><b>&#128721; Objection</b> &mdash; pushes back with a reason. Needs handling.</div>
+        <div><b>&#129520; Equipped</b> &mdash; uses a competitor. Needs a differentiation angle.</div>
+        <div><b>&#128683; Firm no</b> &mdash; hard no / AI callout. Close cleanly, log why.</div>
+        <div><b>&#127919; Wrong fit</b> &mdash; not the ICP. A targeting signal.</div>
+      </div></div>
+      <div class="help-card"><h3>Fix buttons</h3><dl class="help-dl">
+        <dt>When flagged</dt><dd>Only reps below target on reply rate <em>or</em> conversion get a card &mdash; top performers stay off the list.</dd>
+        <dt>Improve reply rate</dt><dd>Copies a prompt for <code>campaign-challenger</code> to fix copy/targeting against your best performers.</dd>
+        <dt>Improve conversion rate</dt><dd>Copies a prompt to analyse the conversations behind real outcomes and recommend a follow-up cadence.</dd>
+        <dt>Skill not installed?</dt><dd>The copied prompt includes the download link, so the handoff works even before the skill is added.</dd>
+      </dl></div>
+      <div class="help-card"><h3>Weekly refresh</h3><p style="font-size:12.5px;color:var(--ink-2);margin:0;">Rebuilt every Monday by a scheduled routine set up on first run &mdash; it re-pulls your LGM data, re-classifies new replies, and updates this same artifact. The &#8635; button triggers it on demand. Patterns and the objection playbook accumulate week over week; they don't reset.</p></div>
+      <div class="help-card"><h3>Need more?</h3><p style="font-size:12.5px;color:var(--ink-2);margin:0;">LGM docs &amp; support: <a class="help-link" href="https://help.lagrowthmachine.com" target="_blank" rel="noopener">help.lagrowthmachine.com &#8599;</a> &middot; <a class="help-link" href="https://app.lagrowthmachine.com/inbox" target="_blank" rel="noopener">your inbox &#8599;</a></p></div>
+    </section>
+  </div>
+</div>
+
+<div class="wpb-modal-overlay" id="wpb-modal-overlay"><div class="wpb-modal" role="dialog" aria-modal="true" aria-labelledby="wpb-modal-title">
+  <h4 id="wpb-modal-title">Copy the prompt</h4>
+  <div class="wpb-modal-text" id="wpb-modal-text"></div>
+  <p style="font-size:11.5px;color:var(--ink-3);margin:0 0 12px;">Paste into a new conversation. The prompt already includes the install link if the skill isn't added yet.</p>
+  <div class="wpb-modal-actions"><button class="wpb-modal-close" id="wpb-modal-close">Close</button><button class="wpb-copy" id="wpb-modal-copy">Copy prompt</button></div>
+</div></div>
+
+<script>
+(function(){
+  var DATA = {{DASHBOARD_DATA}};
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+  function zoneColor(z){ return z==="green"?"var(--z-green)":z==="yellow"?"var(--z-yellow)":"var(--z-red)"; }
+
+  // Header
+  var k = DATA.kpis || {};
+  $("team-sub").textContent = DATA.teamSub || "Team-level KPIs across your active senders";
+  $("meta-line").textContent = DATA.coverage || "";
+  $("refresh-date").textContent = DATA.lastUpdated ? ("Updated "+DATA.lastUpdated+(DATA.refreshTaskId?" · auto every Monday":"")) : "";
+  var kpis = [
+    { cls:"kpi-hero", lbl:"Generated value", val:k.value, target:"from campaigns → deals", empty:"connect CRM / Stripe" },
+    { lbl:(DATA.outcomeLabel||"Outcome"), val:k.outcome, target:"your success event" },
+    { lbl:"Hot pipeline", val:k.hotPipeline, target:"unanswered signals" },
+    { cls: k.liZone?("z"+k.liZone):"", lbl:"LinkedIn reply", val:(k.liReply!=null?k.liReply+"%":null), target:"target ≥25%" },
+    { cls: k.emZone?("z"+k.emZone):"", lbl:"Email reply", val:(k.emReply!=null?k.emReply+"%":null), target:"target ≥6%" },
+    { lbl:"Median response", val:k.medianResp, target:"after first reply" }
+  ];
+  $("kpi-row").innerHTML = kpis.map(function(c){
+    var valHtml = (c.val==null||c.val==="") ? '<p class="k-val empty">'+esc(c.empty||"—")+'</p>' : '<p class="k-val">'+esc(c.val)+'</p>';
+    return '<div class="wpb-kpi '+(c.cls||"")+'"><p class="k-lbl">'+esc(c.lbl)+'</p>'+valHtml+'<p class="k-target">'+esc(c.target)+'</p></div>';
+  }).join("");
+
+  // Hot leads
+  var hot = DATA.hotLeads || [];
+  if(hot.length){
+    var rows = hot.map(function(h){
+      var q = encodeURIComponent(h.lead||"").replace(/%20/g,"+");
+      var url = "https://app.lagrowthmachine.com/inbox?ID=ALL&ST=REPLIED&Q="+q;
+      return '<a class="hero-lead" href="'+url+'" target="_blank" rel="noopener"><span class="wait">'+esc(h.wait)+'</span><span class="lead-name">'+esc(h.lead)+'</span><span class="who-owner">'+esc(h.owner)+'</span><span class="lead-msg">'+esc(h.msg)+'</span><span class="open-ic">open ↗</span></a>';
+    }).join("");
+    $("hero-mount").innerHTML = '<div class="hero"><p class="hero-tag"><span>\u{1F525} Hot leads to close now</span><span class="count">'+hot.length+' unanswered buying signals</span></p><p class="hero-sub">All replied with clear intent and are still awaiting a reply. Click a lead to open that rep\'s replied inbox in LGM.</p><div class="hero-list">'+rows+'</div></div>';
+  }
+
+  // Speed
+  if(DATA.speed){
+    var sp = DATA.speed;
+    $("speed-mount").innerHTML = '<div class="speed-card"><div class="speed-metric"><span class="sm-val">'+esc(sp.median||"—")+'</span><span class="sm-lbl">median response, after first reply (trimmed)</span></div><div class="speed-metric"><span class="sm-val warn">'+esc(sp.backlog!=null?sp.backlog:"—")+'</span><span class="sm-lbl">warm leads aged &gt;7d (the backlog)</span></div><p class="speed-note">'+esc(sp.note||"")+'</p></div>';
+  }
+
+  // Insights
+  if((DATA.insights||[]).length){
+    $("insights-mount").innerHTML = '<div class="chart-insight-block"><h4>Reply rate, outcomes, conversion and value each crown a different rep</h4><ul>'+DATA.insights.map(function(i){return '<li>'+i+'</li>';}).join("")+'</ul></div>';
+  }
+
+  // Team table (sortable)
+  var team = DATA.team || [];
+  var COLS = [
+    {key:"name",label:"Identity",type:"str"},{key:"contacted",label:"Contacted",type:"num"},
+    {key:"accept",label:"LI accept",type:"pctp"},{key:"reply",label:"LI reply",type:"pct"},
+    {key:"emailReply",label:"Email reply",type:"pctp"},{key:"awaiting",label:"Awaiting",type:"num"},
+    {key:"medResp",label:"Median resp",type:"txt"},{key:"outcome",label:(DATA.outcomeLabel||"Outcome"),type:"num",divider:true},
+    {key:"conv",label:"Conversion",type:"pctapx"},{key:"value",label:"Value €",type:"txt"}
+  ];
+  var sortKey="reply", sortDir=-1;
+  function fmt(c,r){
+    var v=r[c.key];
+    if(c.type==="str") return esc(v);
+    if(c.type==="num") return v==null?"—":Number(v).toLocaleString();
+    if(c.type==="pctp") return v==null?"—":v+"%";
+    if(c.type==="pctapx") return v==null?"—":Number(v).toFixed(1)+"%"+(r.convApprox?"*":"");
+    if(c.type==="txt") return v==null||v===""?"—":esc(v);
+    if(c.type==="pct"){ var z=r.lowSample?"gray":(r.replyZone||"gray"); var zl=r.lowSample?"low sample":(z==="green"?"on target":z==="yellow"?"watch":"to fix"); return '<span class="reply-cell"><span class="zdot '+z+'"></span>'+Number(v).toFixed(1)+'% <span style="color:var(--ink-3);font-size:10px">'+zl+'</span></span>'; }
+    return "—";
+  }
+  function cmp(a,b){ var x=a[sortKey],y=b[sortKey]; if(x==null&&y==null)return 0; if(x==null)return 1; if(y==null)return -1; if(typeof x==="string")return sortDir*x.localeCompare(y); return sortDir*(x-y); }
+  function renderTable(){
+    $("team-head").innerHTML = COLS.map(function(c){
+      var cls=[]; if(c.type!=="str"&&c.type!=="pct") cls.push("num"); cls.push("sortable"); if(c.key===sortKey)cls.push("sorted"); if(c.divider)cls.push("grp-divider");
+      var arr=c.key===sortKey?(sortDir<0?"▼":"▲"):"⇅";
+      return '<th class="'+cls.join(" ")+'" data-key="'+c.key+'">'+esc(c.label)+'<span class="arr">'+arr+'</span></th>';
+    }).join("");
+    $("team-table-body").innerHTML = team.slice().sort(cmp).map(function(r){
+      return '<tr>'+COLS.map(function(c){ if(c.key==="name")return '<td class="name-cell">'+esc(r.name)+'</td>'; var cl=(c.type!=="pct")?"num":""; if(c.divider)cl+=" grp-divider"; return '<td class="'+cl+'">'+fmt(c,r)+'</td>'; }).join("")+'</tr>';
+    }).join("");
+  }
+  if(team.length){
+    $("team-head").addEventListener("click",function(e){ var th=e.target.closest("th[data-key]"); if(!th)return; var kk=th.getAttribute("data-key"); if(kk===sortKey){sortDir=-sortDir;}else{sortKey=kk;sortDir=(kk==="name")?1:-1;} renderTable(); });
+    renderTable();
+  }
+  $("team-foot").textContent = DATA.teamFoot || "Reply rate, acceptance & awaiting are active-routine; outcome, conversion & value are all-time. Median response drops the slowest 20% (ghosted/aged). * = estimated where retired-campaign volume is inferred.";
+
+  // Fix cards
+  var fixes = DATA.fixes || [];
+  $("actions-list").innerHTML = fixes.length ? fixes.map(function(a){
+    var btns = '<button class="wpb-fix" data-prompt="'+encodeURIComponent(a.improveReply||"")+'">⚡ Improve reply rate</button>';
+    if(a.improveConv) btns += '<button class="wpb-fix" data-prompt="'+encodeURIComponent(a.improveConv)+'">\u{1F4C8} Improve conversion rate</button>';
+    return '<div class="a-card flag-'+(a.flag||"red")+'"><div class="a-top"><p class="a-headline">For <span class="who">'+esc(a.who)+'</span>: '+esc(a.headline)+'</p><span class="a-stat '+(a.flag||"red")+'">'+esc(a.stat||"")+'</span></div><p class="a-context">'+esc(a.context)+'</p><div class="a-cta-row">'+btns+'</div></div>';
+  }).join("") : '<div class="empty-state">No campaign is below target this week &mdash; nothing flagged.</div>';
+
+  // Playbooks
+  var pb = DATA.playbook || {};
+  if(pb.aiCallout){ $("ai-callout-mount").innerHTML = '<div class="rq-card warn"><h3>⚠️ AI-tone in your campaign copy is churning warm leads</h3><p>'+pb.aiCallout+'</p></div>'; }
+  function pattern(p){ return '<div class="p-card"><div class="p-top"><div><p class="p-name">'+esc(p.name)+'</p><p class="p-lift">'+esc(p.lift||"")+'</p></div><span class="p-conf '+(p.conf||"inferential")+'">'+esc(p.conf||"")+'</span></div><p class="p-desc">'+esc(p.desc||"")+'</p>'+(p.excerpt?'<div class="p-excerpt">'+esc(p.excerpt)+'</div>':'')+'<p class="p-meta">'+esc(p.meta||"")+'</p></div>'; }
+  $("pattern-reply").innerHTML = (pb.patternsReply||[]).length ? pb.patternsReply.map(pattern).join("") : '<div class="empty-state">No reply-side pattern mined yet &mdash; it fills as converting threads are read.</div>';
+  $("pattern-campaign").innerHTML = (pb.patternsCampaign||[]).length ? pb.patternsCampaign.map(pattern).join("") : '<div class="empty-state">No campaign-side pattern yet.</div>';
+  $("bp-list").innerHTML = (pb.channels||[]).map(function(b){
+    var rows=(b.rows||[]).map(function(r){return '<div class="bp-row"><span class="bp-what">'+esc(r.what)+'</span><span class="bp-metric'+(r.up?" up":"")+'">'+esc(r.metric)+'</span></div>';}).join("");
+    var emp=(b.empties||[]).map(function(e){return '<div class="bp-empty">— '+esc(e)+'</div>';}).join("");
+    return '<div class="bp-card"><div class="bp-head"><span class="bp-chan '+esc(b.chan)+'">'+esc(b.chan)+'</span><h4>'+esc(b.title)+'</h4></div>'+rows+emp+'<p class="bp-conf">'+esc(b.conf||"")+'</p></div>';
+  }).join("");
+
+  // Reply Quality
+  var q = DATA.quality || {};
+  if(q.principalObjection){ var po=q.principalObjection; $("principal-obj-mount").innerHTML='<div class="po-banner"><p class="po-lbl">Principal objection to coach on</p><h3>'+esc(po.type)+'</h3><p>'+esc(po.desc)+'</p><div class="po-team"><b>Bring to your team:</b> '+esc(po.team)+'</div></div>'; }
+  $("prio-body").innerHTML = (q.priority||[]).map(function(p){ return '<tr><td class="p-cat">'+esc(p.cat)+'</td><td><span class="prio-pill '+(p.pr||"lo")+'">'+esc(p.prl)+'</span></td><td>'+esc(p.todo)+'</td></tr>'; }).join("");
+  if(q.bestReply){ var br=q.bestReply; $("best-reply-mount").innerHTML='<div class="rq-card"><h3>Best-handled reply this week &mdash; clone this</h3><div class="example-box"><p class="ex-score">'+esc(br.label)+'</p><p class="ex-text">'+esc(br.text)+'</p><p class="ex-meta">'+esc(br.meta)+'</p></div></div>'; }
+  else { $("best-reply-mount").innerHTML='<div class="rq-card"><h3>Best-handled reply this week</h3><p>No scored objection reply yet in this sample &mdash; this fills as more real objection threads are read. No fabricated examples are shown.</p></div>'; }
+  // Radar
+  (function(){ var cats=q.radar||[]; if(!cats.length)return; var svg=$("radar"),cx=120,cy=120,R=82,max=Math.max.apply(null,cats.map(function(c){return c[1];}))||1,n=cats.length,s="";
+    [0.25,0.5,0.75,1].forEach(function(f){ var pts=cats.map(function(_,i){var a=-Math.PI/2+i*2*Math.PI/n;return (cx+Math.cos(a)*R*f).toFixed(1)+","+(cy+Math.sin(a)*R*f).toFixed(1);}).join(" "); s+='<polygon class="grid" points="'+pts+'"/>'; });
+    cats.forEach(function(c,i){ var a=-Math.PI/2+i*2*Math.PI/n,ex=cx+Math.cos(a)*R,ey=cy+Math.sin(a)*R; s+='<line class="axis" x1="'+cx+'" y1="'+cy+'" x2="'+ex.toFixed(1)+'" y2="'+ey.toFixed(1)+'"/>'; var lx=cx+Math.cos(a)*(R+14),ly=cy+Math.sin(a)*(R+14),anc=Math.abs(Math.cos(a))<0.3?"middle":(Math.cos(a)>0?"start":"end"); s+='<text class="rlbl" x="'+lx.toFixed(1)+'" y="'+(ly+3).toFixed(1)+'" text-anchor="'+anc+'">'+esc(c[0])+'</text>'; });
+    var dp=cats.map(function(c,i){var a=-Math.PI/2+i*2*Math.PI/n,f=c[1]/max;return (cx+Math.cos(a)*R*f).toFixed(1)+","+(cy+Math.sin(a)*R*f).toFixed(1);}).join(" "); s+='<polygon class="poly" points="'+dp+'"/>';
+    cats.forEach(function(c,i){var a=-Math.PI/2+i*2*Math.PI/n,f=c[1]/max,vx=cx+Math.cos(a)*R*f,vy=cy+Math.sin(a)*R*f;s+='<circle cx="'+vx.toFixed(1)+'" cy="'+vy.toFixed(1)+'" r="2.5" fill="var(--linkedin)"/>';}); svg.innerHTML=s; })();
+
+  // Tabs
+  var tabs=document.querySelectorAll(".wpb-tab");
+  tabs.forEach(function(t){ t.addEventListener("click",function(){ tabs.forEach(function(x){x.setAttribute("aria-selected",x===t?"true":"false");}); document.querySelectorAll(".wpb-panel").forEach(function(p){p.classList.toggle("active",p.id===t.getAttribute("aria-controls"));}); }); });
+  var subs=document.querySelectorAll(".sub-tab");
+  subs.forEach(function(t){ t.addEventListener("click",function(){ subs.forEach(function(x){x.setAttribute("aria-selected",x===t?"true":"false");}); document.querySelectorAll(".sub-panel").forEach(function(p){p.classList.toggle("active",p.id===t.getAttribute("aria-controls"));}); }); });
+
+  // Fix modal
+  var overlay=$("wpb-modal-overlay"),mt=$("wpb-modal-text");
+  document.addEventListener("click",function(e){ var b=e.target.closest(".wpb-fix"); if(b){ mt.textContent=decodeURIComponent(b.getAttribute("data-prompt")); overlay.classList.add("open"); } });
+  $("wpb-modal-close").addEventListener("click",function(){ overlay.classList.remove("open"); });
+  overlay.addEventListener("click",function(e){ if(e.target===overlay) overlay.classList.remove("open"); });
+  $("wpb-modal-copy").addEventListener("click",function(){ var t=mt.textContent; if(navigator.clipboard)navigator.clipboard.writeText(t); var b=$("wpb-modal-copy"),o=b.textContent; b.textContent="Copied ✓"; setTimeout(function(){b.textContent=o;},1500); });
+
+  // Refresh
+  $("refresh-btn").addEventListener("click",function(){
+    var id=DATA.refreshTaskId;
+    if(window.cowork && window.cowork.runScheduledTask && id){ window.cowork.runScheduledTask(id); }
+    else { alert("Refresh runs the weekly routine that re-pulls your LGM data, re-classifies new replies, and updates this dashboard. Enable it in the setup skill to make this button live."); }
+  });
+})();
+</script>
+</body></html>
