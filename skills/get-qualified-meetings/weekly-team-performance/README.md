@@ -67,6 +67,7 @@ Everything is optional. Without a companion, its button falls back to a copy-pas
 - **Hot leads to close** — buying-intent replies still unanswered, each linking to that rep's LGM inbox.
 - **Cross-rep coaching** — what your best campaigns do differently, mined into named patterns and one-click **Fix** prompts for the reps who are behind.
 - **Reply quality** — real reply classification, your principal objection, a competitor read, and the best-handled reply to clone.
+- **Deepen it in batches** — the dashboard builds fast; then classify more conversations on demand (this week's replies, the last 50, or everything awaiting), in timed bites, and the Reply Quality tab sharpens each time. Not on LGM? Run it from a conversation export.
 - **Optional Monday auto-refresh** — a weekly routine keeps the dashboard fresh; a button triggers it on demand.
 
 ## What's not supported
