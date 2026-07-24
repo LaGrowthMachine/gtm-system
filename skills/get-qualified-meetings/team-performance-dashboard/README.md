@@ -1,4 +1,4 @@
-# Weekly Team Performance
+# Team Performance Dashboard
 
 > A head-of-sales cockpit for your La Growth Machine outbound — who's generating the most replies and conversions, which hot leads are going cold, and how to clone your best reps' campaigns across the team — built live from your own LGM data.
 
@@ -24,7 +24,7 @@ Outbound tools show account totals, not *"which rep should I coach, on what, and
 **One-line (recommended)** — uses [`skills`](https://github.com/vercel-labs/skills) from Vercel Labs to install into Claude Code, Cursor, Codex, Amp + 30 other agents in one go:
 
 ```bash
-npx skills add LaGrowthMachine/gtm-system/skills/get-qualified-meetings/weekly-team-performance
+npx skills add LaGrowthMachine/gtm-system/skills/get-qualified-meetings/team-performance-dashboard
 ```
 
 Add `-g` for a global install.
@@ -34,10 +34,10 @@ Add `-g` for a global install.
 ```bash
 git clone https://github.com/LaGrowthMachine/gtm-system.git
 cd gtm-system
-cp -r skills/get-qualified-meetings/weekly-team-performance ~/.claude/skills/
+cp -r skills/get-qualified-meetings/team-performance-dashboard ~/.claude/skills/
 ```
 
-Then ask Claude — e.g. *"Build my weekly team performance dashboard."* The first run does a short setup (~10-15 min: connect LGM, pick your success event and how you track it, optional value layer); every run after that just rebuilds the dashboard.
+Then ask Claude — e.g. *"Build my team performance dashboard."* The first run does a short setup (~10-15 min: connect LGM, pick your success event and how you track it, optional value layer); every run after that just rebuilds the dashboard.
 
 ## Recommended companion skills
 
@@ -103,7 +103,7 @@ This skill needs the La Growth Machine MCP to run. It also plugs into:
 
 - Browse all GTM skills: [the GTM System catalog](https://github.com/LaGrowthMachine/gtm-system)
 - Get new skills as they ship: [Subscribe](https://tally.so/r/NpRWgp)
-- See how La Growth Machine fits your GTM stack: [Try LGM free](https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=weekly-team-performance)
+- See how La Growth Machine fits your GTM stack: [Try LGM free](https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=team-performance-dashboard)
 
 ## License
 
