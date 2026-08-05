@@ -1,0 +1,199 @@
+<!--
+  Audience ICP Filter — the SINGLE result artifact.
+  One visualize:show_widget render. Three fixed zones:
+    1. Data coverage   2. Segmentation   3. Action (state-driven)
+  Zone 3 is the ONLY action area and shows exactly one primary path:
+    - mode "enrich"  → coverage blocked a criterion; green enrichment CTA, nothing else.
+    - mode "review"  → an inline triage deck over the ambiguous residue, THEN the green Create CTA.
+    - mode "create"  → no residue; the green Create CTA directly.
+  There is no separate review-deck widget any more — it lives here.
+
+  Fill the CFG and L objects at the bottom, and the zone 1/2 placeholders.
+  Green (#3DDC84) is reserved for the Create CTA and enrichment CTA only
+  (LGM brand: green = action). Triage buttons are neutral; only their ✓/✕
+  icons carry green / coral, with a NAVY glyph (contrast-checked).
+  Copyable text (the match table) is NOT in here — it goes below as Markdown.
+  {L_*} visible strings follow the user's language; sendPrompt stays English.
+-->
+<h2 class="sr-only">{L_A11Y}</h2>
+<style>
+.u{--bg:#F2F0F5;--ink:#1E1735;--ink2:#5A5170;--ink3:#6E6685;--muted:#8A82A0;--green:#3DDC84;--coral:#F07060;
+background:var(--bg);color:var(--ink);border-radius:24px;padding:26px 28px;margin:.5rem 0;position:relative;overflow:hidden;
+font-family:'PP Telegraf',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.5}
+.u *{position:relative;z-index:1}
+.u .deco{position:absolute;z-index:0;top:-46px;right:-40px;width:150px;height:150px;border-radius:22px;overflow:hidden;background:#fff;transform:rotate(18deg)}
+.u .deco svg{position:absolute;top:0;left:0;width:150px;height:150px}
+.u h3{font-size:21px;font-weight:700;margin:0 0 2px;letter-spacing:-.01em}
+.u .sub{font-size:13px;color:var(--ink2);margin:0 0 24px}
+.u .z{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px;font-weight:700}
+.u .card{background:#fff;border-radius:16px;padding:15px 17px;margin-bottom:22px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-size:12px;padding:4px 10px;border-radius:8px;font-weight:600;background:var(--bg);color:var(--ink)}
+.chip.miss{border:1.5px dashed var(--muted);color:var(--ink2);background:transparent;padding:2.5px 8.5px}
+.why{font-size:13px;color:var(--ink);margin:10px 0 0;padding-top:11px;border-top:1.5px solid var(--bg);font-weight:600}
+.why span{color:var(--ink2);display:block;margin-top:4px;font-size:12.5px;font-weight:400}
+.bar{display:flex;height:10px;gap:3px;margin-bottom:14px}
+.bar div{border-radius:3px}
+.row{display:flex;align-items:baseline;gap:11px;padding:7px 0;border-bottom:1.5px solid var(--bg)}
+.row:last-child{border-bottom:none}
+.dot{width:9px;height:9px;border-radius:3px;flex:none;position:relative;top:-1px}
+.n{font-variant-numeric:tabular-nums;font-weight:700;min-width:34px;text-align:right;font-size:16px}
+.lb{flex:1}.ac{font-size:12.5px;color:var(--ink2);text-align:right}
+.row.hot .lb{font-weight:700}
+.row.hot .ac{color:var(--ink);font-weight:600;display:inline-flex;align-items:center;gap:5px;justify-content:flex-end}
+.row.hot .ac .down{width:16px;height:16px;border-radius:50%;background:var(--ink);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:10px}
+.act-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.act-head .z{margin:0}
+.prog{font-size:12px;color:var(--ink2);font-variant-numeric:tabular-nums;font-weight:600}
+.nm{font-size:18px;font-weight:700;margin:0 0 2px}
+.role{font-size:13.5px;margin:0 0 11px}.role b{font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tag{font-size:12px;padding:3px 9px;border-radius:7px;background:var(--bg);color:var(--ink2);font-weight:500}
+.bio{background:var(--bg);border-radius:11px;padding:10px 12px;font-size:12.5px;margin-bottom:11px}
+.bio small{display:block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);font-weight:700;margin-bottom:3px}
+.rwhy{font-size:12.5px;color:var(--ink3);margin:0}.rwhy b{color:var(--ink2);font-weight:700}
+.btns{display:flex;gap:12px;margin-top:16px}
+.u button{font-family:inherit;cursor:pointer;font-weight:700;border:none;transition:opacity .15s,transform .08s}
+.u button:active{transform:scale(.97)}.u button:hover{opacity:.92}
+.tri{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;border-radius:14px;padding:14px 0 12px;font-size:14px}
+.tri .ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--ink)}
+.skip{background:#fff;border:1.5px solid var(--muted);color:var(--ink2)}
+.skip .ic{background:var(--coral)}
+.keep{background:var(--ink);border:1.5px solid var(--ink);color:#fff}
+.keep .ic{background:var(--green)}
+.foot{display:flex;align-items:center;justify-content:space-between;margin-top:13px;font-size:12px;color:var(--ink3)}
+.undo{background:none;border:none;color:var(--ink2);cursor:pointer;font-family:inherit;font-size:12px;font-weight:600;text-decoration:underline;padding:0}
+.kbd b{color:var(--ink2)}
+.done-line{font-size:13px;color:var(--ink2);margin:0 0 15px;text-align:center}.done-line b{color:var(--ink);font-weight:700}
+.cta{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--green);color:var(--ink);border-radius:16px;padding:17px 22px;width:100%;box-shadow:0 2px 0 rgba(30,23,53,.12)}
+.cta .circ{width:38px;height:38px;border-radius:50%;background:var(--ink);color:var(--green);display:inline-flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+.cta .lbl{font-size:15px;font-weight:700;line-height:1.3;text-align:left}
+.cta .lbl code{background:rgba(30,23,53,.14);padding:1px 6px;border-radius:5px;font-size:13.5px}
+.cta .lbl small{display:block;font-weight:400;font-size:12.5px;margin-top:3px}
+.sec{display:block;margin:14px auto 0;background:none;border:none;color:var(--ink2);font-size:12.5px;font-weight:600;text-decoration:underline;cursor:pointer}
+.hint{font-size:12px;color:var(--ink3);margin:13px 0 0}
+</style>
+
+<div class="u" id="u">
+  <div class="deco">
+    <svg width="173" height="173" viewBox="0 0 173 173" fill="none"><g clip-path="url(#du1)"><g clip-path="url(#du2)"><path d="M25.819 78.631C8.442 78.631 -5.639 64.549 -5.639 47.184V7.87C-5.639 3.527 -9.166 0 -13.507 0C-17.847 0 -21.375 3.527 -21.375 7.869V47.184C-21.375 64.563 -35.455 78.631 -52.819 78.631H-92.132C-96.473 78.631 -100 82.16 -100 86.5C-100.001 87.5334 -99.7974 88.5568 -99.4022 89.5117C-99.007 90.4666 -98.4275 91.3342 -97.6967 92.065C-96.966 92.7958 -96.0985 93.3755 -95.1436 93.7708C-94.1888 94.1661 -93.1654 94.3694 -92.132 94.369H-52.819C-35.456 94.369 -21.375 108.451 -21.375 125.816V165.131C-21.375 169.473 -17.848 173 -13.507 173C-9.166 173 -5.639 169.473 -5.639 165.131V125.816C-5.639 108.451 8.442 94.369 25.819 94.369H65.132C69.473 94.369 73 90.841 73 86.5C73 82.159 69.473 78.631 65.132 78.631H25.819Z" fill="#F2F0F5"/></g></g><defs><clipPath id="du1"><rect width="173" height="173" fill="#fff"/></clipPath><clipPath id="du2"><rect width="173" height="173" fill="#fff"/></clipPath></defs></svg>
+  </div>
+
+  <h3>{L_TITLE}</h3>
+  <p class="sub">{AUDIENCE_NAME} · {TOTAL} leads</p>
+
+  <p class="z">1 · {L_COVERAGE}</p>
+  <div class="card">
+    <div class="chips">{COVERAGE_CHIPS}</div>
+    {COVERAGE_NOTE}
+  </div>
+
+  <p class="z">2 · {L_SEGMENTATION}</p>
+  <div class="bar">
+    <div style="width:{PCT_MATCH}%;background:#1E1735"></div>
+    <div style="width:{PCT_REVIEW}%;background:#5A5170"></div>
+    <div style="width:{PCT_NOMATCH}%;background:#8A82A0"></div>
+    <div style="width:{PCT_EXCLUDED}%;background:#fff;border:1.5px solid #8A82A0;box-sizing:border-box"></div>
+  </div>
+  <div class="card" style="padding:6px 17px">
+    <div class="row"><span class="dot" style="background:#1E1735"></span><span class="n">{N_MATCH}</span><span class="lb">{L_MATCH}</span><span class="ac">{L_MATCH_ACTION}</span></div>
+    <div class="row hot"><span class="dot" style="background:#5A5170"></span><span class="n">{N_REVIEW}</span><span class="lb">{L_REVIEW}</span><span class="ac"><span class="down">↓</span>{L_BELOW}</span></div>
+    <div class="row"><span class="dot" style="background:#8A82A0"></span><span class="n">{N_NOMATCH}</span><span class="lb">{L_NOMATCH}</span><span class="ac">{L_NOMATCH_ACTION}</span></div>
+    <div class="row"><span class="dot" style="background:#fff;border:1.5px solid #8A82A0"></span><span class="n">{N_EXCLUDED}</span><span class="lb">{L_EXCLUDED}</span><span class="ac">{L_EXCLUDED_ACTION}</span></div>
+  </div>
+
+  <div class="act-head"><p class="z" id="zlabel"></p><span class="prog" id="prog"></span></div>
+  <div class="card" id="stage"></div>
+  <p class="hint">{L_SOURCE_UNTOUCHED}</p>
+</div>
+
+<script>
+(function(){
+  // ---- filled by Claude ----
+  var CFG = {
+    mode: "review",                 // "enrich" | "review" | "create"
+    audience: "{AUDIENCE_NAME}",
+    matchBase: {N_MATCH},           // confident matches that always go to [icp]
+    enrich: { n: 0, why: "" },      // used only when mode === "enrich"
+    leads: {REVIEW_LEADS_JSON}      // [] when none; each: {id,fn,ln,title,co,loc,ind,bio,why}
+  };
+  var L = {
+    reviewHead:"{L_ACT_REVIEW_HEAD}", createHead:"{L_ACT_CREATE_HEAD}", enrichHead:"{L_ACT_ENRICH_HEAD}",
+    skip:"{L_SKIP}", keep:"{L_KEEP}", undo:"{L_UNDO}", kept:"{L_KEPT}", kbd:"{L_KBD}",
+    noTitle:"{L_NO_TITLE}", why:"{L_WHY}", bio:"{L_BIO}",
+    doneKept:"{L_DONE_KEPT}", ofN:"{L_OF_N}", willHold:"{L_WILL_HOLD}",
+    create:"{L_CREATE}", auto:"{L_AUTO}", keptWord:"{L_KEPT_WORD}", sourceKept:"{L_SOURCE_KEPT}",
+    resume:"{L_RESUME}", enrich:"{L_ENRICH}", enrichWhy:"{L_ENRICH_WHY}", credits:"{L_CREDITS}"
+  };
+  // --------------------------------
+
+  var i=0, dec=[], stage=document.getElementById('stage'),
+      prog=document.getElementById('prog'), zlabel=document.getElementById('zlabel');
+  function esc(s){return (s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+  function enrichView(){
+    zlabel.textContent=L.enrichHead; prog.style.display='none';
+    stage.innerHTML='<button class="cta" onclick="U.enrich()"><span class="circ">▶</span>'
+      +'<span class="lbl">'+esc(L.enrich)+'<small>'+esc(CFG.enrich.why||L.enrichWhy)+' · '+CFG.enrich.n+' '+esc(L.credits)+'</small></span></button>';
+  }
+
+  function card(l){
+    var meta=[];
+    if(l.loc) meta.push('<span class="tag">📍 '+esc(l.loc)+'</span>');
+    if(l.ind) meta.push('<span class="tag">'+esc(l.ind)+'</span>');
+    var role=(l.title?'<b>'+esc(l.title)+'</b>':'<span style="color:var(--ink3)">'+esc(L.noTitle)+'</span>')+(l.co?' · '+esc(l.co):'');
+    return '<p class="nm">'+esc(l.fn)+' '+esc(l.ln)+'</p><p class="role">'+role+'</p>'
+      +(meta.length?'<div class="meta">'+meta.join('')+'</div>':'')
+      +'<div class="bio"><small>'+esc(L.bio)+'</small>'+esc(l.bio||'—')+'</div>'
+      +'<p class="rwhy"><b>'+esc(L.why)+' :</b> '+esc(l.why)+'</p>'
+      +'<div class="btns">'
+      +'<button class="tri skip" onclick="U.d(0)"><span class="ic">✕</span>← '+esc(L.skip)+'</button>'
+      +'<button class="tri keep" onclick="U.d(1)"><span class="ic">✓</span>'+esc(L.keep)+' →</button>'
+      +'</div>'
+      +'<div class="foot"><button class="undo" onclick="U.u()" '+(dec.length?'':'disabled style="opacity:.35"')+'>↩ '+esc(L.undo)+'</button>'
+      +'<span class="kbd">'+esc(L.kept)+' : <b>'+dec.filter(function(d){return d.keep;}).length+'</b></span></div>';
+  }
+
+  function reviewView(){
+    if(i>=CFG.leads.length) return createView();
+    zlabel.textContent=L.reviewHead; prog.style.display=''; prog.textContent=(i+1)+' / '+CFG.leads.length;
+    stage.innerHTML=card(CFG.leads[i]);
+  }
+
+  function createView(){
+    var kept=dec.filter(function(d){return d.keep;}).length, total=CFG.matchBase+kept;
+    zlabel.textContent=L.createHead; prog.style.display='none';
+    var done = CFG.leads.length
+      ? '<p class="done-line">'+esc(L.doneKept)+' <b>'+kept+'</b> '+esc(L.ofN).replace('{n}',CFG.leads.length)+' · '+esc(L.willHold).replace('{m}',CFG.matchBase).replace('{k}',kept)+'</p>'
+      : '';
+    stage.innerHTML=done
+      +'<button class="cta" onclick="U.create('+total+','+kept+')"><span class="circ">▶</span>'
+      +'<span class="lbl">'+esc(L.create)+' <code>[icp] '+esc(CFG.audience)+'</code> · '+total+' leads'
+      +'<small>'+CFG.matchBase+' '+esc(L.auto)+' + '+kept+' '+esc(L.keptWord)+' · '+esc(L.sourceKept)+'</small></span></button>'
+      +(CFG.leads.length?'<button class="sec" onclick="U.restart()">↩ '+esc(L.resume)+'</button>':'');
+  }
+
+  window.U={
+    d:function(keep){ dec.push({id:CFG.leads[i].id,keep:!!keep}); i++; reviewView(); },
+    u:function(){ if(!dec.length)return; dec.pop(); if(i>0)i--; reviewView(); },
+    restart:function(){ i=0; dec=[]; reviewView(); },
+    enrich:function(){ if(window.sendPrompt) sendPrompt('Run profile enrichment on this audience so I can filter by location and industry'); },
+    create:function(total,kept){
+      if(!window.sendPrompt) return;
+      var ids=dec.filter(function(d){return d.keep;}).map(function(d){return d.id;}).join(', ');
+      sendPrompt('Create the [icp] audience in La Growth Machine: the '+CFG.matchBase+' confident matches plus the '+kept+' leads I kept ('+ids+') — '+total+' total. Leave the source audience untouched.');
+    }
+  };
+
+  document.addEventListener('keydown',function(e){
+    if(CFG.mode!=='review' || i>=CFG.leads.length) return;
+    if(e.key==='ArrowRight'){e.preventDefault();U.d(1);}
+    else if(e.key==='ArrowLeft'){e.preventDefault();U.d(0);}
+    else if(e.key==='Backspace'){e.preventDefault();U.u();}
+  });
+
+  if(CFG.mode==='enrich') enrichView();
+  else if(CFG.mode==='review' && CFG.leads.length) reviewView();
+  else createView();
+})();
+</script>

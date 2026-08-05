@@ -26,10 +26,18 @@ If the user hasn't imported yet, tell them to do that first, then come back with
 
 Any audience is mostly noise: the user's own colleagues are in it, competitors are watching, and a third of the job titles are unreadable. This skill checks whether the data can support the ICP the user wants, asks what that ICP actually is, sorts the list, and writes the segments back as complementary audiences.
 
+## Execution style — fast and quiet
+
+This skill does a lot of steps. Two rules keep it usable:
+
+- **Minimal narration.** Do the reasoning and the tool calls, but do **not** narrate each step to the user ("page 1 loaded", "the param is skip not offset", "wrapping the payload"…). The user wants the *result*, not a play-by-play. Stay silent through the pipeline and speak only when you present the widgets — one or two sentences of framing, no more. Think as hard as you like; just don't type it out.
+- **Parallelize and batch.** Fetch the lead pages **concurrently** (issue the `get_audience_leads` calls for all pages in one batch). Keep only the scored fields when you normalise (`leadId, jobTitle, companyName, proEmail, shortBio, location, industry`) — not all 40 columns — so the payloads stay small.
+- **Never re-read the whole audience in pass 2.** This was the measured bottleneck: reviewing 250 leads one by one took 8 minutes. Pass 1 hands you a bounded `pass2_queue` — only the genuinely suspect leads (ambiguous, bio-inferred matches, agency/freelance matches, and leads dropped on a soft geo/industry miss). **Pass 2 reviews only that queue**, typically a few dozen. If the queue is still large (60+), fan it out: a couple of parallel sub-agents on **Sonnet** splitting the queue, reserving deeper reasoning only for the final ambiguous handful. A clean, on-target audience produces a queue of ~15–25; a full re-read is never needed.
+
 ## Workflow
 
 **Step 0 — Load the list.**
-From an LGM audience (`list_audiences` → `get_audience_leads`, paginating at 100/page until you have `total`), or from a CSV. Normalise to one object per person: `leadId` (or `firstname`+`lastname`), `jobTitle`, `companyName`, `proEmail`, plus `shortBio`, `location`, `industry` when present.
+From an LGM audience (`list_audiences` → `get_audience_leads`) or a CSV. **Pagination: the parameter is `skip` (not `offset`), 100 max per page** — so page 2 is `skip:100`, page 3 `skip:200`. Read `total` from the first page and fire the remaining pages **in one concurrent batch**. Normalise to one object per person: `leadId` (or `firstname`+`lastname`), `jobTitle`, `companyName`, `proEmail`, plus `shortBio`, `location`, `industry` when present.
 
 **Step 1 — Coverage gate. Run this before asking about the ICP.**
 ```bash
@@ -45,14 +53,14 @@ python3 scripts/build.py spec.json > pass1.json
 ```
 It refuses invalid input rather than emitting a best-effort sort. If it errors, fix the spec — never work around it by classifying manually.
 
-**Step 4 — Pass 2, semantic. Mandatory.** Read every bucket, `match` first. Write overrides with reasons:
+**Step 4 — Pass 2, semantic. Mandatory — but bounded.** Pass 1's output carries a `pass2_queue`: the only leads worth a human/LLM look. **Review that queue, not the whole audience** (see *The pass-2 queue* below). Each queued lead has a `_flag` telling you why it's there. Resolve each into `match` or `no_match`, write the overrides with reasons, then re-validate:
 ```bash
 python3 scripts/build.py --adjudicate review.json
 ```
 
-**Step 5 — Present** counts, segments, and what pass 2 changed.
+**Step 5 — Present** the single result artifact (coverage + segmentation + the state-driven action zone). If a residue remains it embeds the inline triage deck; otherwise it shows the Create CTA directly (see *Zone 3 — one action, review then create*).
 
-**Step 6 — Write complementary audiences** back (see below), or export a CSV.
+**Step 6 — Create the audience** after review: `[icp]` = confident matches + whatever the user kept in the deck. Then offer a CSV as a secondary option, only if they want it — never auto-generate one.
 
 ## The coverage gate
 
@@ -88,11 +96,28 @@ If the user declines enrichment, proceed — but state which criteria you droppe
 | `Founder @ Stealth Mode` | **review** | Almost certainly in ICP. |
 | A title in a language the taxonomy misses | **review** | Often a clear match. |
 
-**Review every bucket, not just `review`.** The `match` bucket is where a false positive costs you — that lead gets sequenced. Read `match` first.
+**False positives live in `match`, not just `review` — but you don't re-read all matches.** The `pass2_queue` already pulls the risky matches (bio-inferred, agency/freelance) alongside the ambiguous and the soft-dropped. Trust the queue: it's how you catch the false positives without paying the 8-minute cost of re-reading confident matches.
+
+**Pass 2 is Claude's job, not the user's.** The whole promise of this skill is that the user does *not* hand-sort a list. A 50-lead review bucket handed to the user is a failure, not a result. In pass 2 **you** read each queued lead's full record — job title, bio, industry, company — and resolve as many as you honestly can into `match` or `no_match`, leaving only the genuinely ambiguous handful for the user. Working the queue down is the deliverable; surfacing it untouched is not.
+
+### The pass-2 queue
+
+`build.py` returns `pass2_queue` — the bounded set of leads pass 2 should actually inspect, each tagged with a `_flag`. **Do not review anything outside it**; leads not in the queue are confident enough to trust, and re-reading them is the 8-minute mistake.
+
+| `_flag` | What it is | What to check |
+|---|---|---|
+| `ambiguous` | the whole `review` bucket | resolve to match / no_match, or leave for the deck |
+| `bio-inferred match` | matched via the bio, not the title | confirm the bio really means an in-ICP function |
+| `agency/freelance — confirm it's the ICP` | a match whose company/bio reads like an agency, freelancer or consultant | keep if they're a real buyer, drop if they're a service provider |
+| `dropped on geo/industry — check the variant` | right seniority + function, but failed the location/industry substring | rescue if the label is just a variant of an in-ICP geo/industry |
+
+The queue also catches the exact failures from real runs: agencies/freelancers sitting in `match`, and real SaaS companies wrongly in `no_match` because LinkedIn labelled them "Technology, Information and Internet" instead of "Software". On a clean, on-target audience the queue is ~15–25 leads; that's the whole of pass 2's work.
 
 The script re-runs the same reconciliation on your overrides, and rejects an override on a lead that doesn't exist, an invalid bucket, a duplicate, or a reclassification with no substantive reason. You cannot lose a lead in pass 2 either.
 
 Never present pass-1 output as the final answer. If you are about to hand over results without having run pass 2, stop and run it.
+
+**If the review bucket is large, the fix is usually upstream.** Pass 1 already reads `shortBio` as a fallback when the title is silent, so a big review bucket typically means either the audience isn't enriched (check coverage) or the ICP is under-specified (a founder rule left unanswered, a function list too narrow). Diagnose the cause and say it — don't just move 40 leads by hand.
 
 ## The ICP Q&A
 
@@ -110,6 +135,36 @@ Ask before classifying. The same audience feeds very different ICPs.
 
 If the ICP is vague ("good leads", "decision makers"), push once for specifics. A vague ICP produces a huge review bucket — the original problem with extra steps.
 
+## The spec format
+
+`build.py` reads one JSON object:
+
+```json
+{
+  "icp": {
+    "seniority": ["founder_c", "vp_head", "manager_lead"],
+    "functions": ["sales", "growth_marketing", "revops"],
+    "founder_qualifies_regardless_of_function": false,
+    "locations": ["France", "Paris"],
+    "industries": ["Software"]
+  },
+  "exclusions": {
+    "domains": ["yourcompany.com"],
+    "companies": ["Your Company"],
+    "keywords": ["competitor-a", "competitor-b"]
+  },
+  "leads": [ { "leadId": "...", "jobTitle": "...", "companyName": "...", "proEmail": "...", "shortBio": "...", "location": "...", "industry": "..." } ]
+}
+```
+
+`locations` and `industries` are optional — include them only when the coverage gate says the data supports them. Each lead needs a `leadId`, or both `firstname` and `lastname`. For `--adjudicate`, pass `{"result": <pass1 output>, "overrides": [{"_key": "...", "bucket": "...", "reason": "..."}]}`.
+
+**Geo matches on substring, so list the real variants.** Enrichment writes `"Greater Paris Metropolitan Region"`, `"Greater Lyon Area"` — none contain the word `"France"`, so `locations: ["France"]` would wrongly drop them. Glance at the actual `location` values (`--coverage` or a quick scan) and include the metros/regions that appear.
+
+**Industry is auto-expanded — you don't hand-list the variants.** When your `industries` include a known bucket (`saas`, `software`, `tech`, `fintech`, `healthtech`, `ecommerce`), `build.py` expands it to the LinkedIn labels that mean the same thing (`saas` → `Software Development`, `Technology, Information and Internet`, `IT Services`, …). Just pass `["saas"]`. For a bucket not in the synonym map, list the variants yourself, or let the `dropped on geo/industry` queue flag surface the misses for pass 2.
+
+**`CMO`, `CRO`, `CFO` etc. are abbreviations the title patterns catch for seniority but not for function.** A bare "CMO @ Acme" resolves as founder/C-level but lands in `review` for function. In pass 2, read these as their function (CMO → marketing, CRO → sales) rather than leaving them ambiguous.
+
 ## Seniority tiers
 
 Evaluated top-down, first match wins — which is why `Chief Executive Officer` resolves as founder/C-level rather than as an "executive" IC.
@@ -122,6 +177,8 @@ Evaluated top-down, first match wins — which is why `Chief Executive Officer` 
 | `ic` | Account Executive, SDR, BDR, Specialist, Coordinator, Analyst, Consultant, Engineer, Intern, Junior |
 
 The `Chief … Officer` pattern is deliberately broad — it catches real C-levels, and pass 2 removes the HR/medical/happiness false positives.
+
+**Title first, bio as fallback.** Detection runs on the job title; when the title carries no seniority or no function signal, pass 1 falls back to `shortBio` (now that enrichment exposes it). A `Managing Director` whose bio reads "Développement commercial" is matched on that bio. On a real 150-lead audience, reading the bio cut the review bucket by ~60%. A bio-inferred match is flagged in its reason ("inferred: function from bio") so pass 2 can give it a second look.
 
 ## Function tiers
 
@@ -148,7 +205,7 @@ Three failure modes seen on real data, all handled in pass 1:
 
 Always seed exclusions with the user's **own** company and domain — the most common leak and the most embarrassing.
 
-Pass 2 extends this: exclude competitors the user didn't list but you recognise, and say which ones you added.
+Pass 2 extends this: exclude competitors the user didn't list but you recognise, and say which ones you added. But **a competitor name matching inside a `bio` (a tool the lead mentions) is not the same as their employer** — don't exclude on a bio-only competitor hit. In testing, "lemlist"/"expandi" appeared in leads' bios as tools they use, and excluding them was wrong; check it's the employer/domain before dropping.
 
 ## The buckets
 
@@ -167,55 +224,87 @@ A `review` bucket around a third is normal on thin data. Say so plainly and name
 
 | Tempting | Why it fails | Do instead |
 |---|---|---|
+| Narrating every step to the user | Slow, noisy, buries the result | Work quietly, present the widgets |
 | Eyeballing the list and sorting it yourself | Silent, unauditable, leaks the user's own team | Run pass 1 |
+| Excluding on a competitor name found only in the bio | It's a tool they mention, not their employer | Exclude on employer/domain, not bio-only |
+| Auto-generating a CSV | The primary outcome is audiences in LGM | Offer CSV as a secondary, on request |
+| Dumping the full match list below the widget | Clutter; the verdict is in the widget, the audience is in LGM | Offer it in one line; show only if asked |
+| Two competing CTAs (review + create) | The user doesn't know which to click | Review first, create after |
 | Shipping pass-1 output as final | HR and medical C-levels sit in `match` | Always run pass 2 |
-| Only reviewing the `review` bucket in pass 2 | False positives live in `match`, and they get sequenced | Read `match` first |
+| Re-reading all 250 leads in pass 2 | 8-minute bottleneck; most are obvious | Review only the `pass2_queue` |
+| Writing the matches one `create_lead` at a time, narrated | The slow tail of the run | Fire concurrently in waves of ~45 (50/10s limit), silently |
 | Skipping the coverage gate | You offer geo filtering on empty data and dump the list into `review` | Run `--coverage` first |
 | Filtering on a criterion the data can't support | Produces a confident, meaningless result | Drop it and say so |
 | Guessing the ICP from the audience name | The same audience feeds very different ICPs | Run the Q&A |
 | Dropping ambiguous leads to keep output tidy | Hides real pipeline | Route to `review` |
 | Reaching for email enrichment | 5 credits vs 1, and useless for ICP scoring | Profile enrichment only |
-| Improvising the result layout | The user has to relearn the output every run | Always the four fixed zones |
-| Hiding the coverage zone when data is clean | The layout shifts run to run | Keep it, with green chips |
+| Improvising the result layout | The user has to relearn the output every run | Always the three fixed zones |
+| Hiding the coverage zone when data is clean | The layout shifts run to run | Keep it, with chips |
+| Handing the review bucket to the user as a list | That's the hand-sorting the skill exists to kill | Drain it in pass 2, deck the residue |
 
 ## Writing complementary audiences (LGM connected)
 
-The source audience is **left untouched** — it stays the raw record. Add two audiences alongside it:
+The source audience is **left untouched** — it stays the raw record. The main output is one new audience:
 
-| Bucket | Audience name |
+| Audience | Contents |
 |---|---|
-| ICP matches | `[icp] <source audience name>` |
-| Needs review | `[review] <source audience name>` |
+| `[icp] <source audience name>` | confident matches **+** the leads kept in the inline triage deck |
 
-`no_match` and `excluded` are reported but not written — an audience of people you decided not to contact is clutter.
+`no_match` and `excluded` are reported but not written — an audience of people you decided not to contact is clutter. A `[review] <source audience name>` audience is only created in the fallback case where the user declines to triage the deck at all — then park the residue there for later rather than losing it.
 
-Writing a lead to another audience is non-destructive: it is merged on identity, not moved, so the source audience survives intact as the audit trail. Store the classification reason on the lead (a custom attribute) so the decision stays auditable in-app later.
+Writing a lead to another audience is non-destructive: `create_lead` (with `audience: "[icp] …"`) merges on identity, not moves, so the source audience survives intact as the audit trail. Store the classification reason on the lead (a custom attribute) so the decision stays auditable in-app later.
 
-Confirm before writing, and state exactly how many leads go where.
+**Write the whole audience in parallel, quietly — this is the run's other bottleneck.** There is no bulk endpoint, so each match is one `create_lead` call, but they are independent: fire them **concurrently**, not one-then-the-next with a message between each. LGM's rate limit is **50 calls / 10 s**, so send them in concurrent waves of ~45 and pause ~10 s between waves; 140 leads finishes in ~30 s instead of minutes. Don't narrate the batches ("20 attached", "40 done"…) — write silently and report only the final line. If it's large (150+), hand the write to a sub-agent so the main thread stays clean.
+
+Confirm before writing, and state exactly how many leads go where — once, at the end.
 
 ## Output & LGM handoff
 
-The result **always** renders through the same widget, with the same four zones in the same order. Uniformity is the point: the user learns to read one layout once. Never improvise a different presentation, never reorder or drop a zone.
+The whole result is **one** `visualize:show_widget` render — a single artifact, `references/result-widget.html`. Fill its placeholders and the `CFG`/`L` config; do not rebuild or restyle it, and never split it into two widgets. Three fixed zones, same order every run:
 
-Render it with `visualize:show_widget`. Zone order and why:
+1. **Data coverage** — first, because it conditions everything below. Keep it visible even when every field is fine (chips, no note).
+2. **Segmentation** — the stacked bar + the buckets. The `review` row is highlighted and points **↓ below** (the `L_BELOW` label) so the user knows those leads are handled in zone 3.
+3. **Action** — the only action area, state-driven. It **replaces** the old "audiences to create" recap (which just repeated numbers already read).
 
-1. **Data coverage** — first, because it conditions everything below. Seeing that geography was unavailable *before* reading the counts stops the user assuming the sort is complete. Keep it visible even when every field is fine (green chips, no note) — a layout that changes shape run to run defeats the purpose.
-2. **Segmentation** — the stacked bar plus the four buckets with counts.
-3. **Pass 2** — what you reclassified and why. Show it **even when nothing moved** ("Pass 2 — 0 reclassified"); it is the evidence that pass 2 ran.
-4. **Audiences to create** — the names, the counts, and the reminder that the source is untouched.
+**Pass 2 does not get a zone.** What you reclassified is an audit detail — one prose line below the widget ("Pass 2: moved 3 — 2 rescued from a bio signal, 1 competitor excluded"), not a card.
+
+### Zone 3 — one action, review then create
+
+The artifact drives zone 3 from `CFG.mode`, so the user always sees exactly one primary path:
+
+| `CFG.mode` | When | Zone 3 shows |
+|---|---|---|
+| `"enrich"` | coverage blocked an ICP criterion | the green enrichment CTA, nothing else — you don't reach review/create until the data supports the ICP |
+| `"review"` | coverage clean **and** a pass-2 residue remains | an **inline triage deck** over the residue; when the last card is decided it becomes the green Create CTA automatically |
+| `"create"` | coverage clean **and** no residue | the green Create CTA directly |
+
+So the flow is **review first, then create**, in one artifact — no two competing CTAs. Kept cards join the confident matches in `[icp]`; skipped ones stay out; there's normally no `[review]` audience to make (only the fallback where the user declines to triage at all).
+
+### Filling it
+
+Zone 1/2 placeholders: `{COVERAGE_CHIPS}` (one `<span class="chip">Field NN%</span>` per sufficient field, `chip miss` per insufficient), `{COVERAGE_NOTE}` (a `<p class="why">` consequence-first, omitted when clean), `{PCT_*}` (sum to 100), `{N_*}`, and the `{L_*}` labels in the user's language.
+
+Zone 3 config (JS object near the bottom of the template):
+- `CFG.mode` — `"enrich"` / `"review"` / `"create"` per the table.
+- `CFG.audience` — the source audience name (the Create CTA renders `[icp] <that name>`).
+- `CFG.matchBase` — the count of confident matches (`N_MATCH`); the Create total = base + kept.
+- `CFG.enrich` — `{n, why}`, used only in enrich mode.
+- `CFG.leads` — one object per residual lead: `{id, fn, ln, title, co, loc, ind, bio, why}` (`id` = real `leadId`, `why` = the reason in plain language). `[]` when there's no residue.
+
+The Create button's `sendPrompt` returns the confident-match count + the kept `leadId`s. **That is the write trigger:** create `[icp]` from the matches + kept, writing in parallel (see *Writing the ICP audience*), then report the final count.
+
+Below the widget, in prose: **one line** on what pass 2 changed. **Do not print the match list by default** — the widget already gives the verdict and the audience is written into LGM, so a 37-row dump is clutter. Offer it in a single sentence ("want the list of matches, or a CSV?") and produce the Markdown table or the CSV **only if the user asks**.
 
 ### Hard rules
 
-- **No copyable text inside the widget.** It renders in a sandboxed iframe with no clipboard. The match table (name, title, company, why) goes **below** the widget as native Markdown, where the renderer gives it a working copy button.
-- **Two buttons maximum, exactly one of them green.** Green is the LGM action colour and is reserved for action — never decoration, never a data fill.
-- **The green button goes to whichever action serves the user right now.** If the coverage gate blocked ICP criteria, green is *enrichment* (creating audiences on incomplete data would be the wrong default). Otherwise green is *create the audiences*. The other action becomes the outlined ghost button. Zones never move; only the destination of the green changes.
-- **Visible labels follow the user's language.** Audience names (`[icp] …`, `[review] …`) and every `sendPrompt(...)` string stay in **English** regardless.
-- Bar widths are the bucket percentages; the four segments must sum to 100%.
-- No CSV export button — offer it in text if the user wants one.
+- **No copyable text inside the widget** (sandboxed iframe, no clipboard). If the user asks for the match list, it goes **below** as native Markdown — but don't volunteer it unprompted.
+- **Green (`#3DDC84`) is reserved for the primary action only** — the Create CTA and the enrichment CTA. Never elsewhere. The triage buttons are neutral (Keep = navy fill, Skip = outline); only their small icons carry colour: **✓ on a green circle, ✕ on a coral circle (`#F07060`), both with a navy glyph** (contrast-checked: navy-on-green 9.6:1, navy-on-coral 5.9:1; white fails on both).
+- **Do not auto-generate a CSV.** The primary outcome is the audience in LGM. A CSV is a **secondary** option offered in one line, produced only if the user says yes.
+- Bar widths are the bucket percentages; segments sum to 100%.
 
 ### Colour and contrast — measured, not eyeballed
 
-The palette is fixed by the LGM brand system: background `#F2F0F5`, ink `#1E1735`, action green `#3DDC84`. Every text colour below was contrast-checked against the grey background and clears the 4.5:1 body threshold.
+Palette fixed by the LGM brand: background `#F2F0F5`, ink `#1E1735`, action green `#3DDC84`, coral `#F07060`. Contrast-checked against the grey:
 
 | Token | Hex | On `#F2F0F5` | Use |
 |---|---|---|---|
@@ -224,126 +313,17 @@ The palette is fixed by the LGM brand system: background `#F2F0F5`, ink `#1E1735
 | Ink 3 | `#6E6685` | 4.8:1 | Zone labels, hints |
 | Muted | `#8A82A0` | 3.2:1 | **Borders and fills only — never text** |
 
-Three consequences that are easy to get wrong:
+1. **Never set text in green** (`#3DDC84` on grey = 1.6:1). Green is a background only.
+2. **Glyphs on the green/coral icon circles and the green CTA circle are navy `#1E1735`, never white.**
+3. **Never build hierarchy with opacity** — a tint ramp collapses (35%/18% = 2.1:1/1.4:1). Use the solid tokens; give the lightest bar segment a `#8A82A0` border.
 
-1. **Never set text in green.** `#3DDC84` on the grey is 1.6:1 — illegible. Green is a background only.
-2. **Content on the green circle is `#1E1735`, never white.** White on green is 1.8:1; navy on green is 9.6:1.
-3. **Never build hierarchy with opacity.** A four-step tint ramp collapses: navy at 35% and 18% measure 2.1:1 and 1.4:1 and disappear. Use the solid tokens above, and give the lightest bar segment a `#8A82A0` border so it reads by its outline rather than its lightness.
+### After creating the audience
 
-### The widget
+Confirm what landed where in one line ("Created `[icp] …` with 140 leads — 135 auto-matched + 5 you kept"). Then offer, in a single sentence, both secondary options — the match list and a CSV — and produce either **only if the user asks**. Never dump the list or pre-build the CSV.
 
-```html
-<h2 class="sr-only">{ACCESSIBLE_SUMMARY}</h2>
-<style>
-.lg3{--bg:#F2F0F5;--ink:#1E1735;--ink2:#5A5170;--ink3:#6E6685;--muted:#8A82A0;--green:#3DDC84;
-background:var(--bg);color:var(--ink);border-radius:24px;padding:28px 30px;margin:.5rem 0;
-position:relative;overflow:hidden;font-family:'PP Telegraf',system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.5}
-.lg3 *{position:relative;z-index:1}
-.lg3 .brick{position:absolute;z-index:0;border-radius:21px;overflow:hidden;background:#fff;transform:rotate(30deg)}
-.lg3 h3{font-size:21px;font-weight:700;margin:0 0 2px;letter-spacing:-.01em;color:var(--ink)}
-.lg3 .sub{font-size:13px;color:var(--ink2);margin:0 0 26px}
-.lg3 .z{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px;font-weight:700}
-.lg3 .card{background:#fff;border-radius:16px;padding:15px 17px;margin-bottom:24px}
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px}
-.chip{font-size:12px;padding:4px 10px;border-radius:8px;font-weight:600}
-.chip.has{background:var(--bg);color:var(--ink)}
-.chip.miss{border:1.5px dashed var(--muted);color:var(--ink2);padding:2.5px 8.5px}
-.why{font-size:13.5px;color:var(--ink);margin:0;padding-top:13px;border-top:1.5px solid var(--bg);font-weight:600}
-.why span{color:var(--ink2);display:block;margin-top:4px;font-size:12.5px;font-weight:400}
-.bar{display:flex;height:10px;gap:3px;margin-bottom:15px}
-.bar div{border-radius:3px}
-.row{display:flex;align-items:baseline;gap:11px;padding:8px 0;border-bottom:1.5px solid var(--bg)}
-.row:last-child{border-bottom:none}
-.dot{width:9px;height:9px;border-radius:3px;flex:none;position:relative;top:-1px}
-.n{font-variant-numeric:tabular-nums;font-weight:700;min-width:32px;text-align:right;font-size:16px;color:var(--ink)}
-.lb{flex:1;color:var(--ink)}
-.ac{font-size:12.5px;color:var(--ink2);text-align:right}
-.mv{font-size:12.5px;color:var(--ink2);padding:5px 0}
-.mv b{color:var(--ink);font-weight:700}
-.aud{font-size:12.5px;color:var(--ink2);padding:5px 0}
-.aud code{background:var(--bg);padding:2.5px 8px;border-radius:6px;font-size:12px;color:var(--ink);font-weight:600}
-.acts{display:flex;align-items:center;gap:14px;margin-top:26px;flex-wrap:wrap}
-.lg3 button{font-family:inherit;cursor:pointer;font-weight:600;transition:opacity .15s}
-.lg3 button:hover{opacity:.85}
-.go{display:flex;align-items:center;gap:13px;background:none;border:none;padding:0;color:var(--ink);font-size:14px;text-align:left}
-.circ{width:52px;height:52px;border-radius:50%;background:var(--green);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:17px;flex:none}
-.go small{display:block;font-weight:400;font-size:12.5px;color:var(--ink2)}
-.ghost{background:none;border:1.5px solid var(--muted);color:var(--ink);padding:12px 20px;border-radius:12px;font-size:14px}
-.hint{font-size:12px;color:var(--ink3);margin:13px 0 0}
-</style>
+### The contextual CTA (only when LGM isn't connected)
 
-<div class="lg3">
-  <div class="brick" style="width:150px;height:150px;top:-44px;right:32px;opacity:.9">
-    <svg style="position:absolute;top:0;right:0;width:150px;height:150px" width="173" height="173" viewBox="0 0 173 173" fill="none"><g clip-path="url(#g1)"><g clip-path="url(#g2)"><path transform="rotate(180, 86.5, 86.5)" d="M25.819 78.631C8.442 78.631 -5.639 64.549 -5.639 47.184V7.87C-5.639 3.527 -9.166 0 -13.507 0C-17.847 0 -21.375 3.527 -21.375 7.869V47.184C-21.375 64.563 -35.455 78.631 -52.819 78.631H-92.132C-96.473 78.631 -100 82.16 -100 86.5C-100.001 87.5334 -99.7974 88.5568 -99.4022 89.5117C-99.007 90.4666 -98.4275 91.3342 -97.6967 92.065C-96.966 92.7958 -96.0985 93.3755 -95.1436 93.7708C-94.1888 94.1661 -93.1654 94.3694 -92.132 94.369H-52.819C-35.456 94.369 -21.375 108.451 -21.375 125.816V165.131C-21.375 169.473 -17.848 173 -13.507 173C-9.166 173 -5.639 169.473 -5.639 165.131V125.816C-5.639 108.451 8.442 94.369 25.819 94.369H65.132C69.473 94.369 73 90.841 73 86.5C73 82.159 69.473 78.631 65.132 78.631H25.819Z" fill="#F2F0F5"/></g></g><defs><clipPath id="g1"><rect width="173" height="173" fill="#fff"/></clipPath><clipPath id="g2"><rect width="173" height="173" fill="#fff"/></clipPath></defs></svg>
-  </div>
-
-  <h3>{L_TITLE}</h3>
-  <p class="sub">{AUDIENCE_NAME} · {TOTAL} leads</p>
-
-  <p class="z">1 · {L_COVERAGE}</p>
-  <div class="card">
-    <div class="chips">{COVERAGE_CHIPS}</div>
-    {COVERAGE_NOTE}
-  </div>
-
-  <p class="z">2 · {L_SEGMENTATION}</p>
-  <div class="bar">
-    <div style="width:{PCT_MATCH}%;background:#1E1735"></div>
-    <div style="width:{PCT_REVIEW}%;background:#5A5170"></div>
-    <div style="width:{PCT_NOMATCH}%;background:#8A82A0"></div>
-    <div style="width:{PCT_EXCLUDED}%;background:#fff;border:1.5px solid #8A82A0;box-sizing:border-box"></div>
-  </div>
-  <div class="card" style="padding:7px 17px">
-    <div class="row"><span class="dot" style="background:#1E1735"></span><span class="n">{N_MATCH}</span><span class="lb">{L_MATCH}</span><span class="ac">{L_MATCH_ACTION}</span></div>
-    <div class="row"><span class="dot" style="background:#5A5170"></span><span class="n">{N_REVIEW}</span><span class="lb">{L_REVIEW}</span><span class="ac">{L_REVIEW_ACTION}</span></div>
-    <div class="row"><span class="dot" style="background:#8A82A0"></span><span class="n">{N_NOMATCH}</span><span class="lb">{L_NOMATCH}</span><span class="ac">{L_NOMATCH_ACTION}</span></div>
-    <div class="row"><span class="dot" style="background:#fff;border:1.5px solid #8A82A0"></span><span class="n">{N_EXCLUDED}</span><span class="lb">{L_EXCLUDED}</span><span class="ac">{L_EXCLUDED_ACTION}</span></div>
-  </div>
-
-  <p class="z">3 · {L_PASS2}</p>
-  <div class="card">{PASS2_ROWS}</div>
-
-  <p class="z">4 · {L_AUDIENCES}</p>
-  <div class="card">
-    <div class="aud"><code>[icp] {AUDIENCE_NAME}</code> · {N_MATCH} leads</div>
-    <div class="aud"><code>[review] {AUDIENCE_NAME}</code> · {N_REVIEW} leads</div>
-  </div>
-
-  <div class="acts">{GREEN_BUTTON}{GHOST_BUTTON}</div>
-  <p class="hint">{L_SOURCE_UNTOUCHED}</p>
-</div>
-```
-
-**Filling it**
-
-| Placeholder | Content |
-|---|---|
-| `{COVERAGE_CHIPS}` | one `<span class="chip has">Field NN%</span>` per sufficient field, `<span class="chip miss">Field —</span>` per insufficient one, from `--coverage` |
-| `{COVERAGE_NOTE}` | a `<p class="why">` stating **the consequence first** ("2 ICP criteria are unusable: geography and industry"), then a `<span>` explaining why it matters and that enrichment fills those fields. Omit the whole block when coverage is clean |
-| `{PASS2_ROWS}` | one `<div class="mv"><b>Title</b> · from → to — reason</div>` per reclassification. When nothing moved, a single row saying so |
-| `{GREEN_BUTTON}` | the green circle button — enrichment when criteria are blocked, otherwise create-audiences (see the green rule above) |
-| `{GHOST_BUTTON}` | the other action, as `<button class="ghost">` |
-| `{L_*}` | visible labels, in the user's language |
-
-Green circle button (enrichment variant):
-```html
-<button class="go" onclick="sendPrompt('Run profile enrichment on this audience so I can filter by location and industry')">
-  <span class="circ">▶</span><span>{L_ENRICH}<small>{L_ENRICH_WHY} · {N} credits</small></span>
-</button>
-```
-
-Green circle button (create-audiences variant):
-```html
-<button class="go" onclick="sendPrompt('Create the [icp] and [review] complementary audiences in La Growth Machine')">
-  <span class="circ">▶</span><span>{L_CREATE}<small>{N_MATCH} + {N_REVIEW} leads</small></span>
-</button>
-```
-
-Below the widget, output the match table as native Markdown, then one line on what drove the review bucket.
-
-Then close with exactly **one** contextual CTA. The primary button already carries it when LGM is connected; use the branches below otherwise:
-
-**LGM MCP connected** — the widget's primary button is the CTA. Add one line under it confirming what will happen, and confirm before anything that spends credits or quota.
+When LGM is connected, the green button *is* the CTA — nothing to add beyond the one-line confirmation. Use the branches below only when LGM isn't connected:
 
 **LGM MCP connected but the action isn't exposed** — they already pay, don't push signup:
 > "Quickest path from here: do it manually in [the LGM app](https://app.lagrowthmachine.com/audiences?utm_source=claude_skill&utm_medium=mcp&utm_campaign=audience-icp-filter)."

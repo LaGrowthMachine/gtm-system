@@ -102,5 +102,21 @@
   "noise_patterns": [
     "\\bstudent\\b", "\\bintern\\b", "\\bopen to work\\b", "\\bseeking\\b",
     "\\bjob seeker\\b", "\\bretired\\b", "\\bventure scout\\b", "\\bangel investor\\b"
+  ],
+  "_industry_synonyms_comment": "When the user's ICP industries list contains a key (or the key contains it), the variants are added before matching. LinkedIn writes SaaS a dozen ways; this keeps a real SaaS company from being wrongly dropped as no_match. Match is substring, case-insensitive.",
+  "industry_synonyms": {
+    "saas": ["software development", "computer software", "software", "technology, information and internet", "information technology", "it services", "internet", "saas", "b2b software", "enterprise software"],
+    "software": ["software development", "computer software", "software", "technology, information and internet", "information technology", "it services", "internet", "saas"],
+    "tech": ["software development", "computer software", "technology, information and internet", "information technology", "it services", "internet", "information services", "data infrastructure and analytics", "technology"],
+    "fintech": ["financial services", "fintech", "banking", "software development", "technology, information and internet"],
+    "healthtech": ["hospitals and health care", "health, wellness and fitness", "medical devices", "biotechnology research", "software development"],
+    "ecommerce": ["retail", "e-commerce", "consumer goods", "internet", "software development"]
+  },
+  "_agency_comment": "Agency / freelance / consulting signals. NOT an auto-exclude (some agencies are ICP) — a lead whose company or bio hits these is FLAGGED so pass 2 gives it a look instead of trusting the auto-match. Checked against company name and bio.",
+  "agency_patterns": [
+    "\\bagenc(e|y|ies)\\b", "\\bfreelance", "\\bfreelanc", "\\bind[eé]pendant", "\\bfractional\\b",
+    "\\bconsult(ing|ant|ance)\\b", "\\bconseil\\b", "\\bstudio\\b", "\\bcollective\\b", "\\bcollectif\\b",
+    "\\bself-?employed\\b", "\\bauto-?entrepreneur\\b", "\\b\\bEI\\b", "\\bsole trader\\b", "\\bportage\\b",
+    "\\bsolopreneur\\b", "\\bexternalis", "\\boutsourc"
   ]
 }
