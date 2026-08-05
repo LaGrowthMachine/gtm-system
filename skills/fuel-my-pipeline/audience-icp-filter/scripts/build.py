@@ -46,8 +46,42 @@ def _load_taxonomy(path=TAXONOMY_PATH):
         "function": {f["key"]: [re.compile(p, re.I) for p in f["patterns"]]
                      for f in raw["function"]},
         "noise": [re.compile(p, re.I) for p in raw["noise_patterns"]],
+        "industry_synonyms": {k.lower(): [v.lower() for v in vs]
+                              for k, vs in raw.get("industry_synonyms", {}).items()},
+        "agency": [re.compile(p, re.I) for p in raw.get("agency_patterns", [])],
     }
     return tax
+
+
+def expand_industries(industries, tax):
+    """Add known LinkedIn industry variants for any canonical bucket the user
+    named. 'SaaS' alone would miss a company labelled 'Technology, Information
+    and Internet'; expanding it up front stops that lead becoming a false
+    no_match the model then has to repair. Returns a de-duplicated list."""
+    if not industries:
+        return industries
+    syn = tax.get("industry_synonyms", {})
+    out = []
+    for term in industries:
+        t = term.strip().lower()
+        out.append(term)
+        for key, variants in syn.items():
+            if key in t or t in key:
+                out.extend(variants)
+    seen, dedup = set(), []
+    for x in out:
+        xl = x.lower()
+        if xl not in seen:
+            seen.add(xl)
+            dedup.append(x)
+    return dedup
+
+
+def is_agency(lead, tax):
+    """True if the lead's company or bio reads like an agency / freelance /
+    consulting shop. Not an exclusion — a flag so pass 2 double-checks."""
+    hay = (_norm(lead.get("companyName")) + " | " + _norm(lead.get("shortBio")))
+    return any(p.search(hay) for p in tax.get("agency", []))
 
 
 # ---------------------------------------------------------------- validation
@@ -224,11 +258,26 @@ def classify(lead, icp, exclusions, tax):
         if pat.search(tl):
             return "no_match", f"noise title: {title}"
 
+    # The title is the primary signal, but since enrichment now exposes the bio,
+    # use it as a fallback: many people write their function in the bio, not the
+    # title ("Managing Director" + bio "Développement commercial"). Only fall
+    # back when the title is silent — the title is more reliable when present.
+    bio = _norm(lead.get("shortBio")).lower()
+
     seniority = detect_seniority(tl, tax)
+    sen_src = "title"
+    if seniority is None and bio:
+        seniority = detect_seniority(bio, tax)
+        sen_src = "bio"
+
     functions = detect_functions(tl, tax)
+    fn_src = "title"
+    if not functions and bio:
+        functions = detect_functions(bio, tax)
+        fn_src = "bio"
 
     if seniority is None:
-        return "review", f"seniority unclear from title: {title}"
+        return "review", f"seniority unclear from title or bio: {title}"
 
     if seniority not in icp["seniority"]:
         return "no_match", f"seniority {seniority} not in ICP"
@@ -238,7 +287,7 @@ def classify(lead, icp, exclusions, tax):
 
     if not founder_pass:
         if not functions:
-            return "review", f"function unclear from title: {title}"
+            return "review", f"function unclear from title or bio: {title}"
         if not set(functions) & set(icp["functions"]):
             return "no_match", f"function {functions} not in ICP"
 
@@ -252,6 +301,13 @@ def classify(lead, icp, exclusions, tax):
     detail = f"{seniority}"
     if functions:
         detail += f" / {'+'.join(functions)}"
+    src = []
+    if sen_src == "bio":
+        src.append("seniority from bio")
+    if fn_src == "bio":
+        src.append("function from bio")
+    if src:
+        detail += f" (inferred: {', '.join(src)} — worth a pass-2 glance)"
     return "match", f"ICP match: {detail}"
 
 
@@ -259,11 +315,15 @@ def build(spec):
     validate_spec(spec)
     tax = _load_taxonomy()
 
-    icp = spec["icp"]
+    icp = dict(spec["icp"])
+    # expand SaaS/tech/etc. into their real LinkedIn industry variants up front
+    if icp.get("industries"):
+        icp["industries"] = expand_industries(icp["industries"], tax)
     exclusions = spec.get("exclusions", {}) or {}
     leads = spec["leads"]
 
     result = {b: [] for b in BUCKETS}
+    queue = []
     for i, lead in enumerate(leads):
         bucket, reason = classify(lead, icp, exclusions, tax)
         key = _norm(lead.get("leadId")) or \
@@ -272,6 +332,25 @@ def build(spec):
         row["_key"] = key
         row["_bucket"] = bucket
         row["_reason"] = reason
+
+        # Flag the leads pass 2 should actually look at — so it reviews ~a few
+        # dozen, not the whole audience. Three risk classes:
+        flag = None
+        if bucket == "review":
+            flag = "ambiguous"                                   # always
+        elif bucket == "match":
+            if "inferred:" in reason:
+                flag = "bio-inferred match"                      # soft match
+            elif is_agency(lead, tax):
+                flag = "agency/freelance — confirm it's the ICP" # false-positive risk
+        elif bucket == "no_match":
+            # dropped ONLY on a soft substring criterion → likely false negative
+            if reason.startswith("location outside") or reason.startswith("industry outside"):
+                flag = "dropped on geo/industry — check the variant"
+        if flag:
+            row["_flag"] = flag
+            queue.append(row)
+
         result[bucket].append(row)
 
     validate_result(leads, result)
@@ -280,6 +359,8 @@ def build(spec):
         "pass": 1,
         "adjudicated": False,
         "counts": {b: len(result[b]) for b in BUCKETS} | {"total": len(leads)},
+        "pass2_queue_size": len(queue),
+        "pass2_queue": queue,
         "buckets": result,
     }
 
@@ -467,6 +548,12 @@ def _selftest():
          "no_match", "noise title"),
         ({"leadId": "11", "jobTitle": "General Manager of Sales and Marketing",
           "companyName": "20Cube"}, "match", "vp_head + sales/marketing"),
+        ({"leadId": "12", "jobTitle": "Managing Director", "companyName": "Acme",
+          "shortBio": "Développement commercial B2B"},
+         "match", "function comes from bio, not the title"),
+        ({"leadId": "13", "jobTitle": "Principal", "companyName": "Acme",
+          "shortBio": "Woodworking hobbyist and dad of three"},
+         "review", "bio has no function signal either — stays in review"),
     ]
 
     failures = 0
@@ -511,6 +598,45 @@ def _selftest():
        sum(out["counts"][b] for b in BUCKETS) != len(cases):
         failures += 1
         print("FAIL [reconciliation] counts do not add up", file=sys.stderr)
+
+    # --- industry synonym expansion: 'saas' must catch a LinkedIn-labelled variant ---
+    icp_saas = {"seniority": ["founder_c", "vp_head"], "functions": ["growth_marketing"],
+                "founder_qualifies_regardless_of_function": False, "industries": ["saas"]}
+    total += 1
+    got, reason = classify(
+        {"leadId": "s1", "jobTitle": "Head of Marketing", "companyName": "Implicity",
+         "industry": "Technology, Information and Internet"},
+        {**icp_saas, "industries": expand_industries(icp_saas["industries"], tax)}, {}, tax)
+    if got != "match":
+        failures += 1
+        print(f"FAIL [industry synonym] expected match got {got} ({reason})", file=sys.stderr)
+
+    # a genuinely off-industry lead still drops
+    total += 1
+    got, _ = classify(
+        {"leadId": "s2", "jobTitle": "Head of Marketing", "companyName": "TotalEnergies",
+         "industry": "Oil and Gas"},
+        {**icp_saas, "industries": expand_industries(icp_saas["industries"], tax)}, {}, tax)
+    if got != "no_match":
+        failures += 1
+        print(f"FAIL [off-industry] expected no_match got {got}", file=sys.stderr)
+
+    # --- pass2_queue is bounded: only ambiguous / risky / soft-drops, not everything ---
+    total += 1
+    qout = build({"icp": {**icp_saas, "industries": ["saas"]}, "exclusions": {}, "leads": [
+        {"leadId": "q1", "jobTitle": "Head of Marketing", "companyName": "Acme",
+         "industry": "Software Development"},                       # clean match, NOT queued
+        {"leadId": "q2", "jobTitle": "Head of Marketing", "companyName": "Freelance Studio",
+         "industry": "Software Development", "shortBio": "Freelance CMO / consultant"},  # agency match → queued
+        {"leadId": "q3", "jobTitle": "Head of Marketing", "companyName": "EnergyCo",
+         "industry": "Renewables & Environment"},                   # dropped on industry → queued
+        {"leadId": "q4", "jobTitle": "Software Engineer", "companyName": "Acme",
+         "industry": "Software Development"},                       # dropped on FUNCTION → NOT queued
+    ]})
+    qkeys = {r["_key"] for r in qout["pass2_queue"]}
+    if qkeys != {"q2", "q3"} or qout["pass2_queue_size"] != 2:
+        failures += 1
+        print(f"FAIL [pass2_queue] expected {{q2,q3}} got {qkeys}", file=sys.stderr)
 
     # --- pass 2: the semantic failures regex cannot see ---
     # 'Chief Happiness Officer' matches the C-level pattern but is an HR role.
