@@ -102,6 +102,12 @@ time-dependent fields refreshed from the newer report, and the merge report coun
 `rematured`. Without that, the headline rate carries a structural downward bias and the tail
 is permanently truncated.
 
+**The skip-list only parks a thread once its outcome can no longer change.** A thread with a
+`pending` or `dead` instance younger than 30 days goes into `recheck_thread_ids` instead, and
+the next run re-reads it. Without that, re-maturation is correct code that never executes:
+`merge` used to park every thread it saw, and the skill tells the model never to re-read a
+parked thread, so a `pending` instance was frozen out of the denominator permanently.
+
 A `recovered` outcome is terminal: re-merging an older report can never walk it back. And
 re-merging the same report after a re-maturation is still a no-op, so the idempotency
 guarantee holds.

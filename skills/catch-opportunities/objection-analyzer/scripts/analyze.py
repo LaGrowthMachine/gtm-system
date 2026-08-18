@@ -67,7 +67,8 @@ POST_CATEGORIES = {"interested", "curious", "question", "not_interested",
 REPLY_CATEGORIES = {"interested", "curious", "question", "objection", "wrong_fit",
                     "not_interested", "auto_ooo", "voice_message"}
 PRODUCT_MIN_N = 15             # a roadmap conversation needs more than five threads
-COPY_LIFT_POINTS = 0.15        # points above the corpus first-touch base rate
+COPY_LIFT_POINTS = 0.15        # points above the base rate of the OTHER types
+SETTLE_DAYS = 30               # below this an outcome can still change, so keep re-reading
 PROGRESSED = {"interested", "question", "curious"}
 RUBRIC_KEYS = ["tone_match", "addresses_message", "length_mirrors", "one_question_max",
                "no_forbidden_phrases", "not_pushy", "resource_priority", "not_creepy",
@@ -427,10 +428,15 @@ def analyze(run, maturity_days=MATURITY_DAYS_DEFAULT, min_n=MIN_N_DEFAULT, as_of
             })
 
     total = len(instances)
-    # Corpus-wide first-touch share. A type only signals "our copy caused this" when it
-    # lands at first touch far more than this account's objections do generally.
-    ft_base = (round(sum(1 for i in instances if i["is_first_touch"]) / total, 3)
-               if total else None)
+    def ft_base_excluding(tid):
+        """First-touch share of every OTHER type. Including the type under test lets it drag
+        its own baseline, which made the verdict a function of corpus composition: the same
+        90 price threads scored `inconclusive` next to 10 timing objections and `copy` next
+        to 90. Leave-one-out is the standard construction for exactly this."""
+        others = [i for i in instances if i["type"] != tid]
+        if not others:
+            return None
+        return round(sum(1 for i in others if i["is_first_touch"]) / len(others), 3)
     counts = {}
     for inst in instances:
         counts[inst["type"]] = counts.get(inst["type"], 0) + 1
@@ -478,17 +484,23 @@ def analyze(run, maturity_days=MATURITY_DAYS_DEFAULT, min_n=MIN_N_DEFAULT, as_of
         med_rub = round(statistics.median(rts), 1) if rts else None
         recovery = rate(len(rec), den, min_n)
 
+        ft_base = ft_base_excluding(tid)
         sig_copy = (ft_share >= 0.5 and ft_base is not None
                     and (ft_share - ft_base) >= COPY_LIFT_POINTS)
         sig_target = lift_max is not None and lift_max > 2.0
-        sig_product = (recovery["value"] is not None and recovery["value"] < 0.20
+        sig_product = (not sig_copy
+                       and recovery["value"] is not None and recovery["value"] < 0.20
                        and recovery["n"] >= PRODUCT_MIN_N
                        and handled_share > 0.70
                        and med_rub is not None and med_rub >= WELL_HANDLED_FLOOR)
         n = len(rows)
         conf = "high" if n >= 20 else "medium" if n >= 10 else "low" if n >= min_n else None
+        # Precedence collapses three independent booleans into one owner. Emit all three so
+        # the caller can say "copy: yes, targeting: yes" instead of hiding the collision.
         verdict = ("product" if sig_product else "targeting" if sig_target
                    else "copy" if sig_copy else "inconclusive")
+        also = [k for k, v in (("copy", sig_copy), ("targeting", bool(sig_target)),
+                               ("product", sig_product)) if v and k != verdict]
         if conf is None:
             # Below min_n a verdict is a coin flip dressed as a finding.
             verdict = "inconclusive"
@@ -510,6 +522,7 @@ def analyze(run, maturity_days=MATURITY_DAYS_DEFAULT, min_n=MIN_N_DEFAULT, as_of
             "diagnosis": {"copy": sig_copy, "targeting": (None if not camp else sig_target),
                           "product": sig_product, "verdict": verdict, "confidence": conf,
                           "max_lift": lift_max,
+                          "also_firing": also,
                           "first_touch_base": ft_base,
                           "first_touch_lift_points": (round(ft_share - ft_base, 3)
                                                       if ft_base is not None else None)},
@@ -639,10 +652,22 @@ def merge(state, report, reclassify=False):
                     prior.update({k: v for k, v in inst.items() if k != "first_seen_run"})
                     prior["reclassified_from"] = was
                     reclassified += 1
+    # Only park a thread in the skip-list once its outcomes can no longer change. A
+    # `pending` instance that is skipped forever is frozen out of the recovery denominator
+    # for good, which is how re-maturation became unreachable in practice.
+    as_of_dt = parse_day(report["as_of"])
+    unsettled = set()
+    for inst in state["instances"].values():
+        if inst.get("outcome") == "recovered":
+            continue
+        if (as_of_dt - parse_ts(inst["objection_at"])) < timedelta(days=SETTLE_DAYS):
+            unsettled.add(inst["thread_id"])
     seen = set(state.get("seen_thread_ids") or [])
     seen.update(t["thread_id"] for t in (report.get("threads") or []))
     seen.update(i["thread_id"] for i in report["instances"])
+    seen -= unsettled
     state["seen_thread_ids"] = sorted(seen)
+    state["recheck_thread_ids"] = sorted(unsettled)
 
     if not any(r["run_id"] == report["run_id"] for r in state["runs"]):
         state["runs"].append({
@@ -664,6 +689,7 @@ def merge(state, report, reclassify=False):
     state["not_computed"] = report["not_computed"]
     return state, {"new_instances": new, "duplicate_instances": dupe,
                    "reclassified": reclassified, "rematured": rematured,
+                   "recheck_threads": len(unsettled),
                    "conflicts": conflicts, "new_this_run": new}
 
 
@@ -1181,11 +1207,49 @@ def _selftest():
     r = analyze(run(th, an), min_n=5)
     ct = [x for x in r["by_type"] if x["type"] == "channel_trust"][0]
     tm = [x for x in r["by_type"] if x["type"] == "timing"][0]
+    # leave-one-out: channel_trust is measured against timing's 0.0, not against a pooled base
     check("copy_verdict_is_a_lift", ct["diagnosis"]["verdict"] == "copy"
-          and ct["diagnosis"]["first_touch_base"] == 0.5
-          and ct["diagnosis"]["first_touch_lift_points"] == 0.5
+          and ct["diagnosis"]["first_touch_base"] == 0.0
+          and ct["diagnosis"]["first_touch_lift_points"] == 1.0
           and tm["diagnosis"]["verdict"] != "copy",
-          "ct=%s tm=%s" % (ct["diagnosis"]["verdict"], tm["diagnosis"]["verdict"]))
+          "ct=%s base=%s tm=%s" % (ct["diagnosis"]["verdict"],
+                                   ct["diagnosis"]["first_touch_base"], tm["diagnosis"]["verdict"]))
+
+    # 13c the verdict must not depend on what ELSE was swept. Same price data, two corpora.
+    def _corpus(n_price, n_timing):
+        th2, an2 = [], []
+        for i in range(n_price):
+            th2.append(thread("cp%d" % i, [m("received", "2026-06-01"), m("sent", "2026-06-02")]))
+            an2.append(ann("cp%d" % i, "price_budget", 0, 1))
+        for i in range(n_timing):
+            th2.append(thread("ct%d" % i, [m("sent", "2026-06-01"), m("received", "2026-06-02"),
+                                           m("sent", "2026-06-03"), m("received", "2026-06-04"),
+                                           m("sent", "2026-06-05")]))
+            an2.append(ann("ct%d" % i, "timing", 3, 4))
+        r2 = analyze(run(th2, an2), min_n=5)
+        p2 = [x for x in r2["by_type"] if x["type"] == "price_budget"][0]
+        return p2["diagnosis"]["verdict"], p2["diagnosis"]["first_touch_base"]
+    vA, bA = _corpus(30, 5)
+    vB, bB = _corpus(30, 30)
+    check("copy_verdict_is_composition_independent", vA == vB == "copy" and bA == bB == 0.0,
+          "A=%s/%s B=%s/%s" % (vA, bA, vB, bB))
+
+    # 13d a type our own opener provokes is not reported as a product wall
+    th3, an3 = [], []
+    for i in range(20):
+        th3.append(thread("pw%d" % i, [m("received", "2026-06-01"), m("sent", "2026-06-02")]))
+        an3.append(ann("pw%d" % i, "feature_gap", 0, 1, "none", rub={k: 2 for k in RUBRIC_KEYS}))
+    for i in range(20):
+        # objection at index 3, so this type is NOT first-touch and gives feature_gap a real base
+        th3.append(thread("pv%d" % i, [m("sent", "2026-06-01"), m("received", "2026-06-02"),
+                                       m("sent", "2026-06-03"), m("received", "2026-06-04"),
+                                       m("sent", "2026-06-05"), m("received", "2026-06-06")]))
+        an3.append(ann("pv%d" % i, "timing", 3, 4, "interested"))
+    r3 = analyze(run(th3, an3), min_n=5)
+    fg3 = [x for x in r3["by_type"] if x["type"] == "feature_gap"][0]
+    check("copy_beats_product_when_both_fire", fg3["diagnosis"]["verdict"] == "copy"
+          and fg3["diagnosis"]["product"] is False,
+          "verdict=%s product=%s" % (fg3["diagnosis"]["verdict"], fg3["diagnosis"]["product"]))
 
     # 13b a single-type corpus cannot show a deviation, so no copy verdict is issued
     th, an = [], []
@@ -1387,6 +1451,23 @@ def _selftest():
     a_m = dumps(st_m)
     st_m2, _ = merge(json.loads(a_m), r_late)
     check("rematuration_stays_idempotent", dumps(st_m2) == a_m)
+
+    # 17l a thread whose outcome can still change is NOT parked in the skip-list, or
+    #     re-maturation is unreachable and the recovery denominator loses its tail
+    fresh = analyze(run(
+        [thread("fr1", [m("received", "2026-08-10"), m("sent", "2026-08-11")])],
+        [ann("fr1", "timing", 0, 1, "none")], rid="fresh"), min_n=1)
+    st_f, rpt_f = merge(empty_state(), fresh)
+    check("unsettled_thread_stays_rereadable",
+          "fr1" not in st_f["seen_thread_ids"] and "fr1" in st_f["recheck_thread_ids"]
+          and rpt_f["recheck_threads"] == 1)
+    settled = analyze(run(
+        [thread("st1", [m("received", "2026-06-01"), m("sent", "2026-06-02"),
+                        m("received", "2026-06-03")])],
+        [ann("st1", "timing", 0, 1, "interested")], rid="settled"), min_n=1)
+    st_s, _ = merge(empty_state(), settled)
+    check("recovered_thread_is_parked", "st1" in st_s["seen_thread_ids"]
+          and st_s["recheck_thread_ids"] == [])
 
     # 18 CSV round-trip equals the JSON path
     csv_text = (

@@ -123,7 +123,9 @@ search_conversations(leadReplied=true, campaignIds?, lastMessageAtFrom?, limit)
 get_conversation_messages(conversationId)                     → the FULL thread
 ```
 
-Drop anything already in `seen_thread_ids`. For a campaign scope, `list_campaigns` →
+Drop anything already in `seen_thread_ids`, but **do re-read anything in
+`recheck_thread_ids`**: those are threads whose outcome can still change, and skipping them
+freezes them out of the recovery denominator for good. For a campaign scope, `list_campaigns` →
 `get_audience_leads` → `get_lead_conversations` also gives you lead names.
 
 Three gotchas that change the numbers:
@@ -228,7 +230,10 @@ python3 scripts/analyze.py merge report.json --write
 python3 scripts/analyze.py render
 ```
 
-3. **Read `report.json` and report only what it says.** Per type: count, share,
+3. **Read `report.json` and report only what it says.** A type can trip more than one
+   signal; `diagnosis.also_firing` lists the others, so report "copy, and targeting too"
+   rather than hiding the collision behind one owner. A type whose own opener provokes it is
+   never reported as a product gap. Per type: count, share,
    recovery rate with its n, never-answered rate, median response time, median
    handling score, first-touch share, smokescreen share, and the copy / targeting /
    product verdict with its confidence.
@@ -287,8 +292,8 @@ Out: benchmarking (`campaign-challenger`), writing a full sequence
 (`multichannel-campaign-builder`), targeting strategy, attribution.
 
 An objection is a candidate for an upstream fix when it lands at first touch at least 15
-points above **this account's own first-touch base rate** (an absolute cutoff would measure
-thread length, since on cold outbound most replies arrive on the first message), or
+points above the base rate of **every other objection type** (leave-one-out: including the
+type in its own baseline made the verdict depend on what else was in the sweep), or
 its verdict is `copy`, or the type is `channel_trust` or `value_doubt`. Match it to
 the five causes:
 
