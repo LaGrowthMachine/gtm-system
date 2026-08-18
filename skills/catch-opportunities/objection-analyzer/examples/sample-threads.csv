@@ -1,0 +1,25 @@
+thread_id,direction,timestamp,content,channel,campaign,identity,lead_ref,status
+th-001,sent,2026-05-04T09:12:00+00:00,"Saw you're hiring three SDRs this quarter. How are you handling the list building side right now?",linkedin,Q2-Founders,rep-a,J. L. · Northwind,OK
+th-001,received,2026-05-05T14:03:00+00:00,"We already use Outreachly for that.",linkedin,Q2-Founders,rep-a,J. L. · Northwind,OK
+th-001,sent,2026-05-05T17:40:00+00:00,"Makes sense. How are you using it today, on which part of the funnel? Asking because the LinkedIn side is what most teams still do by hand.",linkedin,Q2-Founders,rep-a,J. L. · Northwind,OK
+th-001,received,2026-05-06T08:22:00+00:00,"Honestly that's the messy bit. We export and do it manually.",linkedin,Q2-Founders,rep-a,J. L. · Northwind,OK
+th-002,sent,2026-05-04T09:15:00+00:00,"Quick one on your outbound setup, are you running LinkedIn and email from the same place?",linkedin,Q2-Founders,rep-a,M. D. · Bluepeak,OK
+th-002,received,2026-05-04T11:50:00+00:00,"Way out of our budget I'm sure.",linkedin,Q2-Founders,rep-a,M. D. · Bluepeak,OK
+th-002,sent,2026-05-04T12:05:00+00:00,"It starts lower than you'd think and it pays for itself fast. Happy to jump on a quick call to walk you through the pricing and show you a demo of what it can do.",linkedin,Q2-Founders,rep-a,M. D. · Bluepeak,OK
+th-003,sent,2026-05-06T10:00:00+00:00,"Noticed Gamma just opened a Berlin office. Is the outbound team growing with it?",email,Q2-Founders,rep-a,S. K. · Gamma,OK
+th-003,received,2026-05-07T09:31:00+00:00,"Not a priority for us right now, we're mid-migration to a new CRM.",email,Q2-Founders,rep-a,S. K. · Gamma,OK
+th-003,sent,2026-05-07T15:12:00+00:00,"Makes sense. What's the CRM move, and when do you expect it to land? Happy to circle back after rather than during.",email,Q2-Founders,rep-a,S. K. · Gamma,OK
+th-003,received,2026-05-08T07:44:00+00:00,"HubSpot, should be done end of July. Ping me then.",email,Q2-Founders,rep-a,S. K. · Gamma,OK
+th-004,sent,2026-05-06T10:04:00+00:00,"Saw your post on outbound attribution. Curious how you're measuring reply quality today?",linkedin,Q2-Founders,rep-a,A. R. · Vertex,OK
+th-004,received,2026-05-06T18:20:00+00:00,"Where did you get my details? I never signed up for anything.",linkedin,Q2-Founders,rep-a,A. R. · Vertex,OK
+th-005,sent,2026-05-11T09:00:00+00:00,"You mentioned scaling outbound without more headcount. What's blocking that today?",linkedin,Q3-RevOps,rep-b,T. B. · Kestrel,OK
+th-005,received,2026-05-12T10:15:00+00:00,"Too expensive for where we are.",linkedin,Q3-RevOps,rep-b,T. B. · Kestrel,OK
+th-005,sent,2026-05-12T16:00:00+00:00,"Fair. Expensive compared to what, out of curiosity? Helps me tell you straight whether it's worth your time.",linkedin,Q3-RevOps,rep-b,T. B. · Kestrel,OK
+th-005,received,2026-05-13T09:05:00+00:00,"Compared to the 300 a month we pay now for email only.",linkedin,Q3-RevOps,rep-b,T. B. · Kestrel,OK
+th-006,sent,2026-05-11T09:03:00+00:00,"How's the SDR team splitting time between sourcing and selling right now?",linkedin,Q3-RevOps,rep-b,P. N. · Aster,OK
+th-006,received,2026-05-11T16:44:00+00:00,"I'm not the right person, we outsourced all of our outbound last year.",linkedin,Q3-RevOps,rep-b,P. N. · Aster,OK
+th-007,sent,2026-05-13T08:30:00+00:00,"Quick question on your prospecting stack, are you enriching before or after the import?",email,Q3-RevOps,rep-b,C. V. · Halden,OK
+th-007,received,2026-05-14T11:10:00+00:00,"I'm actually a student looking for an internship, not a buyer.",email,Q3-RevOps,rep-b,C. V. · Halden,OK
+th-008,sent,2026-05-18T09:00:00+00:00,"You wrote about reply rates dropping across the board. What are you seeing on LinkedIn specifically?",linkedin,Q3-RevOps,rep-b,D. F. · Marlow,OK
+th-008,received,2026-05-19T13:25:00+00:00,"We tried a tool like this in 2024 and it tanked our acceptance rate.",linkedin,Q3-RevOps,rep-b,D. F. · Marlow,OK
+th-008,sent,2026-05-19T14:00:00+00:00,"That's worth knowing. Was it the tool itself or everything around it, volume, targeting, that sort of thing?",linkedin,Q3-RevOps,rep-b,D. F. · Marlow,OK

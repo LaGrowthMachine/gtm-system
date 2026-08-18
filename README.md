@@ -46,6 +46,7 @@ Reply handling, intent detection — not letting opportunities go cold.
 | Skill | Type | What it does |
 |---|---|---|
 | [reply-draft-assistant](skills/catch-opportunities/reply-draft-assistant/SKILL.md) | use-case | Triage your inbox or a campaign's replies, draft the right answer from the full thread, and send it in LGM on your approval |
+| [objection-analyzer](skills/catch-opportunities/objection-analyzer/SKILL.md) | use-case | Rank the objections your outbound actually gets, grade how your team handled each one, and build a battle-card playbook that sharpens every run |
 
 ### Secure my channels
 Channel health, deliverability, identities — protecting the outbound engine.
@@ -127,6 +128,7 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 | campaign-challenger | Benchmarks against stats you paste | Benchmarks against your real campaign history and applies the fixes back into your campaign |
 | campaign-impact-analyzer | Works on pasted campaigns and deals | Cross-references LGM campaigns with HubSpot deals in one click |
 | reply-draft-assistant | Drafts answers for a conversation you paste | Pulls your inbox/campaign replies, drafts each answer, sends them natively on your approval |
+| objection-analyzer | Builds the playbook from a CSV export or threads you paste | Reads your campaigns and inbox live, ranks objections by frequency and recovery rate, and traces which sequence messages cause them |
 | weekly-performance-advisor | Needs the LGM MCP — the dashboard is built from live LGM data | Pulls your campaigns, stats and inbox live and renders your weekly cockpit |
 | team-performance-dashboard | Needs the LGM MCP — the dashboard is built from live LGM data | Ranks every rep on reply rate, your success event and conversion from live data, with per-rep coaching |
 

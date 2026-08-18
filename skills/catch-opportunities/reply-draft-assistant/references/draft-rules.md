@@ -29,7 +29,7 @@ The goal of every reply: move the conversation forward **and** leave the person 
 
 | Sub-type | Angle |
 |---|---|
-| **competitor** | "Nice, [tool] is solid. How's [specific use case] going on your end?" — dig first. If they're happy, exit with value. If hesitant, offer a comparison/benchmark. Never bash the competitor. |
+| **competitor** | "How are you using [tool] today, on [specific use case]?" — dig first, and skip the compliment: "nice, [tool] is solid" reads as fake and makes them defend it harder. If they're happy, exit with value. If hesitant, offer a comparison/benchmark. Never bash the competitor. |
 | **price** | Don't defend the price. Ask about the constraint behind it. Offer an ROI angle or a lighter entry point — or accept it's not a fit. |
 | **timing** | Acknowledge. Ask what *is* the priority right now, offer to help with that, set a specific reconnect date. |
 | **tried-before** | Ask what went wrong. Empathize. Share what's changed since — no pressure. |

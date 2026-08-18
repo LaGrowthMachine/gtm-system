@@ -59,13 +59,13 @@ When the category is **Objection**, tag the sub-type — it changes the reply an
 
 | Sub-type | Signals |
 |---|---|
-| **competitor** | "we already use [tool]", names a competing product |
+| **competitor** (a.k.a. *already-equipped*) | "we already use [tool]", names a competing product |
 | **price** | "too expensive", "out of budget", "[competitor] is cheaper" |
 | **timing** | "not a priority right now", "maybe next quarter", "revisit later" |
 | **tried-before** | "we tried this 2 years ago", "didn't work for us" |
 | **scope** | "we don't do that anymore", "we focus on inbound", "outsourced this" |
 
-For the **competitor** sub-type, also note whether they ask a question back ("what do you use?") — that's a signal of genuine openness, flag it.
+For the **competitor** sub-type, also note whether they ask a question back ("what do you use?") — that's a signal of genuine openness, flag it. Either label is fine in the output line, `competitor` or the more readable `already-equipped`; they are the same sub-type.
 
 ## Wrong-fit sub-types
 
