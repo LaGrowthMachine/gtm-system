@@ -1,0 +1,258 @@
+{
+  "schema": "objection-analyzer/taxonomy",
+  "version": 1,
+  "owner": "objection-analyzer",
+  "note": "Canonical objection taxonomy for B2B outbound replies. Tool-agnostic. The 9 ids below are frozen: analyze.py refuses any type not in this list, because a typo would silently create a phantom category that accumulates forever.",
+  "boundary_rule": {
+    "objection": "A blocker raised by someone who is still engaging. Only these 9 types count in the objection ranking.",
+    "not_an_objection": [
+      "wrong_fit — the person disqualifies themselves. Counted and ranked in the reply mix, with its own segmentation verdict. Never mixed into objection share.",
+      "not_interested — a refusal with no stated blocker. Nothing to coach. Counted in the reply mix, watched as a rate."
+    ]
+  },
+  "families": {
+    "solution": "They have, or think they have, the problem covered.",
+    "commercial": "The trade is wrong: price, moment, or believability.",
+    "process": "The path to a decision is blocked, or the job left the building.",
+    "trust": "The channel itself is the problem."
+  },
+  "types": [
+    {
+      "id": "competitor_in_place",
+      "label": "Already equipped",
+      "family": "solution",
+      "sounds_like": [
+        "we already use X",
+        "we have this covered internally",
+        "we're happy with our current setup"
+      ],
+      "aliases": [
+        "competitor",
+        "already-equipped",
+        "already_equipped",
+        "equipped",
+        "incumbent"
+      ],
+      "card": "competitor_in_place.md"
+    },
+    {
+      "id": "feature_gap",
+      "label": "Missing capability",
+      "family": "solution",
+      "sounds_like": [
+        "does it do X?",
+        "we'd need the Y integration",
+        "no SSO, no deal"
+      ],
+      "aliases": [
+        "feature_gap",
+        "missing-feature",
+        "capability_gap"
+      ],
+      "card": "feature_gap.md"
+    },
+    {
+      "id": "tried_before",
+      "label": "Tried, didn't work",
+      "family": "solution",
+      "sounds_like": [
+        "we tested this two years ago",
+        "didn't work for us",
+        "we burned a budget on that"
+      ],
+      "aliases": [
+        "tried-before",
+        "tried_before",
+        "burned"
+      ],
+      "card": "tried_before.md"
+    },
+    {
+      "id": "price_budget",
+      "label": "Price / budget",
+      "family": "commercial",
+      "sounds_like": [
+        "too expensive",
+        "no budget this year",
+        "X is cheaper",
+        "what's the cost?  (as a blocker, not a question)"
+      ],
+      "aliases": [
+        "price",
+        "budget",
+        "price_budget",
+        "cost"
+      ],
+      "card": "price_budget.md"
+    },
+    {
+      "id": "timing",
+      "label": "Not a priority now",
+      "family": "commercial",
+      "sounds_like": [
+        "not right now",
+        "maybe next quarter",
+        "ping me in six months",
+        "we're mid-migration"
+      ],
+      "aliases": [
+        "timing",
+        "not-now",
+        "later"
+      ],
+      "card": "timing.md"
+    },
+    {
+      "id": "value_doubt",
+      "label": "Doesn't believe the outcome",
+      "family": "commercial",
+      "sounds_like": [
+        "does this actually work?",
+        "sounds too good to be true",
+        "we've seen those numbers before"
+      ],
+      "aliases": [
+        "value_resistance",
+        "value-doubt",
+        "value_doubt",
+        "skepticism",
+        "credibility"
+      ],
+      "card": "value_doubt.md"
+    },
+    {
+      "id": "process_authority",
+      "label": "Not my call / procurement",
+      "family": "process",
+      "sounds_like": [
+        "I'd need to run it past X",
+        "procurement owns this",
+        "we're mid-RFP",
+        "security review takes a quarter"
+      ],
+      "aliases": [
+        "process_authority",
+        "authority",
+        "procurement",
+        "no-mandate"
+      ],
+      "card": "process_authority.md"
+    },
+    {
+      "id": "scope_mismatch",
+      "label": "We don't do that anymore",
+      "family": "process",
+      "sounds_like": [
+        "we outsourced this",
+        "we're inbound-only now",
+        "that team was cut"
+      ],
+      "aliases": [
+        "scope",
+        "scope_mismatch",
+        "out-of-scope"
+      ],
+      "card": "scope_mismatch.md"
+    },
+    {
+      "id": "channel_trust",
+      "label": "How did you get this / spam",
+      "family": "trust",
+      "sounds_like": [
+        "where did you get my number?",
+        "is this GDPR-compliant?",
+        "is this automated?",
+        "please stop scraping"
+      ],
+      "aliases": [
+        "channel_trust",
+        "trust",
+        "gdpr",
+        "privacy",
+        "spam-callout"
+      ],
+      "card": "channel_trust.md"
+    }
+  ],
+  "reply_mix_categories": [
+    {
+      "id": "interested",
+      "objection": false
+    },
+    {
+      "id": "curious",
+      "objection": false
+    },
+    {
+      "id": "question",
+      "objection": false
+    },
+    {
+      "id": "objection",
+      "objection": true,
+      "note": "expands into the 9 types above"
+    },
+    {
+      "id": "wrong_fit",
+      "objection": false,
+      "subtypes": [
+        "wrong-person",
+        "not-icp-junior",
+        "not-icp-segment",
+        "job-seeker"
+      ],
+      "note": "drives the segmentation verdict"
+    },
+    {
+      "id": "not_interested",
+      "objection": false
+    },
+    {
+      "id": "auto_ooo",
+      "objection": false,
+      "scorable": false
+    },
+    {
+      "id": "voice_message",
+      "objection": false,
+      "scorable": false
+    }
+  ],
+  "segmentation_verdict_map": {
+    "wrong-person": "Wrong seniority or wrong function targeted — fix the title filter.",
+    "not-icp-segment": "Wrong industry or company size — fix the segment filter.",
+    "not-icp-junior": "Seniority filter too loose — raise the floor.",
+    "job-seeker": "List source is polluted — check where the audience came from."
+  },
+  "cross_skill_mapping": {
+    "note": "One-way lookup: given another skill's label, find this skill's card. Their own classification contracts are untouched.",
+    "reply-draft-assistant": {
+      "competitor": "competitor_in_place",
+      "already-equipped": "competitor_in_place",
+      "price": "price_budget",
+      "timing": "timing",
+      "tried-before": "tried_before",
+      "scope": "scope_mismatch",
+      "_unmapped": [
+        "feature_gap",
+        "value_doubt",
+        "process_authority",
+        "channel_trust"
+      ],
+      "_unmapped_rule": "No sub-type exists on their side. Apply the card only when the objection text clearly matches; otherwise stay on their 5 sub-types."
+    },
+    "team-performance-dashboard": {
+      "price": "price_budget",
+      "timing": "timing",
+      "tried_before": "tried_before",
+      "feature_gap": "feature_gap",
+      "_status": "Aligned on the nine objection sub-type ids and on WRONG_FIT, so both skills report the same objection sub-type distribution. Their top levels still differ: that skill classifies replies into five buckets, this one into eight, so the share-of-replies denominators are not comparable."
+    }
+  },
+  "smokescreen_markers": {
+    "rule": "Any 2 of 3 fire -> likely smokescreen. Not a type, a per-instance flag.",
+    "pre_information": "The objection lands in the thread's FIRST received message, before any substantive exchange.",
+    "no_specifics": "No figure, no tool named, no date, no stated constraint.",
+    "immediate_drop": "The thread dies after our reply even though the reply scored >= 22/27."
+  }
+}

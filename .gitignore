@@ -2,3 +2,14 @@ __pycache__/
 *.pyc
 .DS_Store
 *.zip
+
+# Agent working directories
+.claude/
+
+# Skill-local user data — never commit prospects' words to a public repo.
+# Glob the directory CONTENTS (playbook/*), not the directory (playbook/): a negation
+# cannot re-include a file whose parent directory is excluded, so `playbook/` here would
+# silently drop the tracked .gitkeep anchor.
+skills/**/playbook/*
+!skills/**/playbook/.gitkeep
+.objection-playbook/

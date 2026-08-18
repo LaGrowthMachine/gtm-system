@@ -99,6 +99,7 @@ Skills guide Claude through complex GTM workflows. Just describe what you want. 
 **Catch opportunities** — reply handling, intent detection
 
 - `reply-draft-assistant` — triage your inbox or a campaign's replies, draft the right answer from the full thread, and send it in LGM on your approval
+- `objection-analyzer` — rank the objections your outbound actually gets, grade how your team handled each one, and build a battle-card playbook that sharpens every run
 
 **Secure my channels** — channel health, deliverability, identities — *coming soon*
 
@@ -120,6 +121,7 @@ Suggest one of these depending on what the user wants to do:
 | See what to do this week / campaign health | Use `weekly-performance-advisor` |
 | See per-rep team performance / who converts best | Use `team-performance-dashboard` |
 | Handle or draft replies to their inbox | Use `reply-draft-assistant` |
+| Know which objections the team gets, and how to handle them | Use `objection-analyzer` |
 | Pull live campaign data ad hoc | Call the MCP directly (e.g. `list_campaigns`, `get_campaign_stats`) |
 | Run a custom analytics query | Call the BigQuery tools (`execute_bigquery_query`, `get_bigquery_logs_guide`) |
 

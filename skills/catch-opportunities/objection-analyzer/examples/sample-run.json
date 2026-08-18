@@ -1,0 +1,423 @@
+{
+ "run_id": "example-run-1",
+ "as_of": "2026-08-18",
+ "source": "csv",
+ "scope": {
+  "note": "the 8 threads in sample-threads.csv, annotated as the model would, goal = signup",
+  "goal": "signup"
+ },
+ "threads": [
+  {
+   "campaign_id": "Q2-Founders",
+   "channel": "linkedin",
+   "identity_id": "rep-a",
+   "lead_ref": "J. L. · Northwind",
+   "messages": [
+    {
+     "at": "2026-05-04T09:12:00+00:00",
+     "content": "Saw you're hiring three SDRs this quarter. How are you handling the list building side right now?",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-05T14:03:00+00:00",
+     "content": "We already use Outreachly for that.",
+     "direction": "received",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-05T17:40:00+00:00",
+     "content": "Makes sense. How are you using it today, on which part of the funnel? Asking because the LinkedIn side is what most teams still do by hand.",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-06T08:22:00+00:00",
+     "content": "Honestly that's the messy bit. We export and do it manually.",
+     "direction": "received",
+     "status": "OK"
+    }
+   ],
+   "thread_id": "th-001"
+  },
+  {
+   "campaign_id": "Q2-Founders",
+   "channel": "linkedin",
+   "identity_id": "rep-a",
+   "lead_ref": "M. D. · Bluepeak",
+   "messages": [
+    {
+     "at": "2026-05-04T09:15:00+00:00",
+     "content": "Quick one on your outbound setup, are you running LinkedIn and email from the same place?",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-04T11:50:00+00:00",
+     "content": "Way out of our budget I'm sure.",
+     "direction": "received",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-04T12:05:00+00:00",
+     "content": "It starts lower than you'd think and it pays for itself fast. Happy to jump on a quick call to walk you through the pricing and show you a demo of what it can do.",
+     "direction": "sent",
+     "status": "OK"
+    }
+   ],
+   "thread_id": "th-002"
+  },
+  {
+   "campaign_id": "Q2-Founders",
+   "channel": "email",
+   "identity_id": "rep-a",
+   "lead_ref": "S. K. · Gamma",
+   "messages": [
+    {
+     "at": "2026-05-06T10:00:00+00:00",
+     "content": "Noticed Gamma just opened a Berlin office. Is the outbound team growing with it?",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-07T09:31:00+00:00",
+     "content": "Not a priority for us right now, we're mid-migration to a new CRM.",
+     "direction": "received",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-07T15:12:00+00:00",
+     "content": "Makes sense. What's the CRM move, and when do you expect it to land? Happy to circle back after rather than during.",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-08T07:44:00+00:00",
+     "content": "HubSpot, should be done end of July. Ping me then.",
+     "direction": "received",
+     "status": "OK"
+    }
+   ],
+   "thread_id": "th-003"
+  },
+  {
+   "campaign_id": "Q2-Founders",
+   "channel": "linkedin",
+   "identity_id": "rep-a",
+   "lead_ref": "A. R. · Vertex",
+   "messages": [
+    {
+     "at": "2026-05-06T10:04:00+00:00",
+     "content": "Saw your post on outbound attribution. Curious how you're measuring reply quality today?",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-06T18:20:00+00:00",
+     "content": "Where did you get my details? I never signed up for anything.",
+     "direction": "received",
+     "status": "OK"
+    }
+   ],
+   "thread_id": "th-004"
+  },
+  {
+   "campaign_id": "Q3-RevOps",
+   "channel": "linkedin",
+   "identity_id": "rep-b",
+   "lead_ref": "T. B. · Kestrel",
+   "messages": [
+    {
+     "at": "2026-05-11T09:00:00+00:00",
+     "content": "You mentioned scaling outbound without more headcount. What's blocking that today?",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-12T10:15:00+00:00",
+     "content": "Too expensive for where we are.",
+     "direction": "received",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-12T16:00:00+00:00",
+     "content": "Fair. Expensive compared to what, out of curiosity? Helps me tell you straight whether it's worth your time.",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-13T09:05:00+00:00",
+     "content": "Compared to the 300 a month we pay now for email only.",
+     "direction": "received",
+     "status": "OK"
+    }
+   ],
+   "thread_id": "th-005"
+  },
+  {
+   "campaign_id": "Q3-RevOps",
+   "channel": "linkedin",
+   "identity_id": "rep-b",
+   "lead_ref": "P. N. · Aster",
+   "messages": [
+    {
+     "at": "2026-05-11T09:03:00+00:00",
+     "content": "How's the SDR team splitting time between sourcing and selling right now?",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-11T16:44:00+00:00",
+     "content": "I'm not the right person, we outsourced all of our outbound last year.",
+     "direction": "received",
+     "status": "OK"
+    }
+   ],
+   "thread_id": "th-006"
+  },
+  {
+   "campaign_id": "Q3-RevOps",
+   "channel": "email",
+   "identity_id": "rep-b",
+   "lead_ref": "C. V. · Halden",
+   "messages": [
+    {
+     "at": "2026-05-13T08:30:00+00:00",
+     "content": "Quick question on your prospecting stack, are you enriching before or after the import?",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-14T11:10:00+00:00",
+     "content": "I'm actually a student looking for an internship, not a buyer.",
+     "direction": "received",
+     "status": "OK"
+    }
+   ],
+   "thread_id": "th-007"
+  },
+  {
+   "campaign_id": "Q3-RevOps",
+   "channel": "linkedin",
+   "identity_id": "rep-b",
+   "lead_ref": "D. F. · Marlow",
+   "messages": [
+    {
+     "at": "2026-05-18T09:00:00+00:00",
+     "content": "You wrote about reply rates dropping across the board. What are you seeing on LinkedIn specifically?",
+     "direction": "sent",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-19T13:25:00+00:00",
+     "content": "We tried a tool like this in 2024 and it tanked our acceptance rate.",
+     "direction": "received",
+     "status": "OK"
+    },
+    {
+     "at": "2026-05-19T14:00:00+00:00",
+     "content": "That's worth knowing. Was it the tool itself or everything around it, volume, targeting, that sort of thing?",
+     "direction": "sent",
+     "status": "OK"
+    }
+   ],
+   "thread_id": "th-008"
+  }
+ ],
+ "annotations": [
+  {
+   "thread_id": "th-001",
+   "reply_category": "objection",
+   "objections": [
+    {
+     "type": "competitor_in_place",
+     "objection_msg_index": 1,
+     "post_objection_category": "curious",
+     "verbatim": "We already use Outreachly for that.",
+     "smokescreen_markers": {
+      "pre_information": true,
+      "no_specifics": false,
+      "immediate_drop": false
+     },
+     "handling": {
+      "reply_msg_index": 2,
+      "rubric": {
+       "tone_match": 3,
+       "addresses_message": 3,
+       "length_mirrors": 3,
+       "one_question_max": 3,
+       "no_forbidden_phrases": 3,
+       "not_pushy": 3,
+       "resource_priority": 3,
+       "not_creepy": 3,
+       "process_compliant": 3
+      },
+      "should_have": null,
+      "verbatim": "Makes sense. How are you using it today, on which part of the funnel? Asking because the LinkedIn side is what most teams still do by hand."
+     }
+    }
+   ]
+  },
+  {
+   "thread_id": "th-002",
+   "reply_category": "objection",
+   "objections": [
+    {
+     "type": "price_budget",
+     "objection_msg_index": 1,
+     "post_objection_category": "none",
+     "verbatim": "Way out of our budget I'm sure.",
+     "smokescreen_markers": {
+      "pre_information": true,
+      "no_specifics": true,
+      "immediate_drop": true
+     },
+     "handling": {
+      "reply_msg_index": 2,
+      "rubric": {
+       "tone_match": 1,
+       "addresses_message": 1,
+       "length_mirrors": 0,
+       "one_question_max": 1,
+       "no_forbidden_phrases": 2,
+       "not_pushy": 0,
+       "resource_priority": 0,
+       "not_creepy": 3,
+       "process_compliant": 3
+      },
+      "should_have": "ask what they are comparing the price to, instead of defending it and pushing a demo",
+      "verbatim": "It starts lower than you'd think and it pays for itself fast. Happy to jump on a quick call to walk you through the pricing and show you a demo of what it can do."
+     }
+    }
+   ]
+  },
+  {
+   "thread_id": "th-003",
+   "reply_category": "objection",
+   "objections": [
+    {
+     "type": "timing",
+     "objection_msg_index": 1,
+     "post_objection_category": "interested",
+     "verbatim": "Not a priority for us right now, we're mid-migration to a new CRM.",
+     "smokescreen_markers": {
+      "pre_information": true,
+      "no_specifics": false,
+      "immediate_drop": false
+     },
+     "handling": {
+      "reply_msg_index": 2,
+      "rubric": {
+       "tone_match": 3,
+       "addresses_message": 3,
+       "length_mirrors": 3,
+       "one_question_max": 2,
+       "no_forbidden_phrases": 3,
+       "not_pushy": 3,
+       "resource_priority": 3,
+       "not_creepy": 3,
+       "process_compliant": 3
+      },
+      "should_have": null,
+      "verbatim": "Makes sense. What's the CRM move, and when do you expect it to land? Happy to circle back after rather than during."
+     }
+    }
+   ]
+  },
+  {
+   "thread_id": "th-004",
+   "reply_category": "objection",
+   "objections": [
+    {
+     "type": "channel_trust",
+     "objection_msg_index": 1,
+     "post_objection_category": "none",
+     "verbatim": "Where did you get my details? I never signed up for anything.",
+     "smokescreen_markers": {
+      "pre_information": true,
+      "no_specifics": false,
+      "immediate_drop": false
+     }
+    }
+   ]
+  },
+  {
+   "thread_id": "th-005",
+   "reply_category": "objection",
+   "objections": [
+    {
+     "type": "price_budget",
+     "objection_msg_index": 1,
+     "post_objection_category": "curious",
+     "verbatim": "Too expensive for where we are.",
+     "smokescreen_markers": {
+      "pre_information": true,
+      "no_specifics": true,
+      "immediate_drop": false
+     },
+     "handling": {
+      "reply_msg_index": 2,
+      "rubric": {
+       "tone_match": 3,
+       "addresses_message": 3,
+       "length_mirrors": 3,
+       "one_question_max": 3,
+       "no_forbidden_phrases": 3,
+       "not_pushy": 3,
+       "resource_priority": 3,
+       "not_creepy": 3,
+       "process_compliant": 3
+      },
+      "should_have": null,
+      "verbatim": "Fair. Expensive compared to what, out of curiosity? Helps me tell you straight whether it's worth your time."
+     }
+    }
+   ]
+  },
+  {
+   "thread_id": "th-006",
+   "reply_category": "wrong_fit",
+   "wrong_fit_subtype": "wrong-person",
+   "objections": []
+  },
+  {
+   "thread_id": "th-007",
+   "reply_category": "wrong_fit",
+   "wrong_fit_subtype": "job-seeker",
+   "objections": []
+  },
+  {
+   "thread_id": "th-008",
+   "reply_category": "objection",
+   "objections": [
+    {
+     "type": "tried_before",
+     "objection_msg_index": 1,
+     "post_objection_category": "none",
+     "verbatim": "We tried a tool like this in 2024 and it tanked our acceptance rate.",
+     "smokescreen_markers": {
+      "pre_information": true,
+      "no_specifics": false,
+      "immediate_drop": true
+     },
+     "handling": {
+      "reply_msg_index": 2,
+      "rubric": {
+       "tone_match": 3,
+       "addresses_message": 3,
+       "length_mirrors": 3,
+       "one_question_max": 3,
+       "no_forbidden_phrases": 3,
+       "not_pushy": 3,
+       "resource_priority": 2,
+       "not_creepy": 3,
+       "process_compliant": 3
+      },
+      "should_have": "nothing wrong with the reply, they went quiet. Worth one value follow-up in two weeks",
+      "verbatim": "That's worth knowing. Was it the tool itself or everything around it, volume, targeting, that sort of thing?"
+     }
+    }
+   ]
+  }
+ ]
+}
