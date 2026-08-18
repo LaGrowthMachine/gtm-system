@@ -20,17 +20,20 @@ compute a total yourself and do not describe a reply as "good" without the numbe
 Score each 0-3. When you hesitate between two scores, take the lower one: an inflated
 rubric produces a playbook that congratulates the team instead of coaching it.
 
-| # | Dimension | 0 | 3 |
+The JSON key is given with each dimension: the script refuses a rubric whose keys are not
+exactly these nine, so emit the key, not the label.
+
+| # | Dimension (JSON key) | 0 | 3 |
 |---|---|---|---|
-| 1 | **Tone match** | Corporate reply to a casual message, or the reverse | Reads like the same conversation the prospect started |
-| 2 | **Addresses the message** | Answers a different objection, or ignores it and pitches | Engages the specific blocker they raised, and the acknowledgment does not open on "but" |
-| 3 | **Length mirrors** | Six lines back to a six-word message | Inside the band their last message sets |
-| 4 | **One question max** | Three questions stacked, or a question on an exit | Exactly one, it is open, and it is the last thing in the message |
-| 5 | **No forbidden phrases** | "Just circling back", "hope this finds you well", "game-changer", "leverage" | None of it |
-| 6 | **Not pushy** | Fake urgency, guilt, "but wait", a meeting ask they did not invite | Zero pressure, the next step is theirs to take |
-| 7 | **Resource priority** | Three links dumped, or a link in a first reply | The one hook that fits what they asked for, chaining to the goal's destination |
-| 8 | **Not creepy** | Personalization that reveals scraping, or a claimed connection that is not real | Context they would expect a human to have |
-| 9 | **Process compliant** | Wrong channel, ignores an opt-out, sends after a no | Respects the channel, the no, and the opt-out |
+| 1 | **Tone match** (`tone_match`) | Corporate reply to a casual message, or the reverse | Reads like the same conversation the prospect started |
+| 2 | **Addresses the message** (`addresses_message`) | Answers a different objection, or ignores it and pitches | Engages the specific blocker they raised, and the acknowledgment does not open on "but" |
+| 3 | **Length mirrors** (`length_mirrors`) | Six lines back to a six-word message | Inside the band their last message sets |
+| 4 | **One question max** (`one_question_max`) | Three questions stacked, or a question on an exit | Exactly one, it is open, and it is the last thing in the message |
+| 5 | **No forbidden phrases** (`no_forbidden_phrases`) | "Just circling back", "hope this finds you well", "game-changer", "leverage" | None of it |
+| 6 | **Not pushy** (`not_pushy`) | Fake urgency, guilt, "but wait", a meeting ask they did not invite | Zero pressure, the next step is theirs to take |
+| 7 | **Resource priority** (`resource_priority`) | Three links dumped, or a link in a first reply | The one hook that fits what they asked for, chaining to the goal's destination |
+| 8 | **Not creepy** (`not_creepy`) | Personalization that reveals scraping, or a claimed connection that is not real | Context they would expect a human to have |
+| 9 | **Process compliant** (`process_compliant`) | Wrong channel, ignores an opt-out, sends after a no | Respects the channel, the no, and the opt-out |
 
 **Thresholds the engine applies.** Three numbers, and 18 does two jobs, so keep them apart.
 
