@@ -45,6 +45,16 @@ exactly these nine, so emit the key, not the label.
 - **Below 18, single reply** — do not clone it and do not quote it as an example. A reply
   under 18 has something structurally wrong with it, not something stylistically weak.
 
+## Real or smokescreen
+
+A per-instance flag, not a type. Mark three booleans and let the script apply the
+2-of-3 rule: `pre_information` (the objection lands on the **first** received message,
+before anything substantive), `no_specifics` (no figure, no tool, no date, no stated
+constraint), `immediate_drop` (the thread died even though the reply scored 22+).
+
+It changes the play. A real objection gets dig-then-reframe. A smokescreen gets one
+de-escalating question that offers an honest out.
+
 ## Score against the goal, not against a generic idea of a good reply
 
 Before scoring anything, name the conversation's goal in one word. Every campaign has one

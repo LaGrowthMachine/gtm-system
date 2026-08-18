@@ -94,6 +94,18 @@ makes everything else safe:
   objection inside one thread counts once, so a chatty prospect cannot inflate the
   ranking.
 
+## Outcomes re-mature, types do not
+
+An outcome is a function of time. A `pending` instance matures, and a lead can answer on day
+20 after being written off on day 8. So on merge, a non-recovered instance has its
+time-dependent fields refreshed from the newer report, and the merge report counts them as
+`rematured`. Without that, the headline rate carries a structural downward bias and the tail
+is permanently truncated.
+
+A `recovered` outcome is terminal: re-merging an older report can never walk it back. And
+re-merging the same report after a re-maturation is still a no-op, so the idempotency
+guarantee holds.
+
 ## Classification drift
 
 The same thread can read as `price_budget` in one run and `value_doubt` in the next.

@@ -58,6 +58,16 @@ BASELINE_PATH = os.path.join(SKILL_DIR, "references", "baseline-playbook.md")
 LOCATION_PATH = os.path.join(SKILL_DIR, "playbook", "LOCATION")
 
 RECOVERY_EXCLUDED = {"none", "auto_ooo", "not_interested", "voice_message"}
+# The recovery numerator is a membership test, so an unrecognised string reads as a
+# recovery. That fails in the flattering direction on the one number the whole tool is
+# judged by, which is exactly what this tier exists to prevent. Both vocabularies are
+# closed and refused on, like `type` and `goal`.
+POST_CATEGORIES = {"interested", "curious", "question", "not_interested",
+                   "auto_ooo", "voice_message", "none"}
+REPLY_CATEGORIES = {"interested", "curious", "question", "objection", "wrong_fit",
+                    "not_interested", "auto_ooo", "voice_message"}
+PRODUCT_MIN_N = 15             # a roadmap conversation needs more than five threads
+COPY_LIFT_POINTS = 0.15        # points above the corpus first-touch base rate
 PROGRESSED = {"interested", "question", "curious"}
 RUBRIC_KEYS = ["tone_match", "addresses_message", "length_mirrors", "one_question_max",
                "no_forbidden_phrases", "not_pushy", "resource_priority", "not_creepy",
@@ -302,6 +312,10 @@ def validate_run(run):
         cat = ann.get("reply_category")
         if not cat:
             raise ValidationError("Annotation for thread %r has no reply_category." % tid)
+        if cat not in REPLY_CATEGORIES:
+            raise ValidationError(
+                "Unknown reply_category %r on thread %r. Allowed: %s."
+                % (cat, tid, ", ".join(sorted(REPLY_CATEGORIES))))
         for ob in (ann.get("objections") or []):
             ot = ob.get("type")
             if ot not in valid:
@@ -316,6 +330,12 @@ def validate_run(run):
             if iid in seen_inst:
                 raise ValidationError("Duplicate instance_id %r in this run." % iid)
             seen_inst.add(iid)
+            post = ob.get("post_objection_category")
+            if post is not None and str(post).strip().lower() not in POST_CATEGORIES:
+                raise ValidationError(
+                    "Unknown post_objection_category %r on thread %r. Allowed: %s. This field "
+                    "decides the recovery numerator, so it is never guessed."
+                    % (post, tid, ", ".join(sorted(POST_CATEGORIES))))
             oi = ob.get("objection_msg_index")
             if not isinstance(oi, int) or oi < 0 or oi >= len(msgs):
                 raise ValidationError("Thread %r: objection_msg_index %r is out of range (0..%d)." % (tid, oi, len(msgs) - 1))
@@ -407,6 +427,10 @@ def analyze(run, maturity_days=MATURITY_DAYS_DEFAULT, min_n=MIN_N_DEFAULT, as_of
             })
 
     total = len(instances)
+    # Corpus-wide first-touch share. A type only signals "our copy caused this" when it
+    # lands at first touch far more than this account's objections do generally.
+    ft_base = (round(sum(1 for i in instances if i["is_first_touch"]) / total, 3)
+               if total else None)
     counts = {}
     for inst in instances:
         counts[inst["type"]] = counts.get(inst["type"], 0) + 1
@@ -454,9 +478,11 @@ def analyze(run, maturity_days=MATURITY_DAYS_DEFAULT, min_n=MIN_N_DEFAULT, as_of
         med_rub = round(statistics.median(rts), 1) if rts else None
         recovery = rate(len(rec), den, min_n)
 
-        sig_copy = ft_share > 0.55
+        sig_copy = (ft_share >= 0.5 and ft_base is not None
+                    and (ft_share - ft_base) >= COPY_LIFT_POINTS)
         sig_target = lift_max is not None and lift_max > 2.0
         sig_product = (recovery["value"] is not None and recovery["value"] < 0.20
+                       and recovery["n"] >= PRODUCT_MIN_N
                        and handled_share > 0.70
                        and med_rub is not None and med_rub >= WELL_HANDLED_FLOOR)
         n = len(rows)
@@ -483,7 +509,10 @@ def analyze(run, maturity_days=MATURITY_DAYS_DEFAULT, min_n=MIN_N_DEFAULT, as_of
             "by_campaign": camp_rows,
             "diagnosis": {"copy": sig_copy, "targeting": (None if not camp else sig_target),
                           "product": sig_product, "verdict": verdict, "confidence": conf,
-                          "max_lift": lift_max},
+                          "max_lift": lift_max,
+                          "first_touch_base": ft_base,
+                          "first_touch_lift_points": (round(ft_share - ft_base, 3)
+                                                      if ft_base is not None else None)},
             "best_reply": ({"instance_id": best["instance_id"], "score": best["rubric_total"],
                             "objection": best["verbatim"], "reply": best["reply_verbatim"],
                             "lead_ref": best["lead_ref"]} if best else None),
@@ -575,18 +604,33 @@ def merge(state, report, reclassify=False):
     produce the same numbers, and re-running a report changes nothing."""
     if state.get("state_version") != STATE_VERSION:
         raise ValidationError("state_version mismatch: %r vs %d." % (state.get("state_version"), STATE_VERSION))
-    new, dupe, reclassified, conflicts = 0, 0, 0, []
+    new, dupe, reclassified, rematured, conflicts = 0, 0, 0, 0, []
     for inst in report["instances"]:
         iid = inst["instance_id"]
         prior = state["instances"].get(iid)
         if prior is None:
             rec = dict(inst)
             rec["first_seen_run"] = report["run_id"]
+            rec["last_seen_as_of"] = report["as_of"]
             rec["reclassified_from"] = None
             state["instances"][iid] = rec
             new += 1
         else:
             dupe += 1
+            # Outcome is time-dependent: `pending` matures, and a lead can answer on day 20
+            # after being written off on day 8. Freezing it at first sight biases the
+            # headline rate downwards and permanently truncates the tail.
+            if prior.get("outcome") != "recovered" and \
+               (prior.get("last_seen_as_of") or "") <= report["as_of"]:
+                before = prior.get("outcome")
+                for k in ("outcome", "matured", "handled", "progressed", "response_hours",
+                          "rubric_total", "reply_verbatim", "should_have",
+                          "post_objection_category"):
+                    if k in inst:
+                        prior[k] = inst[k]
+                prior["last_seen_as_of"] = report["as_of"]
+                if before != prior.get("outcome"):
+                    rematured += 1
             if prior["type"] != inst["type"]:
                 conflicts.append({"instance_id": iid, "kept": prior["type"],
                                   "proposed": inst["type"], "applied": bool(reclassify)})
@@ -619,8 +663,8 @@ def merge(state, report, reclassify=False):
     state["updated_at"] = report["as_of"]
     state["not_computed"] = report["not_computed"]
     return state, {"new_instances": new, "duplicate_instances": dupe,
-                   "reclassified": reclassified, "conflicts": conflicts,
-                   "new_this_run": new}
+                   "reclassified": reclassified, "rematured": rematured,
+                   "conflicts": conflicts, "new_this_run": new}
 
 
 def rollup(state, window=WINDOW_DEFAULT, min_n=MIN_N_DEFAULT, as_of=None):
@@ -1110,7 +1154,7 @@ def _selftest():
     # 12 product-gap rule: answered, answered well, still dead
     th, an = [], []
     good = {k: 2 for k in RUBRIC_KEYS}
-    for i in range(10):
+    for i in range(16):          # PRODUCT_MIN_N: a roadmap conversation needs >5 threads
         th.append(thread("p%d" % i, [m("sent", "2026-06-01"), m("received", "2026-06-02"),
                                      m("sent", "2026-06-03")]))
         an.append(ann("p%d" % i, "feature_gap", 1, 2, "none", rub=good))
@@ -1120,14 +1164,37 @@ def _selftest():
           "verdict=%s rec=%s med=%s handled=%s" % (fg["diagnosis"]["verdict"], fg["recovery_rate"],
                                                    fg["median_rubric"], fg["handled_share"]))
 
-    # 13 copy verdict from first-touch share
+    # 13 the copy verdict is a LIFT over the corpus first-touch base, not a fixed cutoff.
+    #    channel_trust always lands first; timing lands mid-thread. Base = 0.5.
     th, an = [], []
     for i in range(10):
         th.append(thread("q%d" % i, [m("received", "2026-06-01"), m("sent", "2026-06-02"),
                                      m("received", "2026-06-03")]))
         an.append(ann("q%d" % i, "channel_trust", 0, 1, "curious"))
+    for i in range(10):
+        # the lead speaks at index 1, but the objection only lands at index 3, so this
+        # type is NOT first-touch
+        th.append(thread("qt%d" % i, [m("sent", "2026-06-01"), m("received", "2026-06-02"),
+                                      m("sent", "2026-06-03"), m("received", "2026-06-04"),
+                                      m("sent", "2026-06-05"), m("received", "2026-06-06")]))
+        an.append(ann("qt%d" % i, "timing", 3, 4, "curious"))
     r = analyze(run(th, an), min_n=5)
-    check("copy_verdict", r["by_type"][0]["diagnosis"]["verdict"] == "copy"
+    ct = [x for x in r["by_type"] if x["type"] == "channel_trust"][0]
+    tm = [x for x in r["by_type"] if x["type"] == "timing"][0]
+    check("copy_verdict_is_a_lift", ct["diagnosis"]["verdict"] == "copy"
+          and ct["diagnosis"]["first_touch_base"] == 0.5
+          and ct["diagnosis"]["first_touch_lift_points"] == 0.5
+          and tm["diagnosis"]["verdict"] != "copy",
+          "ct=%s tm=%s" % (ct["diagnosis"]["verdict"], tm["diagnosis"]["verdict"]))
+
+    # 13b a single-type corpus cannot show a deviation, so no copy verdict is issued
+    th, an = [], []
+    for i in range(10):
+        th.append(thread("u%d" % i, [m("received", "2026-06-01"), m("sent", "2026-06-02"),
+                                     m("received", "2026-06-03")]))
+        an.append(ann("u%d" % i, "channel_trust", 0, 1, "curious"))
+    r = analyze(run(th, an), min_n=5)
+    check("no_copy_verdict_without_a_base", r["by_type"][0]["diagnosis"]["verdict"] != "copy"
           and r["by_type"][0]["first_touch_share"] == 1.0)
 
     # 14 zero objections is a valid run, not an error
@@ -1280,6 +1347,46 @@ def _selftest():
     check("card_shows_reply_in_a_code_block",
           "Clone this reply" in card_c and "What is taking the priority right now?" in card_c
           and "Worth redoing" not in card_c)
+
+    # 17i the recovery numerator is fail-CLOSED. An unrecognised post-objection value used
+    #     to read as a recovery, which failed in the flattering direction on the one number
+    #     this whole tier exists to protect.
+    for bad in ("not interested", "notInterested", "declined", "banana"):
+        must_raise("post_category_%s_refused" % bad.replace(" ", "_"), (lambda v: lambda: analyze(run(
+            [thread("pc", [m("received", "2026-06-01"), m("sent", "2026-06-02"),
+                           m("received", "2026-06-03")])],
+            [ann("pc", "timing", 0, 1, v)])))(bad), "unknown post_objection_category")
+    must_raise("reply_category_refused", lambda: analyze(run(
+        [thread("rc", [m("received", "2026-06-01")])],
+        [{"thread_id": "rc", "reply_category": "kinda_interested", "objections": []}])),
+        "unknown reply_category")
+
+    # 17j an outcome is a function of time, so a later run re-matures it. Frozen at first
+    #     sight, the headline rate carries a structural downward bias and a truncated tail.
+    late = [thread("lt", [m("received", "2026-06-01"), m("sent", "2026-06-02"),
+                          m("received", "2026-06-20")])]
+    lann = [ann("lt", "timing", 0, 1, "interested")]
+    r_early = analyze(run(late, lann, rid="early", as_of="2026-06-05"), min_n=1)
+    r_late = analyze(run(late, lann, rid="late", as_of="2026-07-01"), min_n=1)
+    check("pending_then_recovered_in_isolation",
+          r_early["instances"][0]["outcome"] == "pending"
+          and r_late["instances"][0]["outcome"] == "recovered")
+    st_m, _ = merge(empty_state(), r_early)
+    st_m, rpt_m = merge(st_m, r_late)
+    check("merge_rematures_a_pending_instance",
+          list(st_m["instances"].values())[0]["outcome"] == "recovered"
+          and rpt_m["rematured"] == 1,
+          "outcome=%s rematured=%s" % (list(st_m["instances"].values())[0]["outcome"], rpt_m["rematured"]))
+    # ...but a recovery is terminal: an older report must never walk it back
+    st_b, _ = merge(empty_state(), r_late)
+    st_b, _ = merge(st_b, r_early)
+    check("recovered_is_terminal",
+          list(st_b["instances"].values())[0]["outcome"] == "recovered")
+
+    # 17k re-merging the same report after re-maturation is still a no-op
+    a_m = dumps(st_m)
+    st_m2, _ = merge(json.loads(a_m), r_late)
+    check("rematuration_stays_idempotent", dumps(st_m2) == a_m)
 
     # 18 CSV round-trip equals the JSON path
     csv_text = (

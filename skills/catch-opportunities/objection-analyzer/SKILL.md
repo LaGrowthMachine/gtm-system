@@ -80,15 +80,14 @@ per-rep ranking to `team-performance-dashboard`.
 Run `python3 scripts/analyze.py doctor` **first, every session**, and say where it landed in
 one line. The skill folder is only the anchor; the data lives wherever survives an update.
 
-It walks five tiers and takes the first writable one: `$OBJECTION_PLAYBOOK_DIR` (a shared
-team folder), then `~/.gtm-skills/objection-analyzer/` (the default, which survives a
-reinstall), then the skill folder, then the working directory, then `paste`. Full ladder in
-`references/persistence.md`. If it lands on `skill`, warn that a skill update erases it.
+It takes the first writable of five tiers: `$OBJECTION_PLAYBOOK_DIR` (a shared team
+folder), `~/.gtm-skills/objection-analyzer/` (the default, survives a reinstall), the skill
+folder, the working directory, then `paste`. Full ladder in `references/persistence.md`. On
+`skill`, warn that an update erases it.
 
 **In the `paste` tier there is no engine.** Say so, label every number **estimated**, drop
-the recovery rate below n=10 entirely, and at the end emit the state as a fenced code
-block: *"this is your playbook, save it and paste it back next time."* Accept a pasted
-state as input on the next run.
+the recovery rate below n=10, and emit the state as a fenced code block at the end: *"this
+is your playbook, save it and paste it back next time."*
 
 ## Workflow
 
@@ -132,7 +131,9 @@ Three gotchas that change the numbers:
 - **`status: SEND_FAILED` can appear with `direction: received`.** It is a failed outbound
   of ours, not a reply. Trust `status` over `direction`.
 - **`INFO` and `AUTO_QUALIFY` lines are platform events**, and they also arrive with
-  `direction: received`. Mark them `is_event: true` or drop them. Unmarked, an event landing
+  `direction: received`. **Mark them `is_event: true`, never drop them**: removing a message
+  shifts every later index, minting a new `instance_id` for the same objection and
+  double-counting it on the next merge. Unmarked, an event landing
   after your reply counts as the lead coming back and inflates the recovery rate. Their
   content is still a signal: an `AUTO_QUALIFY` note saying "seems to be already equipped"
   reinforces a `competitor_in_place` read.
@@ -201,19 +202,18 @@ targeting evidence there is. Tag the sub-type:
 
 ### Real or smokescreen
 
-A per-instance flag, not a type. Mark three booleans and let the script apply the
-2-of-3 rule: `pre_information` (the objection lands on the **first** received message,
-before anything substantive), `no_specifics` (no figure, no tool, no date, no stated
-constraint), `immediate_drop` (the thread died even though the reply scored 22+).
-
-It changes the play. A real objection gets dig-then-reframe. A smokescreen gets one
-de-escalating question that offers an honest out.
+A per-instance flag, not a type. Mark three booleans and let the script apply the 2-of-3
+rule: `pre_information`, `no_specifics`, `immediate_drop`. The definitions and why the
+handling differs (dig-then-reframe versus one de-escalating question that offers an honest
+out) are in `references/coaching-rubric.md`.
 
 ### Mode 1 — Analyze (step 3)
 
 1. **Annotate each thread.** Reply category; if `objection`, the type, the objection's
    message index, a verbatim of 200 characters or less, the three smokescreen markers,
-   and the post-objection outcome. If we answered: the index of our reply, **its text as
+   and the post-objection outcome. `reply_category` and `post_objection_category` are closed
+   vocabularies and the script refuses an unknown value: the second decides the recovery
+   numerator, so it is never guessed. If we answered: the index of our reply, **its text as
    `handling.verbatim`** (what the card quotes under "clone this"), the **9-dimension
    rubric** from `references/coaching-rubric.md` (0-3 each, /27), and a one-sentence
    `should_have` on the weakest. **Dimension 7 is scored against the goal from
@@ -245,10 +245,10 @@ score with low recovery is not a handling problem, low score with decent recover
 the easiest win on the board, and a high never-answered rate is usually the biggest
 finding in a first run.
 
-**What not to report** is listed in the report's own `not_computed[]` — read it and respect
-it, rather than reasoning around it. Chief among them: revenue lost to an objection (point
-at `campaign-impact-analyzer`) and which sequence step caused one. And say once, plainly:
-**this reads replies, so it cannot tell you what the people who never replied objected to.**
+**What not to report** is listed in the report's own `not_computed[]` — respect it rather
+than reasoning around it. Chief among them: revenue lost to an objection (point at
+`campaign-impact-analyzer`) and which sequence step caused one. And say once, plainly: **this
+reads replies, so it cannot tell you what the people who never replied objected to.**
 
 ### Mode 2 — Coach
 
@@ -286,7 +286,9 @@ Want me to?"* — same confirmation gate as Step 1.
 Out: benchmarking (`campaign-challenger`), writing a full sequence
 (`multichannel-campaign-builder`), targeting strategy, attribution.
 
-An objection is a candidate for an upstream fix when `first_touch_share > 0.55`, or
+An objection is a candidate for an upstream fix when it lands at first touch at least 15
+points above **this account's own first-touch base rate** (an absolute cutoff would measure
+thread length, since on cold outbound most replies arrive on the first message), or
 its verdict is `copy`, or the type is `channel_trust` or `value_doubt`. Match it to
 the five causes:
 
@@ -331,8 +333,8 @@ objection categorized rather than a sample, and it ends on reusable team materia
    segmentation verdict, handling grades.
 3. **Recommend.** Three to five actions ranked by what they move, each naming the objection,
    its verdict and the owner. `copy` is a sequence fix, `targeting` a list fix, `product` a
-   routing decision, and a high never-answered rate a process fix that beats all three.
-   Every action cites a number from the JSON.
+   routing decision, a high never-answered rate a process fix that beats all three. Every
+   action cites a number from the JSON.
 4. **Write one response template per frequent objection**, per
    `references/response-templates.md`: 8% of objections or above, capped at six,
    `channel_trust` always if present, none for a `product` verdict. Source the words from
@@ -362,10 +364,10 @@ in the run.
 ## The battle card
 
 `render` writes one card per type: the numbers, what your own data shows, the response
-template once mode 5 has written one, and the shipped baseline body. The full section order
-is in `references/persistence.md`. Two honesty rules it enforces and you must not work
-around: no exemplar is promoted below 22/27, and a hand-edited card is reported and skipped,
-never overwritten. With zero conversations all nine baseline cards still render.
+template once mode 5 has written one, and the baseline body. Section order is in
+`references/persistence.md`. Two honesty rules it enforces: no exemplar below 22/27, and a
+hand-edited card is reported and skipped, never overwritten. With zero conversations all
+nine baseline cards still render.
 
 ## Output & LGM handoff
 
