@@ -253,19 +253,36 @@ Persist patterns in the snapshot; reinforce/decay across weeks.
 ## E5. Reply quality + median response (mostly from the Phase 5 fetch)
 The base build seeds this from a tiny sample; the rich version comes from the Phase 5 conversation
 fetch. **The same fetched threads do double duty: classification AND response-time.**
-- **Classify** each sampled thread into one of six types: `HOT` (explicit call/meeting/pricing ask),
-  `CURIOUS` (engaged, no objection), `OBJECTION` (price / equipped / feature_gap / timing /
-  segment_fit / value_resistance / tried_before / wrong_person), `EQUIPPED` (names a competitor),
-  `FIRM_NO`, `WRONG_FIT`. **Filter for `OBJECTION` before sampling** the objection view — random
-  RECEIVED threads mostly surface CURIOUS/HOT.
-- **Principal objection** = the most frequent objection type in the sample + a one-line coaching
-  guideline + what to bring to the team. **Radar** = the distribution across the six categories.
-  **Priority table** = objection (build a talk track/battle card), most-cited competitor (if enough
-  EQUIPPED data), wrong-fit share (targeting signal), AI-tone callouts.
+- **Classify** each sampled thread into one of five types: `HOT` (explicit call/meeting/pricing
+  ask), `CURIOUS` (engaged, no objection), `OBJECTION`, `FIRM_NO`, `WRONG_FIT`.
+  **Filter for `OBJECTION` before sampling** the objection view — random RECEIVED threads mostly
+  surface CURIOUS/HOT.
+- **Objection sub-types** are the nine canonical ids owned by the `objection-analyzer` skill:
+  `competitor_in_place` / `feature_gap` / `tried_before` / `price_budget` / `timing` /
+  `value_doubt` / `process_authority` / `scope_mismatch` / `channel_trust`. Use those exact ids so
+  the two skills report the same objection sub-type distribution on the same data. If that skill is installed, its
+  `references/objection-taxonomy.json` is the source of truth, aliases included.
+- **Migrating an older snapshot.** Accumulated state from before this taxonomy holds
+  `equipped`, `wrong_person` and `segment_fit`. Map them on load — `equipped` to
+  `competitor_in_place`, the other two to `WRONG_FIT` — or the radar and the priority table
+  will show the old and the new label as two separate rows for the same thing.
+- **An objection is a blocker raised by someone still engaging.** Someone who disqualifies
+  themselves is `WRONG_FIT`, not an objection — that covers the wrong contact, the wrong segment,
+  the too-junior and the job-seeker. Count `WRONG_FIT` separately and never inside the objection
+  share: it is a targeting signal, not a coaching one. `EQUIPPED` is not a separate category, it is
+  the `competitor_in_place` objection.
+- **Principal objection** = the most frequent objection sub-type in the sample + a one-line coaching
+  guideline + what to bring to the team. **Radar** = the distribution across the five categories.
+  **Priority table** = objection (build a talk track/battle card), most-cited competitor (from the
+  `competitor_in_place` objections, if enough of them), wrong-fit share (targeting signal),
+  AI-tone callouts.
 - **Best-handled reply** = score sampled OBJECTION replies on a 9-dimension rubric (tone match /
   addresses the message / length mirrors / one question max / no forbidden phrases / not pushy /
   correct resource priority / not creepy / process-compliant, 0-3 each, >=22/27) and promote the
   top one as the "clone this" example. Never fabricate an example — if none qualify, say so.
+  These are the same nine dimensions the `objection-analyzer` skill scores, in the same order and
+  against the same threshold, so a reply graded in one carries over to the other. Its
+  `references/coaching-rubric.md` holds the 0-3 anchors if you want them.
 - **AI-tone callout** belongs to the campaign copy (Playbooks tab), not reply handling.
 - **Median response (computed from the Phase 5 fetched threads, NOT the base build)** = per identity,
   median time between a lead's message and the rep's next reply **after the first reply**, from the
@@ -324,7 +341,7 @@ omit or empty a field to get its documented empty state (e.g. no `value` → the
                 "patternsCampaign":[ {"name":"...","conf":"high","lift":"...","desc":"...","excerpt":"...","meta":"..."} ],
                 "patternsReply":[ {...} ] },
   "quality": { "principalObjection": {"type":"...","desc":"...","team":"..."} | null,
-               "radar": [ ["Curious",25], ["Reaction",18], ... ],
+               "radar": [ ["Hot",8], ["Curious",25], ["Objection",18], ["Firm no",4], ["Wrong fit",6] ],
                "priority": [ {"cat":"...","pr":"hi"|"mid"|"lo","prl":"...","todo":"..."} ],
                "bestReply": {"label":"...","text":"...","meta":"..."} | null }
 }
