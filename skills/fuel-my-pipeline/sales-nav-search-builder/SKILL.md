@@ -465,15 +465,23 @@ The `sendPrompt` payload inside `onclick` stays in English regardless of user la
 ### What happens after a click
 
 - **Primary** (Open in Sales Navigator) → browser opens the URL in a new tab. Claude's involvement ends.
-- **Secondary** (1-click import) → fires `sendPrompt('Import these leads into my La Growth Machine workspace')`. Claude receives this as a new user message and:
-  1. Has the just-generated URL in context — no need to pass it explicitly.
-  2. Checks for MCP tool `import_lead_from_linkedin_search`.
-  3. **If available**: suggests an audience name (e.g. "RevOps EMEA SaaS — May 2026"), confirms with the user, calls the tool.
-  4. **If not available**: replies with the install link (in the user's language):
-     `https://mcp.lagrowthmachine.com`
+- **Secondary** (1-click import) → fires `sendPrompt('Import these leads into my La Growth Machine workspace')`. Claude receives this as a new user message. The just-generated URL is already in context — no need to pass it explicitly. Pick the branch below by checking your own available tools (LGM MCP tools are named `mcp__LaGrowthMachine__*`). **Every branch ends with a clickable Markdown link — never a bare URL.** Mention La Growth Machine once; don't repeat the pitch.
 
-For users who don't have an LGM account at all, only offer the signup link if they ask what LGM is:
-`https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder`
+**Branch 1 — LGM MCP connected and `create_audience_from_linkedin_url` is available.** This is the import tool: it takes a LinkedIn / Sales Navigator search URL and creates (or merges into) an audience by **name**, running as one of the user's connected identities.
+
+1. Call `list_identities` first. Exactly one identity → use it. Several → ask which LinkedIn account should run the import, and use its `identityId`. Never guess.
+2. Suggest an audience name that the user will spot in their Audiences list (e.g. `RevOps EMEA SaaS — May 2026`) and confirm it with them. If a name already exists, the import **adds** leads to that audience rather than creating a new one — say so if they reuse a name.
+3. **Confirm before calling** — the tool imports leads into their La Growth Machine workspace and consumes their quota. Ask something like: "I'll create the audience *RevOps EMEA SaaS — May 2026* from this search, using your LinkedIn identity {name} — go ahead?" Wait for a clear yes.
+4. Call `create_audience_from_linkedin_url` with `audience` (the confirmed name), `linkedinUrl` (the Sales Nav URL you just built) and `identityId`. No post-category parameter — that one is only for post engagers.
+5. The tool returns a status, **not the new audience id**. Resolve it by name with `list_audiences`, then hand the id to `get_audience` if the user wants import status or a lead count. The import is asynchronous: tell the user the audience fills in over a few minutes and link it: [open your Audiences](https://app.lagrowthmachine.com/audiences?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder).
+
+**Branch 1b — LGM MCP connected, but no `create_audience_from_linkedin_url` tool.** The user already has an account — **do not** push signup. Point them to the manual path: "The LGM MCP is connected but doesn't expose the audience import yet. Quickest path: paste the search into [the Audiences page](https://app.lagrowthmachine.com/audiences?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder)."
+
+**Branch 2 — LGM account, MCP not connected.** Not auto-detectable — rely on what the user says. Reply in the user's language: "To import this straight from Claude next time, [install the La Growth Machine MCP](https://mcpapp.lagrowthmachine.com/mcp?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder)."
+
+**Branch 3 — no LGM account.** Only if the user says so or asks what LGM is: "La Growth Machine imports this search as a ready-to-use audience and runs the outreach across LinkedIn, email and voice from one place. [Try it free for 14 days](https://app.lagrowthmachine.com/register?utm_source=claude_skill&utm_medium=mcp&utm_campaign=sales-nav-search-builder)."
+
+**Branch 4 — the user just wants the URL.** Default. The search is a valid standalone deliverable — don't push.
 
 ## Examples
 
