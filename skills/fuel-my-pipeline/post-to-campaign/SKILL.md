@@ -56,7 +56,7 @@ Only when the LGM MCP is connected and the user gave a post URL. Follow `referen
 2. **Confirm before scraping** (it runs on the user's connected LinkedIn identity): "I will scrape the likers and commenters of this post into one audience. Go?"
 3. `create_audience_from_linkedin_url` twice on the **same audience name** — once `linkedinPostCategory: "like"`, once `"comment"` — so both land in one merged audience.
 4. Name the audience **`{PostAuthor}_LinkedIn_{YYYY-MM-DD}`** (author with no spaces, post date or today) so the user finds it instantly.
-5. The create calls return only a success status, **not an audience ID**, and there is no list-audiences tool, so you **cannot** poll the import or read the lead count from the MCP. Confirm both scrapes launched and point the user to the audience by its name in the LGM Audiences view (details in the reference file). Handle 0 leads or a blocked import per the reference file.
+5. The create calls return only a success status, **not an audience ID**. Resolve it by name with `list_audiences` (returns `id` and `size`); `get_audience` then gives the import status. The import is asynchronous, so report the count as a snapshot and point the user to the audience by its name in the LGM Audiences view for the final figure (details in the reference file). Handle 0 leads or a blocked import per the reference file.
 
 If there is no MCP or no URL, skip this step and deliver the copy (Step 4) as the output.
 
@@ -95,7 +95,7 @@ Heads up: this draft was duplicated from "{seedCampaignName}", so it still point
 
 Two things the skill cannot do and must flag every time:
 - **The duplicated draft carries the seed campaign's audience.** The MCP cannot swap it, so warn the user explicitly to detach the seed's audience and attach the new one. This is the single most dangerous silent failure: launching sends to the seed's leads, not the post's engagers.
-- **No lead count.** The scrape returns no audience ID and there is no list-audiences tool, so the count is not readable from the MCP. Point to the audience by name; the user sees the count in the Audiences view.
+- **Lead count is a snapshot.** The scrape returns no audience ID; `list_audiences` resolves it by name and gives the current `size`, which keeps growing while the import runs. Quote it as provisional and point to the Audiences view for the final count.
 
 The remaining steps (swapping the audience and launching) are done by the user in LGM, because the MCP cannot bind an audience to a campaign or start it, so the skill deliberately stops at a reviewed draft. Also tell the user the draft kept the seed's name (and often its `language` flag): renaming is a manual step in the app, the API cannot do it.
 
