@@ -1,0 +1,36 @@
+{
+  "_comment": "Job-title classification rules used by scripts/analyze.py. Ordered: the FIRST matching seniority rule and the FIRST matching function rule win. Patterns are case-insensitive regexes matched on the whole title. Edit here, never in the script.",
+  "seniority": [
+    {"label": "Owner / Founder", "patterns": ["\\bfounder\\b", "\\bco-?founder\\b", "\\bcofondat", "\\bfondat(eur|rice)\\b", "\\bowner\\b", "\\bpropri[ée]taire\\b", "\\bg[ée]rant(e)?\\b", "\\bpartner\\b(?!ship)", "\\bassoci[ée]e?\\b", "\\bpr[ée]sident(e)?\\b(?!.*\\bvice\\b)", "\\bchairman\\b", "\\bchairwoman\\b"]},
+    {"label": "C-level", "patterns": ["\\bc[a-z]o\\b", "\\bchief\\b", "\\bdirecteur g[ée]n[ée]ral\\b", "\\bdirectrice g[ée]n[ée]rale\\b", "\\bmanaging director\\b", "\\bgesch[äa]ftsf[üu]hrer(in)?\\b", "\\bgeneral manager\\b", "\\bdg\\b", "\\bceo\\b"]},
+    {"label": "VP", "patterns": ["\\bs?e?vp\\b", "\\bvice[- ]?pr[ée]sident(e)?\\b"]},
+    {"label": "Director / Head", "patterns": ["\\bdirector\\b", "\\bdirecteur\\b", "\\bdirectrice\\b", "\\bhead\\b", "\\bdirektor(in)?\\b", "\\bleiter(in)?\\b"]},
+    {"label": "Manager / Lead", "patterns": ["\\bmanager\\b", "\\bmanageuse\\b", "\\blead\\b", "\\bresponsable\\b", "\\bchef(fe)? de\\b", "\\bsupervisor\\b", "\\bteam ?lead\\b", "\\bcoordinat(or|eur|rice)\\b"]},
+    {"label": "Senior IC", "patterns": ["\\bsenior\\b", "\\bsr\\.?\\b", "\\bstaff\\b", "\\bprincipal\\b", "\\bexpert(e)?\\b", "\\bconfirm[ée]e?\\b"]},
+    {"label": "Entry / Student", "patterns": ["\\bintern\\b", "\\bstagiaire\\b", "\\bstudent\\b", "\\b[ée]tudiant(e)?\\b", "\\balternant(e)?\\b", "\\bapprenti(e)?\\b", "\\bjunior\\b", "\\btrainee\\b", "\\bgraduate\\b", "\\bwerkstudent\\b"]}
+  ],
+  "seniority_default": "Individual contributor",
+  "function": [
+    {"label": "RevOps / GTM Ops", "patterns": ["\\brev ?ops\\b", "\\brevenue operations\\b", "\\bsales ?ops\\b", "\\bsales operations\\b", "\\bgtm ?(engineer|ops|operations)\\b", "\\bgo[- ]to[- ]market\\b", "\\bmarketing ops\\b", "\\bgrowth ops\\b", "\\bbusiness operations\\b", "\\bbizops\\b"]},
+    {"label": "General management", "patterns": ["\\bceo\\b", "\\bfounder\\b", "\\bco-?founder\\b", "\\bcofondat", "\\bfondat(eur|rice)\\b", "\\bowner\\b", "\\bpr[ée]sident(e)?\\b", "\\bmanaging director\\b", "\\bdirecteur g[ée]n[ée]ral\\b", "\\bdirectrice g[ée]n[ée]rale\\b", "\\bg[ée]rant(e)?\\b", "\\bgeneral manager\\b", "\\bgesch[äa]ftsf[üu]hrer(in)?\\b", "\\bcoo\\b", "\\bchief operating\\b", "\\bchief of staff\\b", "\\bdg\\b"]},
+    {"label": "Sales", "patterns": ["\\bsales\\b", "\\bcommercial(e)?\\b", "\\baccount executive\\b", "\\bae\\b", "\\bsdr\\b", "\\bbdr\\b", "\\bbusiness develop", "\\bd[ée]veloppement commercial\\b", "\\bcro\\b", "\\bchief revenue\\b", "\\brevenue\\b", "\\baccount manager\\b", "\\bkey account\\b", "\\bpartnerships?\\b", "\\bpartenariats?\\b", "\\bbizdev\\b", "\\bcloser\\b", "\\bvendeur\\b", "\\bvertrieb\\b", "\\bventes?\\b"]},
+    {"label": "Marketing / Growth", "patterns": ["\\bmarketing\\b", "\\bgrowth\\b", "\\bdemand gen", "\\bcontent\\b", "\\bbrand\\b", "\\bseo\\b", "\\bsea\\b", "\\bcmo\\b", "\\bcommunication\\b", "\\bcommunity\\b", "\\bacquisition\\b", "\\bperformance\\b", "\\bcampaign\\b", "\\bevents?\\b", "\\bpr\\b", "\\bmedia\\b"]},
+    {"label": "Product", "patterns": ["\\bproduct\\b", "\\bproduit\\b", "\\bcpo\\b", "\\bux\\b", "\\bui\\b", "\\bdesign(er)?\\b"]},
+    {"label": "Engineering / Data", "patterns": ["\\bengineer", "\\bing[ée]nieur(e)?\\b", "\\bdeveloper\\b", "\\bd[ée]veloppeur\\b", "\\bcto\\b", "\\bchief technology\\b", "\\btech(nical|nique)?\\b", "\\bsoftware\\b", "\\bdata\\b", "\\bdevops\\b", "\\barchitect\\b", "\\bit\\b", "\\bsi\\b", "\\bdsi\\b", "\\bcio\\b", "\\bmachine learning\\b", "\\bai\\b"]},
+    {"label": "Finance", "patterns": ["\\bcfo\\b", "\\bfinanc", "\\bcontroller\\b", "\\bcomptab", "\\baccount(ing|ant)\\b", "\\btreasur", "\\bdaf\\b", "\\bfp&a\\b"]},
+    {"label": "People / HR", "patterns": ["\\bhr\\b", "\\bhuman resources\\b", "\\bpeople\\b", "\\btalent\\b", "\\brecruit", "\\brh\\b", "\\bressources humaines\\b", "\\bchro\\b", "\\bpersonal\\b"]},
+    {"label": "Customer Success / Support", "patterns": ["\\bcustomer success\\b", "\\bcsm\\b", "\\bsupport\\b", "\\bcustomer experience\\b", "\\bclient success\\b", "\\bonboarding\\b", "\\bcustomer care\\b", "\\bservice client\\b"]},
+    {"label": "Consulting / Freelance", "patterns": ["\\bconsult", "\\badvisor\\b", "\\bconseil", "\\bcoach\\b", "\\bfreelance\\b", "\\bind[ée]pendant(e)?\\b", "\\bfractional\\b", "\\binterim\\b", "\\bmentor\\b"]},
+    {"label": "Operations", "patterns": ["\\boperations?\\b", "\\bops\\b", "\\bsupply\\b", "\\blogisti", "\\bprocurement\\b", "\\bachats?\\b", "\\bquality\\b", "\\bqualit[ée]\\b"]},
+    {"label": "Legal", "patterns": ["\\blegal\\b", "\\bjuridique\\b", "\\bcounsel\\b", "\\bavocat(e)?\\b", "\\bcompliance\\b", "\\bdpo\\b"]}
+  ],
+  "function_default": "Other",
+  "reply_labels": {
+    "_comment": "Normalizes free-text reply labels into the fixed enum the engine counts. ORDER MATTERS — first match wins, so OOO and the negations come before POSITIVE ('not interested' must never match 'interested'). Unknown non-empty labels fall into OTHER (still counted as a reply).",
+    "OOO": ["out of office", "ooo", "auto[- ]?reply", "automatic reply", "r[ée]ponse automatique", "absent", "vacation", "vacances", "cong[ée]", "on leave", "maternity", "parental", "away"],
+    "NEGATIVE": ["not interested", "uninterested", "pas int[ée]ress[ée]", "non int[ée]ress[ée]", "no thanks", "non merci", "negative", "n[ée]gatif", "unsubscribe", "d[ée]sabonn", "\\bstop\\b", "remove", "no need", "wrong person", "mauvaise personne", "refus", "decline", "already (have|use)", "d[ée]j[àa]", "\\bno\\b", "\\bnon\\b"],
+    "NOT_NOW": ["not now", "pas maintenant", "later", "plus tard", "follow[- ]?up later", "nurture", "maybe", "peut[- ]?[êe]tre", "timing", "next (quarter|year|month)", "recontact", "busy", "revenir"],
+    "POSITIVE": ["interested", "int[ée]ress[ée]", "positive", "positif", "meeting", "rdv", "demo", "d[ée]mo", "call booked", "booked", "\\byes\\b", "\\boui\\b", "\\bhot\\b", "qualified", "qualifi[ée]", "\\bwon\\b", "opportunity", "wants? to talk", "send (me )?more", "envoie", "let'?s talk", "curious"],
+    "OTHER": ["referral", "redirect", "question", "info", "other", "autre", "forward", "transf[ée]r", "not the right", "colleague", "coll[èe]gue"]
+  }
+}
