@@ -118,6 +118,8 @@ Leads who reply during the wave leave the sequence on the La Growth Machine side
 
 The skill expects **one existing campaign** in the user's workspace to duplicate: a LinkedIn (or multichannel) sequence that **opens with a wait of about 6 weeks** (so a lead who said "not now" yesterday is not touched at launch), then as many message steps as contents per lead (three by default), each followed by a like or a profile visit, steps spaced about 6 weeks apart, messages empty or placeholder. The user creates it once in the app and gives its id or name (`list_campaigns` with `search`). Ask for it on the first run; if none exists, describe the shape and let the user build it, then continue.
 
+Step settings the MCP cannot set (for example LinkedIn **real chat mode**, which sends the message as a chat reply rather than a new DM) belong on the template: set them once in the app, duplication carries the step configuration. If the app forces a placeholder character into each message to save the setting, that placeholder is copied too; the skill replaces the whole message with `edit_campaign_message`, so it never reaches a lead. Check the duplicated campaign's steps: `hasMessage: true` means edit, `false` means add.
+
 Why 6 weeks: a lead who said "not now" has no pain to solve today or did not understand the offer. In six weeks something changes in their business. Shorter cadences read as chasing.
 
 ## The compounding loops
