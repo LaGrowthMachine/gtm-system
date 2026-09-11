@@ -107,6 +107,7 @@ See *Output & LGM handoff* below. Nothing is written before approval.
 
 ### Step 7 — Write into La Growth Machine (on approval)
 
+0. **Identity check before any write.** Every write is keyed on `leadId`, and a wrong id puts a personal sentence on a stranger's record. Never map ids to people by position in a list or by the order of parallel tool results. Before writing, confirm each `lead_id` against the lead record's name (`get_audience_leads` on the source audience, or `get_lead_conversations` one call at a time) and stop on the first mismatch. Custom attributes cannot be emptied through the MCP (an empty string is ignored; a single space is the only way to blank them) and a lead cannot be removed from an audience, so a wrong write is expensive to undo.
 1. `create_lead` with each argument object from the `payload` output (`leadId`, `audience`, the slots). It updates in place and adds the lead to the wave's audience, creating the audience if needed.
 2. `duplicate_campaign(campaignId of the nurture template)` → `rename_campaign` to the wave's name → `get_campaign_steps` on the copy → `add_campaign_step_message` for each empty step with the `newhtml` output (or `edit_campaign_message` if the template already carries messages) → `list_audiences` to resolve the wave's audience id → `set_campaign_audience`.
 3. Tell the user to review and launch the campaign in the app. There is no launch tool, on purpose.

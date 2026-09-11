@@ -39,7 +39,7 @@ Two sellers can disagree on step 3: some read "in three months" as a no in disgu
 
 | Field | Source | Notes |
 |---|---|---|
-| `lead_id` | MCP or export | required, the write key |
+| `lead_id` | MCP or export | required, the write key. Confirm it against the lead's name in LGM before writing; ids and names must come from the same record, never from two lists lined up by position |
 | `name` | thread or audience | for the review table only |
 | `situation` | triage above | `not_now`, `vague`, `in_nurture`; leave empty for the engine to decide `ghosted` |
 | `pains[]` | the lead's own words | 1 to 3 short phrases: "reply handling", "no time for follow-ups", "AI visibility". Keep their vocabulary; the library is tagged the same way. |
