@@ -51,9 +51,11 @@ Whatever the source, the file must carry, per lead: **an identifier** (lead id o
 
 ### Lane A — La Growth Machine MCP (native)
 
-Bounded work: a handful of calls per campaign, not an investigation.
+Bounded work: a handful of calls per campaign, not an investigation. **Hard budget: ~100 tool calls in total — about 40 for steps 1–3 (campaigns, outcomes, attributes) and up to 60 for step 4 (one call per labeled reply).** When you reach it, stop collecting and run the engine on what you have — never propose to "continue in a new message".
 
-1. **Pick campaigns.** `list_campaigns` → keep campaigns with `leadsCount ≥ 30` launched more than 14 days ago (younger ones haven't had time to get replies). Each returns its `audience.id` — you'll need it. Aim for the campaigns that together cover most of the contacted volume; 5–15 campaigns is typical.
+**Never enrich, verify or hand-fill attributes during the analysis** — not with `enrich_lead`, not with another connected MCP (Derrick, Clay, a LinkedIn scraper…), not by opening profiles. Missing attributes are a *finding* the engine reports as a gap; filling them one by one burns the budget and biases the sample toward the leads you happened to look at.
+
+1. **Pick campaigns.** `list_campaigns` → keep campaigns with `leadsCount ≥ 30` launched more than 14 days ago (younger ones haven't had time to get replies). **Keep prospecting campaigns only: `objective = "coldOutreach"`.** Drop `reengageProspects`, `engageExistingUsers` and `partnershipOutreach` — existing users and partners reply to anyone, their rates say nothing about an ICP and inflate the baseline. Mention in one line which campaigns were excluded and why. (`enrich: false` on a campaign is a hint the audience may be un-enriched — the probe in step 3 decides.) Each campaign returns its `audience.id` — you'll need it. Aim for the campaigns that together cover most of the contacted volume; 5–15 campaigns is typical.
 2. **Outcomes per lead** — one `ask_your_outbound` query **per campaign** (a whole-workspace query over a long window exceeds the scan limit). Template — substitute the campaign id:
    ```sql
    SELECT leadId, campaignId,
@@ -70,9 +72,13 @@ Bounded work: a handful of calls per campaign, not an investigation.
    GROUP BY leadId, campaignId
    ```
    Two things the logs **cannot** give you: the reply text (the `message` column is empty on reply events) and interest (don't treat `LGM_CONVERTED` as "interested" — in most workspaces it fires on any reply). Both come from step 4.
-3. **Attributes per lead** — `get_audience_leads` on each campaign's `audience.id`, paginating `skip`/`limit=100`. Join on the lead's `id` = the logs' `leadId`. Take `jobTitle`, `industry`, `location`, `companyName` (there is no company-size field — leave it blank). Cap the hydration at ~40 calls (4,000 leads); if the audiences are bigger, prioritize the campaigns with the most replies and say which were skipped. Leads not found in the fetched audiences stay in the file with empty attributes.
-4. **Label a sample of replies** — `search_conversations` with `leadReplied=true` and `campaignIds=[…]` returns conversation ids + `leadId`. Take **up to 120 conversations spread evenly across the campaigns** (all of them if there are fewer than 40 replies in total), call `get_conversation_messages` on each, and label the lead's reply per *Labeling replies*. Write the label into the row's `Reply label`. Unlabeled repliers stay `Replied = yes` with an empty label — the engine handles partial labeling and says what it did.
+3. **Attributes per lead** — in two passes, so the budget goes to audiences that can actually be analyzed:
+   - **Coverage probe first.** For each campaign's `audience.id`, fetch **one page** (`get_audience_leads`, `limit=100`, `skip=0`) and compute the share of leads with `jobTitle` filled, and separately with `industry`. **Under 20 % on both → the audience is un-enriched: don't paginate it.** Note it as skipped-for-coverage (you'll need the list in step 5b). If every audience is under 20 %, skip to step 5b now — no amount of pagination fixes empty fields.
+   - **Hydrate the rest.** Paginate the audiences that passed (`skip`/`limit=100`), most replies first, within the remaining budget (~40 calls, 4,000 leads). Join on the lead's `id` = the logs' `leadId`. Take `jobTitle`, `industry`, `location`, `companyName` (there is no company-size field — leave it blank). Say which audiences were not fully hydrated. Leads not found in the fetched audiences stay in the file with empty attributes.
+4. **Label a sample of replies** — `search_conversations` with `leadReplied=true` and `campaignIds=[…]` (one call per campaign, `limit` high enough to get them all) returns conversation ids + `leadId` — **no message text**: reading a reply is always one `get_conversation_messages` call per conversation, there is no bulk read. So sample: take **up to 60 conversations spread evenly across the campaigns** (all of them if there are fewer than 40 replies in total), call `get_conversation_messages` on each, and label the lead's reply per *Labeling replies*. If that covers under half the replies, the engine falls back to plain `reply` as the outcome and says so — that is fine; don't spend more calls to force `positive_reply`. Write the label into the row's `Reply label`. Unlabeled repliers stay `Replied = yes` with an empty label — the engine handles partial labeling and says what it did.
 5. Write the rows to `/tmp/outreach.csv`, run the engine.
+
+**5b. If the engine refuses for coverage** (or every audience failed the probe): one line stating the coverage figure and which audiences are un-enriched, then **one** question — offer to turn on auto-enrichment on those campaigns with `set_campaign_auto_enrich` so job title and industry populate, and to re-run once it has processed (hours, not minutes). **Confirm before calling it**: enrichment spends the user's credits (`get_credits` shows the balance). Don't hand-fill, don't lower the thresholds, don't paginate further. If the user prefers, the engine can run on the enriched audiences alone when they reach 100 contacted leads and 20 replies on their own.
 
 ### Lane B — CSV export from any outreach tool
 
@@ -139,6 +145,9 @@ Cluster the **significant `above` segments** (`winning`) into **2–3 archetypes
 | Reading an ICP from `reply` when labels were possible | A "no thanks" counted as success | Label the replies; the engine flips to `positive_reply` on its own |
 | Presenting the profile as *the* ICP | You only learned about who you contacted | Keep the scope note; frame as "within what you targeted" |
 | Inventing attributes not in the data | Absent ≠ free to guess | Use only dimensions with coverage; name the gaps |
+| Enriching or hand-checking leads mid-analysis (any tool) | Burns the call budget, biases the sample to the leads you looked at | Report the gap; offer `set_campaign_auto_enrich`, re-run later |
+| Paginating an un-enriched audience | 800 leads with empty fields is still 0 % coverage | Probe one page first; skip audiences under 20 % |
+| Mixing re-engagement campaigns with cold outreach | Existing users reply to anyone; the baseline is meaningless | Prospecting campaigns only |
 
 ## Output & handoff
 
