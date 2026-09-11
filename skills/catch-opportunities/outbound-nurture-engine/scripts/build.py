@@ -266,9 +266,18 @@ def match(library, leads, per_lead=DEFAULT_PER_LEAD, today=None, ghost_days=DEFA
             _, c, score, reasons = best
             picks.append({"url": c["url"], "title": c["title"], "score": score, "reasons": reasons})
             used.add(c["url"])
-        if len(picks) < per_lead or weak:
-            for p in lead.get("pains") or []:
-                gap_pains[_norm(p)] = gap_pains.get(_norm(p), 0) + 1
+        # a set with no pain match at all is weak, and every pain no pick covers is a content gap
+        covered = set()
+        for pk in picks:
+            for r in pk["reasons"]:
+                if r.startswith("pain:"):
+                    covered.update(r[5:].split(","))
+        lead_pains = _norm_set(lead.get("pains"))
+        if lead_pains and not covered:
+            weak = True
+        if len(picks) < per_lead or weak or (lead_pains - covered):
+            for p in (lead_pains - covered) or lead_pains:
+                gap_pains[p] = gap_pains.get(p, 0) + 1
         results.append({"lead_id": lead["lead_id"], "situation": situation, "picks": picks,
                         "complete": len(picks) == per_lead, "weak": weak})
 
