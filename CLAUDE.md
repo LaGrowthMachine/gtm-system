@@ -112,6 +112,7 @@ Skills guide Claude through complex GTM workflows. Just describe what you want. 
 
 - `reply-draft-assistant` — triage your inbox or a campaign's replies, draft the right answer from the full thread, and send it in LGM on your approval
 - `objection-analyzer` — rank the objections your outbound actually gets, grade how your team handled each one, and build a battle-card playbook that sharpens every run
+- `outbound-nurture-engine` — nurture the replies you did not convert yet (not now, vague, went quiet): match each lead with your own content from a website, Notion or Drive, write it onto the lead as custom attributes, and duplicate and fill a 6-week nurture campaign in LGM
 
 **Secure my channels** — channel health, deliverability, identities — *coming soon*
 
@@ -135,6 +136,7 @@ Suggest one of these depending on what the user wants to do:
 | See per-rep team performance / who converts best | Use `team-performance-dashboard` |
 | Handle or draft replies to their inbox | Use `reply-draft-assistant` |
 | Know which objections the team gets, and how to handle them | Use `objection-analyzer` |
+| Nurture the leads who said not now, or went quiet after replying | Use `outbound-nurture-engine` |
 | Pull live campaign data ad hoc | Call the MCP directly (e.g. `list_campaigns`, `get_campaign_stats`) |
 | Run a custom analytics query | Call the BigQuery tools (`ask_your_outbound`, `get_bigquery_logs_guide`) |
 
