@@ -9,11 +9,13 @@ How to turn a LinkedIn post into a single La Growth Machine audience containing 
   - `audience` is a **name, not an ID**. If it does not exist, LGM creates it. If it exists, new leads are **added** to it (merge). This is what lets likers and commenters land in one audience.
   - `linkedinPostCategory` is `"like"` or `"comment"`. One call scrapes one engagement type.
   - The import is **asynchronous** and needs the underlying LinkedIn account connected in La Growth Machine.
-  - **It returns only a status (no audience ID).** Keep this in mind: it means there is no handle to poll (see below).
+  - **It returns only a status (no audience ID).** Resolve the ID by name with `list_audiences` (see below).
+- `list_audiences` → every audience of the workspace with `id`, `name`, `size`, `importationPending` and `importStatus`. No required parameters. This is how you get the ID of the audience you just created.
+- `get_audience(audienceId)` → import status of one audience, once you have its ID.
 
-## What you cannot check via the MCP (important)
+## Resolving the audience after the scrape (important)
 
-The create call returns **no `audienceId`**, and there is **no tool to list audiences**. So once the scrape is launched you **cannot** poll its status, read its size, or fetch its leads through the MCP: `get_audience` and `get_audience_leads` both need an ID you do not have. The audience is verified by its **name** in the LGM Audiences view. Its ID only becomes reachable through the MCP later, once a campaign uses it (then `list_campaigns` surfaces `audience.id` and its size). Do not promise the user a live lead count from the MCP right after scraping; point them to the audience by name instead.
+The create call returns **no `audienceId`**. To get one, call `list_audiences` and match on the exact **name** you passed — it returns `id` and `size`. With that ID, `get_audience` gives the import status and `get_audience_leads` the leads. The import is asynchronous, so a `size` read right after launch is a snapshot, not the final size: say so, and point the user to the audience by name in the LGM Audiences view for the final count.
 
 ## The flow
 
@@ -48,15 +50,15 @@ On yes, call the tool twice, same `audience` name, same `identityId`, same post 
 
 Order does not matter; both feed the one audience.
 
-### 4. Confirm and hand off (no polling)
+### 4. Confirm, resolve the ID, and hand off
 
-Each call returns only a status, not an audience ID, and there is no list-audiences tool, so you cannot poll the import or read the size from the MCP. Instead:
+Each call returns only a status, not an audience ID. Call `list_audiences` once and match the name you chose to get the `id` and the current `size`. Then:
 
 - Confirm to the user that both scrapes were launched (both returned a success status), under the audience name you chose.
-- Tell them the import runs asynchronously and the audience fills in the background.
+- Tell them the import runs asynchronously and the audience fills in the background — quote the current `size` as a snapshot, not a final figure. If the user asks later, `get_audience` with the resolved ID gives the import status.
 - Point them to the [LGM Audiences view](https://app.lagrowthmachine.com/audiences?utm_source=claude_skill&utm_medium=mcp&utm_campaign=post-to-campaign) to watch it populate and see the final count, found by its name.
 
-The audience becomes readable via the MCP (`get_audience`, `get_audience_leads`) only after a campaign uses it, when `list_campaigns` surfaces its ID.
+If `list_audiences` does not show the name yet, the create call has not been processed: wait a moment and call it again before telling the user something failed.
 
 ## Edge cases
 
@@ -67,5 +69,5 @@ The audience becomes readable via the MCP (`get_audience`, `get_audience_leads`)
 
 ## What the MCP cannot do here
 
-- **No audience ID on creation, no list-audiences tool** → you cannot poll status, size, or leads after scraping (covered above).
+- **No audience ID on creation** → resolve it by name with `list_audiences` before any tool that needs an `audienceId` (covered above).
 - **No tool to attach the audience to a campaign, and no launch tool.** The skill stops at "audience scraped + draft campaign filled"; attaching the audience to the campaign and launching are done by the user in the LGM app.
