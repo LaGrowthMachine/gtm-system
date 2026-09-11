@@ -40,7 +40,7 @@ One library can mix sources: a site for public playbooks, a Drive for private ca
 | `industries[]` | plain words | 2 |
 | `company_sizes[]` | `1-10`, `11-50`, `51-200`, `201-1000`, `1000+` | 1 |
 | `stage` | `reassure` (social proof, testimonials), `educate` (how-to, playbook), `prove` (case study with numbers), `reactivate` (news, launch, benchmark) | 1 when it fits the touch: first touch educates or reassures, second proves, third re-activates or proves |
-| `language` | `en`, `fr`… | a mismatch disqualifies the content for that lead |
+| `language` | `en`, `fr`… | English content can go to any lead; non-English content only to a lead of that language, where it gets +2 so it beats English on a tie |
 | `type` | `case_study`, `playbook`, `article`, `podcast`, `video`, `post`, `template`, `other` | none, shown in the review table |
 | `generic` | true for 1 or 2 evergreen pieces | fallback when nothing scores ≥ `--min-score`; flagged `weak` in the output |
 

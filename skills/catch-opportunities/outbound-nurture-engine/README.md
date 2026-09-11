@@ -71,6 +71,7 @@ Requires Python 3.8+ for the engine (`scripts/build.py`, no dependencies).
 - Custom attributes 8, 9 and 10 are used by default; the skill asks which slots are free and can use any three (slots 11 to 20 once your MCP accepts them on lead updates).
 - Reading Notion or Google Drive needs their MCP connected; otherwise paste the list.
 - Matching is only as good as the tags. The skill tags what it reads; review the first index once.
+- English content is offered to every lead; content in another language only to leads who wrote in that language.
 
 ## Works with
 

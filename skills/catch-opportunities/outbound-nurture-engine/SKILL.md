@@ -40,6 +40,14 @@ Out of scope, handed to sibling skills: a lead who spoke last and awaits an answ
 Three lanes. Whatever the lane, **read the full thread**, not the last message.
 
 - **Inbox (LGM MCP).** `search_conversations` with `leadReplied: true`, optionally `campaignIds` or `lastMessageAtFrom` (default: last 90 days), `limit` 100, paginate with `searchAfter`. Returns ids and metadata only. Hydrate each kept conversation with `get_conversation_messages(conversationId)`. Skip `unsubscribed: true`. Capture `leadId`, `identityId`, `channel`, the lead's name from the thread, `last_received_at` and `last_sent_at`.
+  *If `search_conversations` rejects the call on argument types* (some clients pass every argument as a string and the tool wants arrays, booleans and numbers), take the campaign lane: `list_campaigns` for the campaign ids and the `identity.id`, then one `ask_your_outbound` query for the leads that replied:
+  ```sql
+  SELECT leadId, campaignId, MAX(date) AS last_reply FROM logs
+  WHERE date >= DATE_SUB(CURRENT_DATE(), INTERVAL 120 DAY) AND campaignId IN ('<id1>','<id2>')
+    AND type IN ('LINKEDIN_HAS_REPLY','GOOGLE_REPLY') AND leadId IS NOT NULL
+  GROUP BY leadId, campaignId
+  ```
+  then `get_lead_conversations(leadId, identityId)` and `get_conversation_messages` per lead. Same result, string arguments only.
 - **CSV export** from any outreach tool: one row per conversation with lead id, name, last messages, dates. Ask for the last 3 to 6 months. No writes possible in this lane: the output is the matched contents and the sentences, for the user to paste as custom attributes.
 - **Pasted thread(s)** for one or a few leads.
 
@@ -47,7 +55,7 @@ Bounded work: one search, one hydration pass, no re-reading.
 
 ### Step 2 — Triage and profile (your judgment)
 
-Apply `references/nurture-situations.md` to each thread. Label `situation` as `not_now`, `vague` or `in_nurture`; leave `ghosted` to the engine (it decides from dates). Extract the **nurture profile**: `pains[]` (the words the lead used), `persona` (function), `industry`, `company_size` (one of `1-10`, `11-50`, `51-200`, `201-1000`, `1000+`), `language`, `return_condition` (a date or an event, if given), `already_sent[]` (URLs already shared in the thread). Write one JSON object per lead to `/tmp/nurture-leads.json` (see `examples/sample-leads.json`).
+Apply `references/nurture-situations.md` to each thread. Label `situation` as `not_now`, `vague` or `in_nurture`; leave `ghosted` to the engine (it decides from dates). Extract the **nurture profile**: `pains[]` (the words the lead used), `persona` (function), `industry`, `company_size` (one of `1-10`, `11-50`, `51-200`, `201-1000`, `1000+`), `language`, `return_condition` (a date or an event, if given), `already_sent[]` (URLs already shared in the thread; **resolve short links first**, `curl -sI <short url>` and read `location`, so the URL matches the library entry exactly and the engine can refuse to send it again). Write one JSON object per lead to `/tmp/nurture-leads.json` (see `examples/sample-leads.json`).
 
 Ask the user **once**, on the first run, whether some leads should be excluded (by account size, by score, by campaign). Default: nurture everyone the triage kept. Some sellers treat "come back in three months" as a no in disguise; others nurture it for months. The skill does not decide for them.
 
@@ -77,7 +85,7 @@ Keep `library-index.json` next to the user's work (Claude Code, Cowork). On clau
 ```bash
 python3 scripts/build.py match --library library-index.json --leads /tmp/nurture-leads.json --per-lead 3
 ```
-Flags: `--per-lead` (default 3, must equal the number of content steps in the template campaign), `--ghost-days` (default 10), `--min-score` (default 2), `--today`. The engine returns, per lead, the picks with their score and reasons, plus `excluded` (awaiting reply, too recent, unlabeled) and `content_gaps` (pains with no matching content, with the number of leads waiting). Relay a refusal in one line and ask one question.
+Flags: `--per-lead` (default 3, must equal the number of content steps in the template campaign), `--ghost-days` (default 10: silence after your last message before an unlabeled thread counts as ghosted; **when the template campaign opens with a long wait, such as 42 days, pass a small value like 3**, the wait itself provides the distance), `--min-score` (default 2), `--today`. The engine returns, per lead, the picks with their score and reasons, plus `excluded` (awaiting reply, too recent, unlabeled) and `content_gaps` (pains with no matching content, with the number of leads waiting). Relay a refusal in one line and ask one question.
 
 ### Step 5 — Write the sentences and the campaign messages
 
@@ -107,7 +115,7 @@ Leads who reply during the wave leave the sequence on the La Growth Machine side
 
 ## The nurture template campaign
 
-The skill expects **one existing campaign** in the user's workspace to duplicate: a LinkedIn (or multichannel) sequence with as many message steps as contents per lead (three by default), each preceded by a like or a profile visit, steps spaced about 6 weeks apart, messages empty or placeholder. The user creates it once in the app and gives its id or name (`list_campaigns` with `search`). Ask for it on the first run; if none exists, describe the shape and let the user build it, then continue.
+The skill expects **one existing campaign** in the user's workspace to duplicate: a LinkedIn (or multichannel) sequence that **opens with a wait of about 6 weeks** (so a lead who said "not now" yesterday is not touched at launch), then as many message steps as contents per lead (three by default), each followed by a like or a profile visit, steps spaced about 6 weeks apart, messages empty or placeholder. The user creates it once in the app and gives its id or name (`list_campaigns` with `search`). Ask for it on the first run; if none exists, describe the shape and let the user build it, then continue.
 
 Why 6 weeks: a lead who said "not now" has no pain to solve today or did not understand the offer. In six weeks something changes in their business. Shorter cadences read as chasing.
 

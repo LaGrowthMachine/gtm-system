@@ -183,6 +183,8 @@ def infer_situation(lead, today, ghost_days):
     if lr and ls:
         if lr > ls:
             return None, "awaiting_reply"       # the lead spoke last → reply-draft-assistant, not nurture
+        # ghost_days is the silence after your last message. When the template campaign opens with a
+        # long wait (e.g. 42 days), pass a small value: the wait itself provides the distance.
         if (today - ls).days >= ghost_days:
             return "ghosted", None
         return None, "too_recent"
@@ -191,8 +193,9 @@ def infer_situation(lead, today, ghost_days):
 
 def score_content(lead, content, touch_index):
     """Relevance score. Pain dominates; language mismatch disqualifies; generic contents float at 0."""
-    if content.get("language") and lead.get("language") and \
-            _norm(content["language"]) != _norm(lead["language"]):
+    # English content can go to any lead; non-English content only to a lead of that language
+    if content.get("language") and _norm(content["language"]) != "en" and lead.get("language") \
+            and _norm(content["language"]) != _norm(lead["language"]):
         return None
     s = 0
     reasons = []
@@ -207,6 +210,9 @@ def score_content(lead, content, touch_index):
         s += 1; reasons.append("size")
     if touch_index < len(STAGE_PREFERENCE) and content.get("stage") in STAGE_PREFERENCE[touch_index]:
         s += 1; reasons.append("stage")
+    if content.get("language") and lead.get("language") and _norm(content["language"]) == _norm(lead["language"]) \
+            and _norm(content["language"]) != "en":
+        s += 2; reasons.append("native language")   # native-language content beats English on a tie
     return s, reasons
 
 
@@ -251,7 +257,7 @@ def match(library, leads, per_lead=DEFAULT_PER_LEAD, today=None, ghost_days=DEFA
                 # fallback 1: first unused generic content; fallback 2: best remaining content with
                 # any signal at all (score >= 1), flagged weak; else the slot stays empty (gap)
                 fb = next((g for g in generic if g["url"] not in already and g["url"] not in used
-                           and not (g.get("language") and lead.get("language")
+                           and not (g.get("language") and _norm(g["language"]) != "en" and lead.get("language")
                                     and _norm(g["language"]) != _norm(lead["language"]))), None)
                 if fb is not None:
                     picks.append({"url": fb["url"], "title": fb["title"], "score": 0, "reasons": ["generic"]})
@@ -472,11 +478,16 @@ def _selftest():
             failures.append("match.L5 re-sent an already_sent content")
         if any("fr-guide" in p["url"] for x in r["matched"] for p in x["picks"]):
             failures.append("match: french content matched to an english lead")
-    r2 = check("match.fr_generic", lambda: match(library, [{"lead_id": "F1", "situation": "vague", "language": "fr",
-                                                             "pains": ["reply handling"]}], per_lead=2, today=today))
-    if r2 and (any(p["url"] == "https://x.com/generic" for p in r2["matched"][0]["picks"])
-               or r2["matched"][0]["complete"]):
-        failures.append(f"match.fr_generic: english generic given to a french lead {r2['matched'][0]}")
+    r2 = check("match.fr_lead_gets_en", lambda: match(library, [{"lead_id": "F1", "situation": "vague", "language": "fr",
+                                                                  "pains": ["reply handling"]}], per_lead=2, today=today))
+    if r2 and (r2["matched"][0]["picks"][0]["url"] != "https://x.com/fr-guide" or not r2["matched"][0]["complete"]):
+        failures.append(f"match.fr_lead_gets_en: french lead should get the FR guide first, then English content {r2['matched'][0]}")
+    # a lead replied 2 days ago, the template starts with a 42-day wait: ghost_days=1 keeps them
+    r3 = check("match.initial_wait", lambda: match(library, [{"lead_id": "W1", "last_received_at": "2026-09-09",
+                                                              "last_sent_at": "2026-09-10", "pains": ["reply handling"],
+                                                              "language": "en"}], per_lead=1, today=today, ghost_days=1))
+    if r3 and (not r3["matched"] or r3["matched"][0]["situation"] != "ghosted"):
+        failures.append(f"match.initial_wait: {r3}")
     check("match.emptylib", lambda: match({"contents": []}, leads), True)
     check("match.noleadid", lambda: match(library, [{"situation": "vague"}]), True)
     check("match.badsituation", lambda: match(library, [{"lead_id": "X", "situation": "hot"}]), True)
@@ -522,7 +533,7 @@ def _selftest():
     check("newhtml.unknownvar", lambda: one("<p><var name=\"email\"/> <var name=\"customAttribute8\"/></p>"), True)
     check("newhtml.count", lambda: newhtml({"steps": [{"step_id": "s1", "newHtml": ok_html}]}, [8, 9]), True)
 
-    total = 47
+    total = 48
     for f in failures:
         print("FAIL:", f, file=sys.stderr)
     print(f"{total - len(failures)}/{total} passed")
