@@ -28,6 +28,7 @@ Sourcing, list building, ICP — keeping the lead reservoir full.
 | [post-to-campaign](skills/fuel-my-pipeline/post-to-campaign/SKILL.md) | use-case | Turn a LinkedIn post into a ready-to-launch campaign: scrape the post's likers and commenters into an audience and fill a draft sequence |
 | [audience-icp-filter](skills/fuel-my-pipeline/audience-icp-filter/SKILL.md) | use-case | Filter an existing audience against your ICP — sorts every lead into match / needs review / no match, strips your team and competitors, never silently drops anyone |
 | [won-deal-icp-finder](skills/fuel-my-pipeline/won-deal-icp-finder/SKILL.md) | use-case | Audit your biggest closed-won deals to find your proven ICP and a look-alike target list |
+| [outreach-icp-finder](skills/fuel-my-pipeline/outreach-icp-finder/SKILL.md) | use-case | Find your proven ICP from the outreach you already ran — who actually replies and shows interest, who to stop contacting — from La Growth Machine or any outreach tool's export |
 
 ### Get qualified meetings
 Campaigns, copywriting, sequences — what converts into meetings.
@@ -124,6 +125,7 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 | post-to-campaign | Writes the outreach sequence from the post | Scrapes the post's engagers into an audience and fills a draft campaign |
 | audience-icp-filter | Filters a CSV you paste — you re-import the segmented buckets by hand | Reads your audience live, enriches missing fields on approval, writes `[icp]` and `[review]` back as complementary audiences with the source untouched |
 | won-deal-icp-finder | Works on a HubSpot export you paste | Pulls deals live, attribution clean |
+| outreach-icp-finder | Works on a CSV export from any outreach tool | Pulls campaign outcomes, lead attributes and real reply threads live, then turns the ICP into an audience |
 | multichannel-campaign-builder | Sequence ready to copy into your tool | Creates the sequence as a draft campaign directly in LGM |
 | campaign-challenger | Benchmarks against stats you paste | Benchmarks against your real campaign history and applies the fixes back into your campaign |
 | campaign-impact-analyzer | Works on pasted campaigns and deals | Cross-references LGM campaigns with HubSpot deals in one click |
@@ -164,21 +166,41 @@ The one-line installer at the top sets this up for you automatically.
 
 The MCP exposes your La Growth Machine workspace to Claude. The skills above orchestrate these tools into full workflows.
 
-**Campaigns & audiences**
+**Campaigns — read**
 
 | Tool | What it does |
 |---|---|
-| `list_campaigns` | List your campaigns and their status |
+| `list_campaigns` | List and filter your campaigns by status or name |
 | `get_campaign_stats` | Acceptance, reply and conversion rates for a campaign |
-| `get_campaign_messages` | The message sequence of a campaign |
-| `get_audience` | Details and import status of an audience |
-| `get_audience_leads` | Leads in an audience (name, company, title, email, LinkedIn) |
-| `create_audience_from_linkedin_url` | Build an audience from a LinkedIn / Sales Navigator search or a post's engagers |
+| `get_campaign_messages` | The message sequence of a campaign, with its editable source |
 | `get_campaign_steps` | The steps of a campaign sequence — channel, order, whether a message is attached |
+
+**Campaigns — build & edit**
+
+| Tool | What it does |
+|---|---|
 | `duplicate_campaign` | Copy a campaign into an editable draft, without launching it |
 | `add_campaign_step_message` | Write the message for an empty campaign step |
 | `edit_campaign_message` | Rewrite a campaign step's message |
-| `get_linkedin_post` | Read a LinkedIn post's content and engagement from its URL |
+| `rename_campaign` | Rename a campaign (the name must be unique) |
+| `set_campaign_audience` | Assign or change the audience of a campaign that hasn't started yet |
+| `set_campaign_auto_enrich` | Turn auto-enrichment of a campaign's leads on or off |
+| `set_campaign_out_of_office` | Turn out-of-office auto-rescheduling on or off |
+| `set_campaign_crm_sync` | Turn HubSpot / Pipedrive sync on or off (campaign must be paused) |
+| `set_campaign_skip_rules` | Turn the "skip already contacted" rule on or off |
+
+**Audiences & leads**
+
+| Tool | What it does |
+|---|---|
+| `list_audiences` | Every audience with id, name and lead count — how you resolve an audience id by name |
+| `get_audience` | Details and import status of an audience |
+| `get_audience_leads` | Leads in an audience, full record (contact, company, enrichment status, custom attributes) |
+| `create_audience_from_linkedin_url` | Build an audience from a LinkedIn / Sales Navigator search, a post's engagers or an event's attendees |
+| `create_lead` | Create or update a lead and attach it to an audience |
+| `enrich_lead` | Find a lead's pro email and/or refresh their LinkedIn fields — spends credits, confirms the cost first |
+| `get_enrich_result` | Poll the result of an enrichment request |
+| `get_credits` | Your credit balance — check it before enriching |
 
 **Leads & conversations**
 
@@ -206,12 +228,27 @@ The MCP exposes your La Growth Machine workspace to Claude. The skills above orc
 | `snooze_conversation` / `unsnooze_conversation` | Snooze a conversation until later |
 | `archive_conversation` / `unarchive_conversation` | Archive or restore a conversation |
 
-**Account**
+**Account & workspace**
 
 | Tool | What it does |
 |---|---|
 | `list_identities` | Your connected LinkedIn / email identities |
 | `list_members` | The members of your LGM account |
+| `list_workspaces` | The workspaces you can act in, when your account spans several |
+| `save_identity_preference` | Save tone, language or style preferences for an identity's AI-generated content |
+
+**LinkedIn**
+
+| Tool | What it does |
+|---|---|
+| `get_linkedin_post` | Read a LinkedIn post's content and engagement from its URL |
+
+**Analytics (BigQuery)**
+
+| Tool | What it does |
+|---|---|
+| `ask_your_outbound` | Run a read-only SQL query over your outbound activity logs in BigQuery — funnels, reply times, per-step rates |
+| `get_bigquery_logs_guide` | The logs schema, verified metric definitions and example queries — read it before querying |
 
 **→ [Try La Growth Machine free](https://app.lagrowthmachine.com/register/?utm_source=github&utm_medium=readme&utm_campaign=github-gtm-skills-library&utm_content=github-gtm-skills-library-readme)**
 
