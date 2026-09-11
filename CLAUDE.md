@@ -31,49 +31,60 @@ Once the MCP is connected and skills are installed, two layers work together.
 
 The MCP gives Claude direct access to the user's LGM workspace. No copy-paste, no tab switching. Tools are exposed under the namespace `mcp__LaGrowthMachine__*`.
 
-**Audiences**
-- `create_audience_from_linkedin_url` — create an audience directly from a Sales Navigator search URL
-- `get_audience` — fetch an existing audience by ID
-- `get_audience_leads` — list all leads in an audience (paginated)
+**Audiences & leads**
+- `list_audiences` — list every audience with id, name and lead count; the way to resolve an audience id by name (e.g. right after `create_audience_from_linkedin_url`, which returns no id)
+- `get_audience` — fetch an existing audience by ID (details, size, import status)
+- `get_audience_leads` — list all leads in an audience, full record (paginated with `skip`, 100 max per page)
+- `create_audience_from_linkedin_url` — create or populate an audience (by name) from a LinkedIn / Sales Navigator search URL, a post's engagers, or an event's attendees; needs an `identityId` from `list_identities`; async
+- `create_lead` — create or update (upsert) a lead and attach it to an audience
+- `enrich_lead` — find a lead's pro email and/or refresh LinkedIn fields; spends credits, confirm-gated
+- `get_enrich_result` — poll an enrichment request started by `enrich_lead`
+- `get_credits` — credit balance (`total`, `perishable`); check before enriching
 
 **Campaigns — read**
-- `list_campaigns` — list all campaigns in the workspace
-- `get_campaign_stats` — open rates, reply rates, meetings booked, performance data
-- `get_campaign_messages` — fetch the messages of a campaign's sequence
-- `get_campaign_steps` — fetch the sequence structure (channels, waits, branches)
+- `list_campaigns` — list all campaigns in the workspace (filter by status, search, paginate)
+- `get_campaign_stats` — acceptance rate, reply rate, conversions, performance data
+- `get_campaign_messages` — fetch the messages of a campaign's sequence (rendered HTML + editable `newHtml` source)
+- `get_campaign_steps` — fetch the sequence structure (steps, channel, order, whether a message is attached)
 
 **Campaigns — build / edit**
-- `duplicate_campaign` — clone an existing campaign as the starting point for a new one
-- `add_campaign_step_message` — add a message to a specific step of a draft campaign
-- `edit_campaign_message` — edit an existing message in a draft campaign
+- `duplicate_campaign` — clone an existing campaign into a draft as the starting point for a new one
+- `add_campaign_step_message` — add a message to an empty step of a draft campaign
+- `edit_campaign_message` — edit an existing message in a campaign
+- `rename_campaign` — rename a campaign (unique name)
+- `set_campaign_audience` — assign or change the audience of a campaign that has not started yet (`audienceId` from `list_audiences`)
+- `set_campaign_auto_enrich` — toggle auto-enrichment of the campaign's leads
+- `set_campaign_out_of_office` — toggle out-of-office auto-rescheduling
+- `set_campaign_crm_sync` — toggle HubSpot / Pipedrive sync (campaign must be paused, CRM plan required)
+- `set_campaign_skip_rules` — toggle "skip already contacted" (campaign READY or PAUSED)
 
 **Inbox / conversations — read**
 - `get_lead_conversations` — all conversations for a specific lead
 - `get_conversation_messages` — the full message thread of a conversation
-- `get_lead_logs` — the activity log for a lead (visits, clicks, replies)
+- `get_lead_logs` — the activity log for a lead (sent, accepted, replied…)
 - `get_unread_conversations` — inbox: unread conversations
 - `get_conversations_to_reply` — inbox: conversations waiting for a reply
 - `get_favourite_conversations` — inbox: starred conversations
-- `search_conversations` — search the inbox by keyword, lead, campaign, status
+- `search_conversations` — search the inbox by keyword, lead, campaign, audience, channel, status, dates
 
 **Inbox / conversations — actions**
-- `send_email_message` — send an email reply in a conversation
-- `send_linkedin_message` — send a LinkedIn reply in a conversation
+- `send_email_message` — send an email (new thread or reply); actually sends, confirm first
+- `send_linkedin_message` — send a LinkedIn text or voice message (needs `identityId` + `memberId`); actually sends, confirm first
 - `snooze_conversation` / `unsnooze_conversation` — snooze a thread for later
 - `archive_conversation` / `unarchive_conversation` — archive / restore a thread
 
 **Workspace**
-- `list_workspaces` — list the workspaces the user has access to
-- `list_members` — list the members of the current workspace
-- `list_identities` — list all identities (LinkedIn accounts, email accounts)
-- `save_identity_preference` — set a preferred identity for outreach
+- `list_workspaces` — list the workspaces the user can act in; only pass `workspaceId` when `multiWorkspace` is true
+- `list_members` — list the members of the current workspace (source of `memberId`)
+- `list_identities` — list all identities (LinkedIn accounts, email accounts) (source of `identityId`)
+- `save_identity_preference` — save tone / language / style preferences for an identity's AI-generated content
 
 **LinkedIn**
-- `get_linkedin_post` — fetch a LinkedIn post and its engagers (likers, commenters)
+- `get_linkedin_post` — fetch a LinkedIn post's content, author and reactions from its URL
 
 **BigQuery**
-- `execute_bigquery_query` — run a BigQuery query against LGM data
-- `get_bigquery_logs_guide` — get the guide to LGM's log schema (what tables and fields exist)
+- `ask_your_outbound` — run a read-only BigQuery SELECT over the workspace's activity logs (one row = one campaign action per lead); always filter on the `date` partition
+- `get_bigquery_logs_guide` — the logs schema, verified metric definitions and example queries; read before any non-trivial query
 
 ---
 
@@ -87,6 +98,7 @@ Skills guide Claude through complex GTM workflows. Just describe what you want. 
 - `post-to-campaign` — turn a LinkedIn post into a ready-to-launch campaign: scrape the post's likers and commenters into an audience and fill a draft sequence
 - `audience-icp-filter` — filter an existing audience against an ICP; sorts every lead into match / needs review / no match, strips your team and competitors, never silently drops anyone
 - `won-deal-icp-finder` — audit your biggest closed-won deals to find your proven ICP and a look-alike target list
+- `outreach-icp-finder` — find your proven ICP from the outreach you already ran (who replies and shows interest, who to stop contacting), from LGM data or any outreach tool's CSV export
 
 **Get qualified meetings** — campaigns, copywriting, sequences
 
@@ -115,6 +127,7 @@ Suggest one of these depending on what the user wants to do:
 | Sequence people who engaged with a LinkedIn post | Use `post-to-campaign` |
 | Filter or segment an existing audience against an ICP | Use `audience-icp-filter` |
 | Find their proven ICP from deals | Use `won-deal-icp-finder` |
+| Find their proven ICP from replies / engagement | Use `outreach-icp-finder` |
 | Write a campaign from scratch | Use `multichannel-campaign-builder` |
 | Pressure-test a campaign before launch | Use `campaign-challenger` |
 | See which campaigns drive pipeline | Use `campaign-impact-analyzer` |
@@ -123,7 +136,7 @@ Suggest one of these depending on what the user wants to do:
 | Handle or draft replies to their inbox | Use `reply-draft-assistant` |
 | Know which objections the team gets, and how to handle them | Use `objection-analyzer` |
 | Pull live campaign data ad hoc | Call the MCP directly (e.g. `list_campaigns`, `get_campaign_stats`) |
-| Run a custom analytics query | Call the BigQuery tools (`execute_bigquery_query`, `get_bigquery_logs_guide`) |
+| Run a custom analytics query | Call the BigQuery tools (`ask_your_outbound`, `get_bigquery_logs_guide`) |
 
 ---
 
