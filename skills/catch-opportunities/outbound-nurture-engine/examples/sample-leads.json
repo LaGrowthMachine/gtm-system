@@ -1,0 +1,80 @@
+[
+  {
+    "lead_id": "lead-0001",
+    "name": "Sam Rivera",
+    "situation": "not_now",
+    "pains": ["reply handling", "no time for follow-ups"],
+    "persona": "founder",
+    "industry": "marketing agency",
+    "company_size": "11-50",
+    "language": "en",
+    "return_condition": "October",
+    "already_sent": [],
+    "last_received_at": "2026-08-28",
+    "last_sent_at": "2026-08-29"
+  },
+  {
+    "lead_id": "lead-0002",
+    "name": "Priya Natarajan",
+    "situation": "vague",
+    "pains": ["positive reply rate"],
+    "persona": "revops",
+    "industry": "saas",
+    "company_size": "201-1000",
+    "language": "en",
+    "already_sent": [],
+    "last_received_at": "2026-09-02",
+    "last_sent_at": "2026-09-03"
+  },
+  {
+    "lead_id": "lead-0003",
+    "name": "Jonas Weber",
+    "pains": ["campaign setup"],
+    "persona": "growth",
+    "industry": "logistics",
+    "company_size": "51-200",
+    "language": "en",
+    "already_sent": [],
+    "last_received_at": "2026-08-18",
+    "last_sent_at": "2026-08-20"
+  },
+  {
+    "lead_id": "lead-0004",
+    "name": "Camille Roux",
+    "situation": "not_now",
+    "pains": ["relances"],
+    "persona": "founder",
+    "industry": "consulting",
+    "company_size": "1-10",
+    "language": "fr",
+    "return_condition": "après la rentrée",
+    "already_sent": [],
+    "last_received_at": "2026-07-30",
+    "last_sent_at": "2026-07-31"
+  },
+  {
+    "lead_id": "lead-0005",
+    "name": "Ana Costa",
+    "situation": "vague",
+    "pains": ["hiring sdrs"],
+    "persona": "sales",
+    "industry": "fintech",
+    "company_size": "51-200",
+    "language": "en",
+    "already_sent": [],
+    "last_received_at": "2026-09-05",
+    "last_sent_at": "2026-09-05"
+  },
+  {
+    "lead_id": "lead-0006",
+    "name": "Tom Aldridge",
+    "pains": ["reply handling"],
+    "persona": "sales",
+    "industry": "saas",
+    "company_size": "51-200",
+    "language": "en",
+    "already_sent": [],
+    "last_received_at": "2026-09-09",
+    "last_sent_at": "2026-09-01"
+  }
+]

@@ -48,6 +48,7 @@ Reply handling, intent detection — not letting opportunities go cold.
 |---|---|---|
 | [reply-draft-assistant](skills/catch-opportunities/reply-draft-assistant/SKILL.md) | use-case | Triage your inbox or a campaign's replies, draft the right answer from the full thread, and send it in LGM on your approval |
 | [objection-analyzer](skills/catch-opportunities/objection-analyzer/SKILL.md) | use-case | Rank the objections your outbound actually gets, grade how your team handled each one, and build a battle-card playbook that sharpens every run |
+| [outbound-nurture-engine](skills/catch-opportunities/outbound-nurture-engine/SKILL.md) | use-case | Nurture the replies you did not convert yet (not now, vague, went quiet): match each lead with your own content, write it onto the lead, and fill a 6-week nurture campaign in LGM |
 
 ### Secure my channels
 Channel health, deliverability, identities — protecting the outbound engine.
