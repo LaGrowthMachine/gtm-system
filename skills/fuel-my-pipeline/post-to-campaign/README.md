@@ -57,7 +57,7 @@ Then ask Claude, e.g. *"Contact the people who liked and commented on this post:
 A few things sit just outside the skill, with a clear next step for each:
 
 - **Attaching the audience to the campaign, and launching** — the MCP exposes no tool for either, so you do these two clicks in the app once the draft is ready.
-- **Per-lead custom attributes** — the skill personalizes with standard scraped fields (first name, company, job title). To personalize on custom attributes as well, write them per lead through the La Growth Machine API: see the [API documentation](https://documenter.getpostman.com/view/32966764/2sBXqFM2Vv).
+- **Per-lead custom attributes** — the skill personalizes with standard scraped fields (first name, company, job title). To personalize on custom attributes as well, write them per lead through the La Growth Machine API: see the [API documentation](https://lagrowthmachine.com/api).
 - **Building a campaign structure from scratch** — the skill duplicates an existing shape or asks you to create one; it does not invent steps, channels or delays.
 
 ## Who it's for
