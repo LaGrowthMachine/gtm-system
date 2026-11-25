@@ -1,6 +1,6 @@
 ---
 name: won-deal-icp-finder
-description: "Audit your biggest closed-won deals to find your PROVEN ideal customer profile, then find more accounts like them. Use whenever someone wants to analyze won deals, audit their best customers, see which companies generated the most revenue, find their real ICP, build a look-alike target list, segment customers by what actually pays, or learn which acquisition channel produced their best revenue. Triggers on: 'audit my biggest deals', 'which customers made us the most money', 'analyze my closed-won', 'what's my proven ICP', 'find more customers like my best ones', 'look-alike accounts', 'HubSpot deal analysis', 'revenue by account', 'which channel generated my best deals', 'acquisition source analysis'. For RevOps, Heads of Sales/Marketing, founders and growth leads doing ICP refinement, account-based targeting or pipeline/QBR review. Reads HubSpot via its MCP or a CSV export, then hands the profile to sales-nav-search-builder to generate the prospecting search. Maintained by La Growth Machine."
+description: "Audit your biggest closed-won deals to find your PROVEN ideal customer profile, then find more accounts like them. Use whenever someone wants to analyze won deals, audit their best customers, see which companies generated the most revenue, find their real ICP, build a look-alike target list, segment customers by what actually pays, or learn which acquisition channel produced their best revenue. Triggers on: 'audit my biggest deals', 'which customers made us the most money', 'analyze my closed-won', 'what's my proven ICP', 'find more customers like my best ones', 'look-alike accounts', 'HubSpot deal analysis', 'revenue by account', 'which channel generated my best deals', 'acquisition source analysis'. For RevOps, Heads of Sales/Marketing, founders and growth leads doing ICP refinement, account-based targeting or pipeline/QBR review. Reads HubSpot via its MCP or a CSV export, then turns the profile into a prospecting search (the Sourcing Agent builds it when installed). Maintained by La Growth Machine."
 category: fuel-my-pipeline
 type: use-case
 tags: [analysis, extrapolating]
@@ -28,7 +28,7 @@ The job, in four moves:
 
 1. **Pull and rank** won deals from the last 12 months — selected by **deal value**, not by a closed-won status that may not exist in this CRM — with their companies, ranked by deal size.
 2. **Locate acquisition source.** Where the source lives varies by HubSpot setup — inspect a sample deal + its company + contact to find the right field (standard or custom), then read it for all deals.
-3. **Cluster into ICP archetypes** — 2–4 named, criteria-based company profiles, each with a one-click "find more like this" via `sales-nav-search-builder`.
+3. **Cluster into ICP archetypes** — 2–4 named, criteria-based company profiles, each with a one-click "find more like this" (the Sourcing Agent when installed, a short search otherwise).
 4. **Rank the acquisition sources** behind these big deals (top 5 + values), and — when there's no campaign-level detail — flag the blind spot.
 
 ## Workflow
@@ -103,7 +103,7 @@ State which field carried acquisition source (and on which object), and the `sou
 
 ### Step 3 — ICP archetypes (one widget each, with a "find more")
 
-For **each** archetype: **one** short lead-in line (≤1 sentence — no paragraph), then a `visualize:show_widget` card. **Interleave** — never stack widgets back-to-back. The card carries the criteria read-only plus one button that finds more like it via `sales-nav-search-builder`. The criteria belong in the card; don't also describe them in prose.
+For **each** archetype: **one** short lead-in line (≤1 sentence — no paragraph), then a `visualize:show_widget` card. **Interleave** — never stack widgets back-to-back. The card carries the criteria read-only plus one button that finds more like it (the Sourcing Agent when installed, a short search otherwise). The criteria belong in the card; don't also describe them in prose.
 
 Per archetype, call `visualize:show_widget` with `title` like `icp_archetype_fintech_midmarket`, 1–2 short `loading_messages`, and this template. Fill `{BADGE}` (A/B/C…), `{ARCHETYPE_TITLE}`, `{ARCHETYPE_SUMMARY}` (one line), the `{RECAP_ROWS}`, and `{ARCHETYPE_CRITERIA}` (single-line, inside the button's prompt). Drop any row whose dimension the data didn't carry; mark inferred personas with the muted `(inferred)` span:
 
@@ -122,7 +122,7 @@ Per archetype, call `visualize:show_widget` with `title` like `icp_archetype_fin
     <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding:10px 14px; margin-bottom:14px;">
       <table style="width:100%; font-size:13px; border-collapse:collapse;">{RECAP_ROWS}</table>
     </div>
-    <button style="width:100%; padding:11px 16px; background: var(--color-text-primary); color: var(--color-background-primary); border:none; border-radius: var(--border-radius-md); font-size:14px; font-weight:500; cursor:pointer;" onclick="sendPrompt('Use the sales-nav-search-builder skill to build a LinkedIn Sales Navigator search for this ICP archetype: {ARCHETYPE_CRITERIA}')">Find more companies like this ↗</button>
+    <button style="width:100%; padding:11px 16px; background: var(--color-text-primary); color: var(--color-background-primary); border:none; border-radius: var(--border-radius-md); font-size:14px; font-weight:500; cursor:pointer;" onclick="sendPrompt('Find more people like this ICP archetype: build the LinkedIn Sales Navigator search (with the sourcing-agent skill if it is installed): {ARCHETYPE_CRITERIA}')">Find more companies like this ↗</button>
   </div>
 </div>
 ```
@@ -134,9 +134,13 @@ Per archetype, call `visualize:show_widget` with `title` like `icp_archetype_fin
   For the persona row, append `<span style="color:var(--color-text-tertiary);">(inferred)</span>` when it isn't CRM-confirmed.
 - **`{ARCHETYPE_CRITERIA}`** — single-line restatement the button feeds to the search (e.g. `B2B SaaS and AI companies, 10-250 employees, US and Western Europe, targeting Growth/RevOps/Founder`).
 
-The button routes to **`sales-nav-search-builder`** (sibling skill, maintained by La Growth Machine) which returns a validated Sales Navigator search. After the last archetype, add one line: *if that skill isn't installed yet, it's in the GTM System catalog.* Translate titles/labels/lead-ins to the user's language; the `sendPrompt` payload stays English.
+**Who builds the search.** If the `sourcing-agent` skill is installed, the button hands the archetype to it: it builds
+the Sales Navigator search and, with the La Growth Machine MCP, the audience. If it is not installed, build the
+search here in a short form: the Sales Navigator filters to set by hand (industry, headcount, geography, seniority,
+function) and a boolean title query, as a short list the user applies in Sales Navigator. Say once that the
+Sourcing Agent does it end to end (`npx skills add LaGrowthMachine/gtm-system/agents/sourcing-agent`). Translate titles/labels/lead-ins to the user's language; the `sendPrompt` payload stays English.
 
-**Fallback if the visualizer is unavailable.** If `visualize:show_widget` fails, render each archetype as a **compact** Markdown block — title, the same criteria as bullet-free lines, and the criteria as a one-line `code` string the user can paste into `sales-nav-search-builder`. Keep it tight: no extra prose, no per-archetype essay.
+**Fallback if the visualizer is unavailable.** If `visualize:show_widget` fails, render each archetype as a **compact** Markdown block — title, the same criteria as bullet-free lines, and the criteria as a one-line `code` string the user can paste into the Sourcing Agent or apply in Sales Navigator. Keep it tight: no extra prose, no per-archetype essay.
 
 ### Step 4 — Acquisition sources + the conditional La Growth Machine note
 

@@ -74,7 +74,7 @@ curl -fsSL https://raw.githubusercontent.com/LaGrowthMachine/gtm-system/main/ins
 
 This installs:
 
-- **The GTM skills** — for Claude Code, Cursor, and Codex (via the [Vercel Labs `skills`](https://github.com/vercel-labs/skills) CLI under the hood)
+- **The GTM agents and skills** — for Claude Code, Cursor, and Codex (`skills.sh.json` points the installer to `agents/`; the skills inside an agent install with it, never on their own) (via the [Vercel Labs `skills`](https://github.com/vercel-labs/skills) CLI under the hood)
 - **The LGM MCP** — registered with Claude Code via `claude mcp add --scope user --transport http` (user scope → config stored in `~/.claude.json`, available in every project). No API key to copy: on first use a browser tab opens to sign in to La Growth Machine (OAuth). New to LGM? You can create a free account from that tab.
 
 The script is idempotent — re-running it is safe. Want to review before running?

@@ -31,7 +31,7 @@ When you run this skill, **return only the deliverables, nothing else.** No prea
 4. **Write** one ready-to-insert sentence per content onto the lead (custom attributes) and add the lead to the wave's audience.
 5. **Duplicate** the nurture template campaign, fill its three messages with the lead variables, assign the audience. The user launches it in La Growth Machine.
 
-Out of scope, handed to sibling skills: a lead who spoke last and awaits an answer → `reply-draft-assistant`; a firm "not interested" or an unsubscribe → nothing; objection patterns across the inbox → `objection-analyzer`.
+Out of scope, handed to sibling skills: a lead who spoke last and awaits an answer → a reply, not nurture (the `performance-agent` drafts it when installed, otherwise list it for the user to answer in the La Growth Machine inbox); a firm "not interested" or an unsubscribe → nothing; objection patterns across the inbox → the objection playbook of the `performance-agent` when installed.
 
 ## Workflow
 
@@ -112,7 +112,7 @@ See *Output & LGM handoff* below. Nothing is written before approval.
 2. `duplicate_campaign(campaignId of the nurture template)` → `rename_campaign` to the wave's name → `get_campaign_steps` on the copy → `add_campaign_step_message` for each empty step with the `newhtml` output (or `edit_campaign_message` if the template already carries messages) → `list_audiences` to resolve the wave's audience id → `set_campaign_audience`.
 3. Tell the user to review and launch the campaign in the app. There is no launch tool, on purpose.
 
-Leads who reply during the wave leave the sequence on the La Growth Machine side and come back to the inbox: `reply-draft-assistant` handles them from there.
+Leads who reply during the wave leave the sequence on the La Growth Machine side and come back to the inbox: they are answered from there (by the `performance-agent` when installed, or by the user).
 
 ## The nurture template campaign
 
@@ -137,7 +137,7 @@ The deliverable is the wave: the leads, their contents, the sentences on each le
 One framing line in the user's language, e.g. `Here is the nurture wave: 23 leads, 3 contents each, one campaign to launch. Review before I write it into La Growth Machine.`
 
 1. **The lead table** (Markdown, read-only): name · situation · pain in 3 words · content 1 / 2 / 3 (titles) · score flag (`weak` when a generic fallback was used).
-2. **Excluded leads**, one line each with the reason (awaiting reply → "handled by reply-draft-assistant", too recent, unlabeled).
+2. **Excluded leads**, one line each with the reason (awaiting reply → "to answer in the inbox", too recent, unlabeled).
 3. **The sentences**, grouped per lead, each in its own fenced code block (this is what lands in the custom attribute; the user may edit before approval):
    ```
    our playbook on not-now replies, it covers the timing point you raised: https://example.com/playbooks/not-now

@@ -40,7 +40,7 @@ cp -r skills/fuel-my-pipeline/outreach-icp-finder ~/.claude/skills/
 
 Then ask Claude — e.g. *"Here's my lemlist export from the last 4 months — who actually replies, and who should I stop contacting?"* or, with the La Growth Machine MCP connected, *"Analyze my campaigns since March and tell me my real ICP."*
 
-**Prerequisites:** [Claude Code](https://claude.com/product/claude-code) (or any other supported agent) and Python 3 for the analysis engine. For the "find more like this" button, install the sibling skill [`sales-nav-search-builder`](../sales-nav-search-builder/README.md).
+**Prerequisites:** [Claude Code](https://claude.com/product/claude-code) (or any other supported agent) and Python 3 for the analysis engine. For the "find more like this" button, the [Sourcing Agent](../../../agents/sourcing-agent/SKILL.md) is optional: without it, the skill gives the search filters to apply by hand.
 
 ## What's supported
 
@@ -48,13 +48,13 @@ Then ask Claude — e.g. *"Here's my lemlist export from the last 4 months — w
 - **Job-title normalization** — 8 seniority levels (Owner / Founder, C-level, VP, Director / Head, Manager / Lead, Senior IC, Individual contributor, Entry) and 12 functions (Sales, Marketing / Growth, RevOps / GTM Ops, General management, Product, Engineering / Data, Finance, People / HR, Customer Success, Consulting, Operations, Legal), EN/FR/DE title patterns, editable in `references/title-taxonomy.json`.
 - **Reply labeling** — a fixed five-label vocabulary (POSITIVE, NOT_NOW, NEGATIVE, OOO, OTHER); tool-native labels ("Interested", "Not interested", "Meeting booked", "Pas intéressé"…) are normalized automatically.
 - **Statistically guarded engine** (`scripts/analyze.py`) — Wilson 95% intervals, lift vs baseline, minimum-volume pooling (30 contacted leads per segment by default), campaign-confounding detection with a stratified lift, 2-D crosstabs, attribute-coverage reporting, and explicit refusals when the data is too thin (fewer than 100 contacted leads or 20 replies). Ships a regression suite (`--test`).
-- **Actionable output** — 2–3 ICP archetypes as cards with a "find more people like this" button (routes to `sales-nav-search-builder`), a "stop contacting" list, and the data gaps that limit the profile.
+- **Actionable output** — 2–3 ICP archetypes as cards with a "find more people like this" button (the Sourcing Agent when installed, a short search otherwise), a "stop contacting" list, and the data gaps that limit the profile.
 
 ## What's not supported
 
 - Revenue-based ICP (which customers *paid* the most) — that's the sibling skill [`won-deal-icp-finder`](../won-deal-icp-finder/README.md). This one is about engagement upstream of the deal.
 - Company-size data when the source doesn't carry it (LinkedIn-only tools and La Growth Machine lead records don't) — the dimension is skipped and reported as a gap.
-- Message-level A/B analysis (which copy performs) — see `campaign-challenger` and `campaign-impact-analyzer`.
+- Message-level A/B analysis (which copy performs) — see the Performance Agent (`agents/performance-agent`) and `campaign-impact-analyzer`.
 - Automatic reply labeling at scale: labeling is done on a bounded sample (typically up to 120–150 replies) so the run stays fast; unlabeled replies still count as replies.
 
 ## Who it's for
@@ -78,7 +78,7 @@ Then ask Claude — e.g. *"Here's my lemlist export from the last 4 months — w
 This skill runs standalone with any stack. It also plugs into:
 
 - **La Growth Machine MCP** — pulls campaign outcomes per lead from your workspace's activity logs, hydrates lead attributes from your audiences, labels a sample of real reply threads, and, once the profile is built, turns an archetype into a ready-to-use audience in one click.
-- **`sales-nav-search-builder`** (sibling skill) — each archetype's "find more like this" button builds the matching LinkedIn Sales Navigator search.
+- **Sourcing Agent** (`agents/sourcing-agent`, optional) — each archetype's "find more like this" builds the Sales Navigator search and the audience. Without it, the skill gives the search filters to apply by hand.
 - **`won-deal-icp-finder`** (sibling skill) — cross-check the engagement ICP against the revenue ICP from your CRM.
 
 ## Stay in the loop

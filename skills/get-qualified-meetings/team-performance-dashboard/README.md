@@ -51,9 +51,9 @@ Or add just the ones you want:
 
 | Companion skill | Powers | Install |
 |---|---|---|
-| `campaign-challenger` | the **Improve reply / conversion rate** buttons | `npx skills add LaGrowthMachine/gtm-system/skills/get-qualified-meetings/campaign-challenger` |
+| `performance-agent` | the **Improve reply / conversion rate** buttons | `npx skills add LaGrowthMachine/gtm-system/agents/performance-agent` |
 | `campaign-impact-analyzer` | the optional **value / € layer** (with a CRM MCP) | `npx skills add LaGrowthMachine/gtm-system/skills/get-qualified-meetings/campaign-impact-analyzer` |
-| `sales-nav-search-builder` | targeting / low-acceptance fixes | `npx skills add LaGrowthMachine/gtm-system/skills/fuel-my-pipeline/sales-nav-search-builder` |
+| `sourcing-agent` | targeting / low-acceptance fixes | `npx skills add LaGrowthMachine/gtm-system/agents/sourcing-agent` |
 | `won-deal-icp-finder` | list-quality / bounce fixes | `npx skills add LaGrowthMachine/gtm-system/skills/fuel-my-pipeline/won-deal-icp-finder` |
 
 Everything is optional. Without a companion, its button falls back to a copy-paste prompt that includes the download link — nothing breaks.
@@ -96,8 +96,8 @@ This skill needs the La Growth Machine MCP to run. It also plugs into:
 
 - **La Growth Machine MCP** — pulls every rep's campaigns, stats and inbox live (required).
 - **`campaign-impact-analyzer`** (+ a CRM MCP) — powers the value/€ layer.
-- **`campaign-challenger`** — the "Improve reply / conversion rate" buttons hand the flagged campaign + diagnosis straight to it.
-- **`sales-nav-search-builder` / `won-deal-icp-finder`** — targeting and list-quality fixes.
+- **Performance Agent** — the "Improve reply / conversion rate" buttons hand the flagged campaign + diagnosis straight to it.
+- **Sourcing Agent / `won-deal-icp-finder`** — targeting and list-quality fixes.
 
 ## Stay in the loop
 

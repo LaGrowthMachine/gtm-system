@@ -182,7 +182,7 @@ def infer_situation(lead, today, ghost_days):
     lr, ls = _parse_date(lead.get("last_received_at")), _parse_date(lead.get("last_sent_at"))
     if lr and ls:
         if lr > ls:
-            return None, "awaiting_reply"       # the lead spoke last → reply-draft-assistant, not nurture
+            return None, "awaiting_reply"       # the lead spoke last → a reply to write, not nurture
         # ghost_days is the silence after your last message. When the template campaign opens with a
         # long wait (e.g. 42 days), pass a small value: the wait itself provides the distance.
         if (today - ls).days >= ghost_days:

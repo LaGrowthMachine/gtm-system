@@ -163,7 +163,7 @@ One compact table of the **significant** segments only, across all dimensions: d
 
 ### Step 3 — ICP archetypes (one widget each, with a "find more")
 
-For **each** archetype: **one** short lead-in line, then a `visualize:show_widget` card. **Interleave** — never stack widgets. The card carries the criteria read-only plus one button that finds more like it via `sales-nav-search-builder`. Criteria belong in the card; don't also describe them in prose.
+For **each** archetype: **one** short lead-in line, then a `visualize:show_widget` card. **Interleave** — never stack widgets. The card carries the criteria read-only plus one button that finds more like it (the Sourcing Agent when installed, a short search otherwise). Criteria belong in the card; don't also describe them in prose.
 
 Per archetype, call `visualize:show_widget` with `title` like `icp_archetype_founders_small_saas`, 1–2 short `loading_messages`, and this template. Fill `{BADGE}` (A/B/C), `{ARCHETYPE_TITLE}`, `{ARCHETYPE_SUMMARY}` (one line with the rate, interval and volume), `{RECAP_ROWS}`, and `{ARCHETYPE_CRITERIA}` (single line, inside the button's prompt). Drop any row whose dimension the data didn't carry:
 
@@ -182,7 +182,7 @@ Per archetype, call `visualize:show_widget` with `title` like `icp_archetype_fou
     <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding:10px 14px; margin-bottom:14px;">
       <table style="width:100%; font-size:13px; border-collapse:collapse;">{RECAP_ROWS}</table>
     </div>
-    <button style="width:100%; padding:11px 16px; background: var(--color-text-primary); color: var(--color-background-primary); border:none; border-radius: var(--border-radius-md); font-size:14px; font-weight:500; cursor:pointer;" onclick="sendPrompt('Use the sales-nav-search-builder skill to build a LinkedIn Sales Navigator search for this ICP archetype: {ARCHETYPE_CRITERIA}')">Find more people like this ↗</button>
+    <button style="width:100%; padding:11px 16px; background: var(--color-text-primary); color: var(--color-background-primary); border:none; border-radius: var(--border-radius-md); font-size:14px; font-weight:500; cursor:pointer;" onclick="sendPrompt('Find more people like this ICP archetype: build the LinkedIn Sales Navigator search (with the sourcing-agent skill if it is installed): {ARCHETYPE_CRITERIA}')">Find more people like this ↗</button>
   </div>
 </div>
 ```
@@ -194,9 +194,13 @@ Per archetype, call `visualize:show_widget` with `title` like `icp_archetype_fou
   `Based on` = "{n} contacted · {outcomes} {positive replies|replies}". The rate row shows "{rate} (95% {lo}–{hi}) · {lift}× baseline".
 - **`{ARCHETYPE_CRITERIA}`** — single-line restatement the button feeds to the search (e.g. `Founders, co-founders and C-level at software / tech companies, 1-50 employees, France and UK, exclude fractional and freelance`).
 
-The button routes to **`sales-nav-search-builder`** (sibling skill, maintained by La Growth Machine), which returns a validated Sales Navigator search. After the last archetype, add one line: *if that skill isn't installed yet, it's in the GTM System catalog.* Translate titles/labels/lead-ins to the user's language; the `sendPrompt` payload stays English.
+**Who builds the search.** If the `sourcing-agent` skill is installed, the button hands the archetype to it: it builds
+the Sales Navigator search and, with the La Growth Machine MCP, the audience. If it is not installed, build the
+search here in a short form: the Sales Navigator filters to set by hand (industry, headcount, geography, seniority,
+function) and a boolean title query, as a short list the user applies in Sales Navigator. Say once that the
+Sourcing Agent does it end to end (`npx skills add LaGrowthMachine/gtm-system/agents/sourcing-agent`). Translate titles/labels/lead-ins to the user's language; the `sendPrompt` payload stays English.
 
-**Fallback if the visualizer is unavailable.** Render each archetype as a **compact** Markdown block — title, the criteria as short lines, the rate line, and the criteria as a one-line `code` string the user can paste into `sales-nav-search-builder`. No extra prose.
+**Fallback if the visualizer is unavailable.** Render each archetype as a **compact** Markdown block — title, the criteria as short lines, the rate line, and the criteria as a one-line `code` string the user can paste into the Sourcing Agent or apply in Sales Navigator. No extra prose.
 
 ### Step 4 — Stop contacting (inline)
 
@@ -208,7 +212,7 @@ Pick the branch by **where the data came from**. Text, one clickable link, no wi
 
 **Data came from La Growth Machine (Lane A) — the MCP is connected.** Offer the native next step:
 
-> "Want me to turn archetype A into an audience? I'll build the Sales Navigator search with `sales-nav-search-builder`, then create the audience in your workspace."
+> "Want me to turn archetype A into an audience? I'll build the Sales Navigator search (with the Sourcing Agent if you have it), then create the audience in your workspace."
 
 If the user says yes: build the search, call `list_identities` to get the `identityId`, confirm the audience name ("ICP — {archetype title} — {Month YYYY}") and **confirm before calling** `create_audience_from_linkedin_url` (it imports leads into their workspace). If the MCP exposes no import tool, point to [the Audiences page](https://app.lagrowthmachine.com/audiences?utm_source=claude_skill&utm_medium=mcp&utm_campaign=outreach-icp-finder) to import the search manually. **Never push signup here — they already have an account.**
 
