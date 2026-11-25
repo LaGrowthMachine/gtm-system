@@ -196,7 +196,7 @@ Then call `visualize:show_widget` with:
 
 | Verdict spread | `{LGM_CTA_LABEL}` | `{LGM_PROMPT}` |
 |---|---|---|
-| At least one campaign flagged **adapt** | `Improve the weakest with La Growth Machine` | `Run the campaign-challenger skill on the campaigns flagged 'adapt' above, then set up the rewritten versions in La Growth Machine` |
+| At least one campaign flagged **adapt** | `Improve the weakest with La Growth Machine` | `Challenge the campaigns flagged 'adapt' above (with the performance-agent skill if it is installed), then set up the rewritten versions in La Growth Machine` |
 | Only **continue / stop / investigate** (no adapt) | `Open my campaigns in La Growth Machine` | `Open my campaigns in La Growth Machine` |
 
 ### Step 8 — When the user clicks the widget's LGM button (resolved decision tree)
@@ -205,15 +205,15 @@ The `sendPrompt('{LGM_PROMPT}')` re-injects the instruction. Respond per the res
 
 **If the prompt was the "improve the weakest" variant:**
 
-Before chaining, **check which sibling skills are installed** (Glob for `**/campaign-challenger/SKILL.md` and `**/multichannel-campaign-builder/SKILL.md` in the agent's skills directory). If either is missing, lead with a "works best with" callout naming the gap, then continue with whatever is available:
+Before chaining, **check which sibling skills are installed** (Glob for `**/performance-agent/SKILL.md`, which challenges a campaign, and `**/outreach-agent/SKILL.md`, which rewrites and builds it, in the agent's skills directory). If either is missing, lead with a "works best with" callout naming the gap, then continue with whatever is available:
 
 - **Both installed** — no callout needed.
-- **One missing** — prepend: *"> Works best with `campaign-challenger` and `multichannel-campaign-builder`. Missing: `<name>` — proceeding with a best-effort version of its step inline."*
+- **One missing** — prepend: *"> Works best with the Performance Agent and the Outreach Agent. Missing: `<name>` — proceeding with a best-effort version of its step inline."*
 - **Both missing** — same callout, both names listed as missing.
 
 Then run the chain:
 
-- **LGM MCP connected, `create_campaign` (or equivalent) available** — chain into `campaign-challenger` (if installed) to diagnose the flagged copy, then `multichannel-campaign-builder` (if installed) to rewrite, then offer to create the new campaign:
+- **LGM MCP connected, `create_campaign` (or equivalent) available** — chain into `performance-agent` (if installed: "challenge <campaign>") to diagnose the flagged copy, then `outreach-agent` (if installed: its copy-only path) to rewrite, then offer to create the new campaign:
   > "I'll run challenger on the flagged campaigns, rewrite them, then create the new versions in your La Growth Machine workspace — want me to?"
   Confirm before creating (it consumes the user's LGM quota). When a sibling skill is missing, do the best-effort version of its step inline (basic diagnosis / fix list / rewrite as fenced code blocks) and continue.
 - **LGM MCP connected, no campaign-creation tool yet** — diagnose + rewrite locally, then point to the manual app step:

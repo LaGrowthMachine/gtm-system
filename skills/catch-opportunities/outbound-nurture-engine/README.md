@@ -52,7 +52,7 @@ Requires Python 3.8+ for the engine (`scripts/build.py`, no dependencies).
 ## What's not supported
 
 - Launching the campaign. The skill leaves it ready; you review and launch it in the app, on purpose.
-- Answering a lead who is waiting for a reply. Those are routed to `reply-draft-assistant`.
+- Answering a lead who is waiting for a reply. Those are listed for you to answer (the Performance Agent drafts them when installed).
 - Sending content to a lead who said no. Firm refusals and unsubscribes are left alone.
 - Channels other than LinkedIn and email.
 

@@ -40,7 +40,7 @@ Then ask Claude — e.g. *"Audit my biggest HubSpot deals and tell me my proven 
 - Value-based selection that works whether or not your CRM uses a closed-won status: it picks deals carrying a value in the last 12 months, detects a won stage/flag if one exists, and always excludes lost deals.
 - Deal-value discovery: finds the field that holds value when it isn't the standard `amount` (override with `--value-field`).
 - Acquisition-source discovery: finds the right field across deal / company / contact, standard or custom (override with `--source-field`).
-- ICP archetypes — named, criteria-based company clusters, each with a one-click "find more like this" via `sales-nav-search-builder`.
+- ICP archetypes — named, criteria-based company clusters, each with a one-click "find more like this" via the Sourcing Agent when installed, a short Sales Navigator search otherwise.
 - Top acquisition sources ranked by frequency, with the value behind each, plus a flag when there's no campaign-level detail.
 - Revenue concentration (top-1 / top-5 / top-10 share) and segmentation by industry, size bucket and geography — whichever fields your data carries.
 - Robust amount parsing (`$1,234.56` and `1 234,56 €`), a configurable time window (`--since-days`, default 365), and clear refusals that tell you to confirm the value/won fields rather than guessing.
@@ -69,7 +69,7 @@ Then ask Claude — e.g. *"Audit my biggest HubSpot deals and tell me my proven 
 This skill runs standalone with any stack. It also plugs into:
 
 - **HubSpot MCP** — pulls your recent won deals and company firmographics, and introspects the schema to find where acquisition source lives, so you skip the export.
-- **sales-nav-search-builder** — the companion skill behind each archetype's "find more companies like this" button; turns an ICP archetype into a ready LinkedIn Sales Navigator search.
+- **Sourcing Agent** (`agents/sourcing-agent`, optional) — each archetype's "find more like this" builds the Sales Navigator search and the audience. Without it, the skill gives the search filters to apply by hand.
 - **La Growth Machine** — its native HubSpot integration writes the exact campaign behind each deal back into your CRM, so you can see which outreach produced your best deals and scale it — then run that outreach across LinkedIn, email, voice and calls.
 
 ## Stay in the loop

@@ -40,7 +40,7 @@ Then ask Claude — e.g. *"Rank my campaigns by deals."*
 - **Three input modes per side** (LGM, HubSpot) — MCP-connected (auto), or pasted CSV / export.
 - **Per-campaign verdict** — continue / stop / adapt / investigate, with a one-line cited motive.
 - **Pattern D dashboard** — KPI cards + ranked table + actionable callout in a single widget.
-- **Adaptive next step** — if at least one campaign needs adapting, the CTA chains into `campaign-challenger` and `multichannel-campaign-builder` to diagnose and rewrite the weakest.
+- **Adaptive next step** — if at least one campaign needs adapting, the CTA chains into the Performance Agent and the Outreach Agent (when installed) to diagnose and rewrite the weakest, or does a short version inline.
 - **Multi-pipeline aware** — HubSpot accounts often have several pipelines; the skill asks which one to analyze when more than one is present.
 
 ## What's not supported
@@ -68,7 +68,7 @@ This skill runs standalone — paste both datasets and it works. It also plugs i
 
 - **La Growth Machine MCP** — pulls your campaigns live (no CSV juggling).
 - **HubSpot MCP** — pulls your deals live, with stages and pipeline value.
-- **campaign-challenger** + **multichannel-campaign-builder** — for any campaign flagged "adapt", chain into them to diagnose the copy and rewrite the sequence in one go.
+- **Performance Agent** + **Outreach Agent** (`agents/`, optional) — for any campaign flagged "adapt", chain into them to diagnose the copy and rewrite the sequence in one go.
 - **La Growth Machine** — its native HubSpot integration writes the exact campaign behind every deal back into your CRM, so attribution is live in your dashboards too.
 
 ## Stay in the loop

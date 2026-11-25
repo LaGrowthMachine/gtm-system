@@ -1,0 +1,17 @@
+{
+  "brand": "Acme Projects",
+  "brand_short": "Acme",
+  "currency": "$",
+  "plan_names": ["Starter", "Team", "Business"],
+  "banned_phrases": ["all-in-one", "autopilot", "magic", "replace your team"],
+  "watch_phrases": ["automation platform"],
+  "signup_url_prefix": "https://app.acme.example/signup",
+  "home_url": "https://acme.example/",
+  "allowed_link_prefixes": ["https://acme.example/demo"],
+  "production_host": "acme.example",
+  "lead_endpoint": "",
+  "page_type": "ads",
+  "max_faq": 4,
+  "rules_off": [],
+  "severity": {"comma-and-or": "WARNING"}
+}
