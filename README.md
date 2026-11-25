@@ -21,14 +21,14 @@ Each agent is one skill that runs a whole job, with the skills it needs inside i
 get the job done end to end. They work in Claude (claude.ai, the desktop app, Cowork), Claude Code, Cursor, Codex and
 any agent that reads a `SKILL.md`. On the first run, each agent asks what you sell and to whom (`context/offer.md`).
 
-| Agent | What it does | Replaces the skills |
-|---|---|---|
-| [Outreach Agent](agents/outreach-agent/SKILL.md) | Takes your leads from any source (an audience, a Sales Navigator search, a post's engagers, an event, a CSV or Clay list) and your offer, keeps the ones that fit, picks LinkedIn, email or both, writes a message for each lead and builds the campaign as a draft in La Growth Machine. You launch. | `post-to-campaign`, `multichannel-campaign-builder` |
-| [Sourcing Agent](agents/sourcing-agent/SKILL.md) | Finds the right people from a search, a post, a list or the yeses of a past campaign, reads every profile and keeps the matches with a reason, in an audience ready for your next campaign. Contacts nobody. | `sales-nav-search-builder`, `audience-icp-filter` |
-| [Performance Agent](agents/performance-agent/SKILL.md) | Every Monday: your campaigns on target, to watch or to fix, the replies to answer first, the threads to decide, and the first fix with the weak step already rewritten. | `weekly-performance-advisor`, `campaign-challenger`, `reply-draft-assistant`, `objection-analyzer` |
-| [Analysis Agent](agents/analysis-agent/SKILL.md) | Answers any question on your full outreach history with your numbers and one next step. Read-only. Needs the La Growth Machine Ultimate plan or a trial. | |
-| [Hiring Signal Agent](agents/hiring-signal-agent/SKILL.md) | Finds the companies hiring for the roles you watch, the person who owns the hire, and writes each message from the job post. Uses Apify for the job posts. | |
-| [Landing Page Builder](agents/landing-page-builder/SKILL.md) | Builds the message, the narrative arc, the structure and the copy of a landing page, then an HTML draft for your designer or site builder. | |
+| Agent | What it does |
+|---|---|
+| [Outreach Agent](agents/outreach-agent/SKILL.md) | Takes your leads from any source (an audience, a Sales Navigator search, a post's engagers, an event, a CSV or Clay list) and your offer, keeps the ones that fit, picks LinkedIn, email or both, writes a message for each lead and builds the campaign as a draft in La Growth Machine. You launch. |
+| [Sourcing Agent](agents/sourcing-agent/SKILL.md) | Finds the right people from a search, a post, a list or the yeses of a past campaign, reads every profile and keeps the matches with a reason, in an audience ready for your next campaign. Contacts nobody. |
+| [Performance Agent](agents/performance-agent/SKILL.md) | Every Monday: your campaigns on target, to watch or to fix, the replies to answer first, the threads to decide, and the first fix with the weak step already rewritten. |
+| [Analysis Agent](agents/analysis-agent/SKILL.md) | Answers any question on your full outreach history with your numbers and one next step. Read-only. Needs the La Growth Machine Ultimate plan or a trial. |
+| [Hiring Signal Agent](agents/hiring-signal-agent/SKILL.md) | Finds the companies hiring for the roles you watch, the person who owns the hire, and writes each message from the job post. Uses Apify for the job posts. |
+| [Landing Page Builder](agents/landing-page-builder/SKILL.md) | Builds the message, the narrative arc, the structure and the copy of a landing page, then an HTML draft for your designer or site builder. |
 
 ## Catalog
 
