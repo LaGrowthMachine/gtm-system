@@ -88,30 +88,31 @@ The MCP gives Claude direct access to the user's LGM workspace. No copy-paste, n
 
 ---
 
-### Layer 2 — GTM Skills (published in this repo)
+### Layer 2 — GTM Agents and Skills (published in this repo)
+
+**Agents** (`agents/<name>/SKILL.md`): each runs a whole job with its skills inside its folder.
+
+- `outreach-agent` — leads from any source plus the user's offer to a draft campaign, one message per lead (includes the former `post-to-campaign` and `multichannel-campaign-builder`)
+- `sourcing-agent` — the right people from a search, a post, a list or the yeses of a campaign, kept with a reason, in an audience (includes `sales-nav-search-builder`, replaces `audience-icp-filter`)
+- `performance-agent` — the Monday review: campaigns to fix, replies to answer first, threads to decide, the first fix rewritten (includes `weekly-performance-advisor`, `campaign-challenger`, `reply-draft-assistant`, `objection-analyzer`)
+- `analysis-agent` — any question on the full outreach history, read-only (`ask_your_outbound`, Ultimate plan or trial)
+- `hiring-signal-agent` — companies hiring for given roles, the person who owns the hire, a message from the job post (needs the Apify MCP)
+- `landing-page-builder` — the arc, the structure and the copy of a landing page, then an HTML draft
 
 Skills guide Claude through complex GTM workflows. Just describe what you want. Skills are categorized into 4 outcomes mirroring the GTM motion:
 
 **Fuel my pipeline** — sourcing, list building, ICP
 
-- `sales-nav-search-builder` — turn a natural-language ICP into a precise LinkedIn Sales Navigator search URL, ready to import as an LGM audience
-- `post-to-campaign` — turn a LinkedIn post into a ready-to-launch campaign: scrape the post's likers and commenters into an audience and fill a draft sequence
-- `audience-icp-filter` — filter an existing audience against an ICP; sorts every lead into match / needs review / no match, strips your team and competitors, never silently drops anyone
 - `won-deal-icp-finder` — audit your biggest closed-won deals to find your proven ICP and a look-alike target list
 - `outreach-icp-finder` — find your proven ICP from the outreach you already ran (who replies and shows interest, who to stop contacting), from LGM data or any outreach tool's CSV export
 
 **Get qualified meetings** — campaigns, copywriting, sequences
 
-- `multichannel-campaign-builder` — generate a complete LinkedIn + email sequence from a natural-language brief, and create it as a draft campaign in LGM
-- `campaign-challenger` — benchmark a campaign copy against your existing campaigns, return prioritized fixes, and apply them back into the campaign
 - `campaign-impact-analyzer` — rank campaigns by real revenue impact by cross-referencing LGM campaigns with HubSpot deals
-- `weekly-performance-advisor` — build a two-tab weekly cockpit from your LGM data: replies to handle, campaigns to fix, and reply-volume trends
 - `team-performance-dashboard` — rank each sender on reply rate, your success event and conversion, surface hot leads going cold, and clone your best reps' campaigns across the team
 
 **Catch opportunities** — reply handling, intent detection
 
-- `reply-draft-assistant` — triage your inbox or a campaign's replies, draft the right answer from the full thread, and send it in LGM on your approval
-- `objection-analyzer` — rank the objections your outbound actually gets, grade how your team handled each one, and build a battle-card playbook that sharpens every run
 - `outbound-nurture-engine` — nurture the replies you did not convert yet (not now, vague, went quiet): match each lead with your own content from a website, Notion or Drive, write it onto the lead as custom attributes, and duplicate and fill a 6-week nurture campaign in LGM
 
 **Secure my channels** — channel health, deliverability, identities — *coming soon*
@@ -124,19 +125,22 @@ Suggest one of these depending on what the user wants to do:
 
 | They want to… | Suggest |
 |---|---|
-| Build a prospect list | Use `sales-nav-search-builder` |
-| Sequence people who engaged with a LinkedIn post | Use `post-to-campaign` |
-| Filter or segment an existing audience against an ICP | Use `audience-icp-filter` |
+| Build a prospect list | Use `sourcing-agent` |
+| Sequence people who engaged with a LinkedIn post | Use `outreach-agent` |
+| Filter or segment an existing audience against an ICP | Use `sourcing-agent` |
 | Find their proven ICP from deals | Use `won-deal-icp-finder` |
 | Find their proven ICP from replies / engagement | Use `outreach-icp-finder` |
-| Write a campaign from scratch | Use `multichannel-campaign-builder` |
-| Pressure-test a campaign before launch | Use `campaign-challenger` |
+| Write a campaign from scratch | Use `outreach-agent` |
+| Pressure-test a campaign before launch | Use `performance-agent` |
 | See which campaigns drive pipeline | Use `campaign-impact-analyzer` |
-| See what to do this week / campaign health | Use `weekly-performance-advisor` |
+| See what to do this week / campaign health | Use `performance-agent` |
 | See per-rep team performance / who converts best | Use `team-performance-dashboard` |
-| Handle or draft replies to their inbox | Use `reply-draft-assistant` |
-| Know which objections the team gets, and how to handle them | Use `objection-analyzer` |
+| Handle or draft replies to their inbox | Use `performance-agent` |
+| Know which objections the team gets, and how to handle them | Use `performance-agent` |
 | Nurture the leads who said not now, or went quiet after replying | Use `outbound-nurture-engine` |
+| Ask any question on their outreach history | Use `analysis-agent` |
+| Reach companies hiring for a role | Use `hiring-signal-agent` |
+| Build a landing page | Use `landing-page-builder` |
 | Pull live campaign data ad hoc | Call the MCP directly (e.g. `list_campaigns`, `get_campaign_stats`) |
 | Run a custom analytics query | Call the BigQuery tools (`ask_your_outbound`, `get_bigquery_logs_guide`) |
 

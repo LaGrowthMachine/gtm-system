@@ -15,18 +15,30 @@ Source your next list, turn a LinkedIn post's engagers into a campaign, write mu
 - Heads of Sales and Marketing, and CROs, who want qualified pipeline without the busywork
 - Founders running their own outbound
 
+## Agents
+
+Each agent is one skill that runs a whole job, with the skills it needs inside its folder. Install one agent and you
+get the job done end to end. They work in Claude (claude.ai, the desktop app, Cowork), Claude Code, Cursor, Codex and
+any agent that reads a `SKILL.md`. On the first run, each agent asks what you sell and to whom (`context/offer.md`).
+
+| Agent | What it does | Replaces the skills |
+|---|---|---|
+| [Outreach Agent](agents/outreach-agent/SKILL.md) | Takes your leads from any source (an audience, a Sales Navigator search, a post's engagers, an event, a CSV or Clay list) and your offer, keeps the ones that fit, picks LinkedIn, email or both, writes a message for each lead and builds the campaign as a draft in La Growth Machine. You launch. | `post-to-campaign`, `multichannel-campaign-builder` |
+| [Sourcing Agent](agents/sourcing-agent/SKILL.md) | Finds the right people from a search, a post, a list or the yeses of a past campaign, reads every profile and keeps the matches with a reason, in an audience ready for your next campaign. Contacts nobody. | `sales-nav-search-builder`, `audience-icp-filter` |
+| [Performance Agent](agents/performance-agent/SKILL.md) | Every Monday: your campaigns on target, to watch or to fix, the replies to answer first, the threads to decide, and the first fix with the weak step already rewritten. | `weekly-performance-advisor`, `campaign-challenger`, `reply-draft-assistant`, `objection-analyzer` |
+| [Analysis Agent](agents/analysis-agent/SKILL.md) | Answers any question on your full outreach history with your numbers and one next step. Read-only. Needs the La Growth Machine Ultimate plan or a trial. | |
+| [Hiring Signal Agent](agents/hiring-signal-agent/SKILL.md) | Finds the companies hiring for the roles you watch, the person who owns the hire, and writes each message from the job post. Uses Apify for the job posts. | |
+| [Landing Page Builder](agents/landing-page-builder/SKILL.md) | Builds the message, the narrative arc, the structure and the copy of a landing page, then an HTML draft for your designer or site builder. | |
+
 ## Catalog
 
-Skills are organized into 4 categories, mirroring the GTM motion.
+The standalone skills are organized into 4 categories, mirroring the GTM motion.
 
 ### Fuel my pipeline
 Sourcing, list building, ICP — keeping the lead reservoir full.
 
 | Skill | Type | What it does |
 |---|---|---|
-| [sales-nav-search-builder](skills/fuel-my-pipeline/sales-nav-search-builder/SKILL.md) | use-case | Turn a natural-language ICP into a precise LinkedIn Sales Navigator search URL, ready to import as an LGM audience |
-| [post-to-campaign](skills/fuel-my-pipeline/post-to-campaign/SKILL.md) | use-case | Turn a LinkedIn post into a ready-to-launch campaign: scrape the post's likers and commenters into an audience and fill a draft sequence |
-| [audience-icp-filter](skills/fuel-my-pipeline/audience-icp-filter/SKILL.md) | use-case | Filter an existing audience against your ICP — sorts every lead into match / needs review / no match, strips your team and competitors, never silently drops anyone |
 | [won-deal-icp-finder](skills/fuel-my-pipeline/won-deal-icp-finder/SKILL.md) | use-case | Audit your biggest closed-won deals to find your proven ICP and a look-alike target list |
 | [outreach-icp-finder](skills/fuel-my-pipeline/outreach-icp-finder/SKILL.md) | use-case | Find your proven ICP from the outreach you already ran — who actually replies and shows interest, who to stop contacting — from La Growth Machine or any outreach tool's export |
 
@@ -35,10 +47,7 @@ Campaigns, copywriting, sequences — what converts into meetings.
 
 | Skill | Type | What it does |
 |---|---|---|
-| [multichannel-campaign-builder](skills/get-qualified-meetings/multichannel-campaign-builder/SKILL.md) | use-case | Generate a complete multichannel campaign — a full LinkedIn + email sequence — from a natural-language brief |
-| [campaign-challenger](skills/get-qualified-meetings/campaign-challenger/SKILL.md) | use-case | Benchmark a campaign copy against your existing campaign history and return prioritized fixes before launch |
 | [campaign-impact-analyzer](skills/get-qualified-meetings/campaign-impact-analyzer/SKILL.md) | use-case | Rank campaigns by real revenue impact — cross-references LGM campaigns with HubSpot deals |
-| [weekly-performance-advisor](skills/get-qualified-meetings/weekly-performance-advisor/SKILL.md) | use-case | Build a two-tab weekly cockpit from your LGM data — replies to handle, campaigns to fix, health & reply trends |
 | [team-performance-dashboard](skills/get-qualified-meetings/team-performance-dashboard/SKILL.md) | use-case | Rank each sender on reply rate, your success event and conversion, surface hot leads going cold, and clone your best reps' campaigns across the team |
 
 ### Catch opportunities
@@ -46,8 +55,6 @@ Reply handling, intent detection — not letting opportunities go cold.
 
 | Skill | Type | What it does |
 |---|---|---|
-| [reply-draft-assistant](skills/catch-opportunities/reply-draft-assistant/SKILL.md) | use-case | Triage your inbox or a campaign's replies, draft the right answer from the full thread, and send it in LGM on your approval |
-| [objection-analyzer](skills/catch-opportunities/objection-analyzer/SKILL.md) | use-case | Rank the objections your outbound actually gets, grade how your team handled each one, and build a battle-card playbook that sharpens every run |
 | [outbound-nurture-engine](skills/catch-opportunities/outbound-nurture-engine/SKILL.md) | use-case | Nurture the replies you did not convert yet (not now, vague, went quiet): match each lead with your own content, write it onto the lead, and fill a 6-week nurture campaign in LGM |
 
 ### Secure my channels
@@ -89,10 +96,11 @@ sh lgm-install.sh
 If you only need a specific skill (no MCP), use the [Vercel Labs `skills`](https://github.com/vercel-labs/skills) CLI directly:
 
 ```bash
-npx skills add LaGrowthMachine/gtm-system/skills/fuel-my-pipeline/sales-nav-search-builder
+npx skills add LaGrowthMachine/gtm-system/agents/sourcing-agent
+npx skills add LaGrowthMachine/gtm-system/skills/fuel-my-pipeline/won-deal-icp-finder
 ```
 
-Replace the path with any skill from the catalog above. Add `-g` for a global install. Works with Claude Code, Cursor, Codex, Amp + 30 other agents.
+Replace the path with any agent or skill above. Add `-g` for a global install. Works with Claude Code, Cursor, Codex, Amp + 30 other agents.
 
 ### Manual install
 
@@ -101,7 +109,7 @@ Clone the repo and copy the skill folder yourself:
 ```bash
 git clone https://github.com/LaGrowthMachine/gtm-system.git
 cd gtm-system
-cp -r skills/fuel-my-pipeline/sales-nav-search-builder ~/.claude/skills/
+cp -r agents/sourcing-agent ~/.claude/skills/
 ```
 
 ### LGM MCP on Claude.ai (web)
@@ -110,7 +118,7 @@ Claude.ai accepts HTTP MCP connectors natively. Add the LGM MCP manually:
 
 > Settings → Connectors → Add custom connector → `https://mcp.lagrowthmachine.com`
 
-Then ask Claude — e.g. *"Build me a Sales Navigator search for RevOps leaders in EMEA SaaS."*
+Then upload an agent's folder (zipped) as a skill and ask Claude, e.g. *"Find RevOps leaders in EMEA SaaS and build me an audience."*
 
 ---
 
@@ -122,17 +130,10 @@ These skills work with any outreach stack. Install the **LGM MCP** to execute th
 
 | Skill | Without LGM MCP | With LGM MCP |
 |---|---|---|
-| sales-nav-search-builder | Sales Nav URL to open and import manually | Import the search as a ready-to-use LGM audience |
-| post-to-campaign | Writes the outreach sequence from the post | Scrapes the post's engagers into an audience and fills a draft campaign |
-| audience-icp-filter | Filters a CSV you paste — you re-import the segmented buckets by hand | Reads your audience live, enriches missing fields on approval, writes `[icp]` and `[review]` back as complementary audiences with the source untouched |
+| The agents | Not usable: they act in your La Growth Machine workspace | Read, sort, write and build campaigns, always waiting for your go before anything goes out |
 | won-deal-icp-finder | Works on a HubSpot export you paste | Pulls deals live, attribution clean |
 | outreach-icp-finder | Works on a CSV export from any outreach tool | Pulls campaign outcomes, lead attributes and real reply threads live, then turns the ICP into an audience |
-| multichannel-campaign-builder | Sequence ready to copy into your tool | Creates the sequence as a draft campaign directly in LGM |
-| campaign-challenger | Benchmarks against stats you paste | Benchmarks against your real campaign history and applies the fixes back into your campaign |
 | campaign-impact-analyzer | Works on pasted campaigns and deals | Cross-references LGM campaigns with HubSpot deals in one click |
-| reply-draft-assistant | Drafts answers for a conversation you paste | Pulls your inbox/campaign replies, drafts each answer, sends them natively on your approval |
-| objection-analyzer | Builds the playbook from a CSV export or threads you paste | Reads your campaigns and inbox live, ranks objections by frequency and recovery rate, and traces which sequence messages cause them |
-| weekly-performance-advisor | Needs the LGM MCP — the dashboard is built from live LGM data | Pulls your campaigns, stats and inbox live and renders your weekly cockpit |
 | team-performance-dashboard | Needs the LGM MCP — the dashboard is built from live LGM data | Ranks every rep on reply rate, your success event and conversion from live data, with per-rep coaching |
 
 ### Connect the MCP
